@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>nl.bos</groupId>
+    <artifactId>DQL Tester 16.4</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.0</version>
+        </dependency>
+        <!-- DFC -->
+        <dependency>
+            <groupId>com.documentum</groupId>
+            <artifactId>dfc</artifactId>
+            <version>16.4.0000.0185</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>tools</artifactId>
+            <version>1.8.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.13</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rsa</groupId>
+            <artifactId>certj</artifactId>
+            <version>6.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rsa</groupId>
+            <artifactId>cryptoj</artifactId>
+            <version>6.2.2</version>
+        </dependency>
+    </dependencies>
+</project>

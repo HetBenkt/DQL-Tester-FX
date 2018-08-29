@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity" prefHeight="450.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8.0.121"
+      fx:controller="nl.bos.controllers.LoginPane">
+    <children>
+        <VBox spacing="5.0">
+            <children>
+                <Label text="Repository"/>
+                <ChoiceBox fx:id="chbRepository" maxWidth="1.7976931348623157E308"/>
+                <Label text="User Name"/>
+                <TextField fx:id="txtUsername" maxWidth="1.7976931348623157E308"/>
+                <Label text="Password"/>
+                <PasswordField fx:id="txtPassword" maxHeight="1.7976931348623157E308"/>
+                <Label text="Domain"/>
+                <TextField fx:id="txtDomain" maxHeight="1.7976931348623157E308"/>
+                <CheckBox fx:id="chkUseWindowsLogin" mnemonicParsing="false" text="Use Windows Login"/>
+                <CheckBox fx:id="chkSaveLoginData" mnemonicParsing="false" text="Save Login Data"/>
+                <HBox spacing="5.0">
+                    <children>
+                        <Button fx:id="btnConnect" defaultButton="true" disable="true" mnemonicParsing="false"
+                                onAction="#handleConnect" text="Connect"/>
+                        <Button fx:id="btmCancel" cancelButton="true" mnemonicParsing="false" onAction="#handleCancel"
+                                text="Cancel"/>
+                    </children>
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+            <VBox.margin>
+                <Insets bottom="20.0"/>
+            </VBox.margin>
+        </VBox>
+        <Label text="Info">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+        <HBox spacing="5.0">
+            <children>
+                <Button fx:id="btnServerMap" mnemonicParsing="false" onAction="#handleServerMap" text="Server Map"/>
+                <Button fx:id="btnConnectionBrokerMap" mnemonicParsing="false" onAction="#handleConnectionBrokerMap"
+                        text="Connection Broker Map"/>
+            </children>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+            <VBox.margin>
+                <Insets bottom="20.0"/>
+            </VBox.margin>
+        </HBox>
+        <HBox spacing="5.0">
+            <children>
+                <Label fx:id="lblServer" text="&lt;server&gt;"/>
+                <Label fx:id="lblVersion" text="&lt;version&gt;"/>
+            </children>
+        </HBox>
+    </children>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
+</VBox>
