@@ -1,10 +1,13 @@
 package nl.bos.controllers;
 
 import com.documentum.fc.client.IDfDocbaseMap;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import lombok.extern.java.Log;
 import nl.bos.Repository;
 
@@ -18,6 +21,14 @@ public class LoginPane implements Initializable {
     private Label lblVersion;
     @FXML
     private Label lblServer;
+    @FXML
+    private ChoiceBox chbRepository;
+    @FXML
+    private Button btnConnect;
+    @FXML
+    private TextField txtUsername;
+    @FXML
+    private PasswordField txtPassword;
 
     @FXML
     private void handleConnect(ActionEvent actionEvent) {
@@ -52,9 +63,20 @@ public class LoginPane implements Initializable {
             log.info(MessageFormat.format("Total number of Repostories: {0}", repositoryMap.getDocbaseCount()));
             for (int i = 0; i < repositoryMap.getDocbaseCount(); i++) {
                 log.info(MessageFormat.format("Repository {0}", (i + 1) + ": " + repositoryMap.getDocbaseName(i)));
+                ObservableList repositories = FXCollections.observableArrayList();
+                repositories.add(repositoryMap.getDocbaseName(i));
+                chbRepository.setItems(repositories);
+                chbRepository.setValue(chbRepository.getItems().get(0));
             }
         } catch (Exception e) {
             log.info(e.getMessage());
         }
+    }
+
+    public void handleConnectButton(KeyEvent keyEvent) {
+        if (txtUsername.getText().length() > 0 && txtPassword.getText().length() > 0)
+            btnConnect.setDisable(false);
+        else
+            btnConnect.setDisable(true);
     }
 }

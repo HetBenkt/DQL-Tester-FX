@@ -12,9 +12,10 @@
                 <Label text="Repository"/>
                 <ChoiceBox fx:id="chbRepository" maxWidth="1.7976931348623157E308"/>
                 <Label text="User Name"/>
-                <TextField fx:id="txtUsername" maxWidth="1.7976931348623157E308"/>
+                <TextField fx:id="txtUsername" maxWidth="1.7976931348623157E308" onKeyReleased="#handleConnectButton"/>
                 <Label text="Password"/>
-                <PasswordField fx:id="txtPassword" maxHeight="1.7976931348623157E308"/>
+                <PasswordField fx:id="txtPassword" maxHeight="1.7976931348623157E308"
+                               onKeyReleased="#handleConnectButton"/>
                 <Label text="Domain"/>
                 <TextField fx:id="txtDomain" maxHeight="1.7976931348623157E308"/>
                 <CheckBox fx:id="chkUseWindowsLogin" mnemonicParsing="false" text="Use Windows Login"/>
