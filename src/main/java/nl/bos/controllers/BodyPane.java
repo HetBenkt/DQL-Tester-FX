@@ -1,40 +1,27 @@
 package nl.bos.controllers;
 
-import com.documentum.fc.common.DfException;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
+import javafx.fxml.Initializable;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import lombok.Getter;
 import lombok.extern.java.Log;
-import nl.bos.Repository;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
 @Log
-public class BodyPane {
-    @Getter
-    private static Stage loginStage;
-
+public class BodyPane implements Initializable {
     @FXML
-    private void handleConnect(ActionEvent actionEvent) throws IOException {
-        log.info(String.valueOf(actionEvent.getSource()));
+    private VBox vboxBody;
 
-        loginStage = new Stage();
-        loginStage.initModality(Modality.APPLICATION_MODAL);
-        loginStage.setTitle("Documentum Login");
-        VBox loginPane = FXMLLoader.load(getClass().getResource("/nl/bos/views/LoginPane.fxml"));
-        loginStage.setScene(new Scene(loginPane));
-        loginStage.showAndWait();
-    }
-
-    @FXML
-    private void handleExit(ActionEvent actionEvent) throws DfException {
-        log.info(String.valueOf(actionEvent.getSource()));
-        Repository.disconnect();
-        System.exit(0);
+    public void initialize(URL location, ResourceBundle resources) {
+        try {
+            BorderPane inputPane = FXMLLoader.load(getClass().getResource("/nl/bos/views/InputPane.fxml"));
+            vboxBody.getChildren().add(inputPane);
+        } catch (IOException e) {
+            log.info(e.getMessage());
+        }
     }
 }
