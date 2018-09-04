@@ -7,8 +7,6 @@ import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfLoginInfo;
 import lombok.extern.java.Log;
 
-import java.text.MessageFormat;
-
 import static nl.bos.ICredentials.*;
 
 @Log
@@ -34,28 +32,34 @@ public class Repository {
     }
 
     public static void disconnect() throws DfException {
-        if (repository.session != null && repository.session.isConnected()) {
+        if (repository != null && repository.session != null && repository.session.isConnected()) {
             repository.session.disconnect();
         }
+    }
+
+    public static IDfDocbaseMap obtainRepositoryMap() throws DfException {
+        IDfClientX clientx = new DfClientX();
+        IDfClient client = clientx.getLocalClient();
+        return client.getDocbaseMap();
+    }
+
+    private IDfSession createSession(String repoName) throws DfException {
+        return this.sMgr.getSession(repoName);
     }
 
     private IDfSessionManager createSessionManager(String repoName, String repoUsername, String repoPasskey, String repoDomain) throws DfException {
         IDfClientX clientx = new DfClientX();
         IDfClient client = clientx.getLocalClient();
 
-        IDfSessionManager sMgr = client.newSessionManager();
+        IDfSessionManager newSessionManager = client.newSessionManager();
 
         IDfLoginInfo loginInfoObj = clientx.getLoginInfo();
         loginInfoObj.setUser(repoUsername);
         loginInfoObj.setPassword(repoPasskey);
         loginInfoObj.setDomain(repoDomain);
 
-        sMgr.setIdentity(repoName, loginInfoObj);
-        return sMgr;
-    }
-
-    private IDfSession createSession(String repoName) throws DfException {
-        return this.sMgr.getSession(repoName);
+        newSessionManager.setIdentity(repoName, loginInfoObj);
+        return newSessionManager;
     }
 
     public IDfCollection query(String query) throws DfException {
@@ -64,7 +68,7 @@ public class Repository {
         q.setDQL(query);
 
         IDfCollection collection = q.execute(repository.session, IDfQuery.DF_READ_QUERY);
-        log.info(MessageFormat.format("Query executed %s", query));
+        log.info(String.format("Query executed %s", query));
 
         return collection;
     }

@@ -1,6 +1,5 @@
 package nl.bos;
 
-import com.documentum.fc.client.IDfCollection;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,12 +17,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Repository repository = Repository.getRepositoryCon();
-        IDfCollection query = repository.query("select * from dm_docbase_config");
-        while (query.next()) {
-            log.info(query.getString("r_object_id"));
-        }
-
         BorderPane rootPane = FXMLLoader.load(getClass().getResource("/nl/bos/views/RootPane.fxml"));
         VBox bodyLayout = FXMLLoader.load(getClass().getResource("/nl/bos/views/BodyPane.fxml"));
 
@@ -32,6 +25,5 @@ public class Main extends Application {
         primaryStage.setTitle("DQL Tester 16.4");
         primaryStage.setScene(new Scene(rootPane));
         primaryStage.show();
-
     }
 }
