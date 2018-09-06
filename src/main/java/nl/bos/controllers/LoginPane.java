@@ -31,10 +31,15 @@ public class LoginPane implements Initializable {
     private TextField txtUsername;
     @FXML
     private PasswordField txtPassword;
+    @FXML
+    private TextField txtDomain;
+    private String hostName;
 
     @FXML
     private void handleConnect(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
+        Repository.setCredentials(chbRepository.getValue().toString(), txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
+        InputPane.getLoginStage().close();
     }
 
     @FXML
@@ -58,7 +63,7 @@ public class LoginPane implements Initializable {
         try {
             IDfDocbaseMap repositoryMap = Repository.obtainRepositoryMap();
             //noinspection deprecation
-            String hostName = repositoryMap.getHostName();
+            hostName = repositoryMap.getHostName();
             lblServer.setText(hostName);
 
             log.info(MessageFormat.format("Repositories for Connection Broker: {0}", hostName));

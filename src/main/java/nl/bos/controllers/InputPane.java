@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -18,6 +19,18 @@ import java.io.IOException;
 public class InputPane {
     @Getter
     private static Stage loginStage;
+    @FXML
+    private Label lblStatus;
+    @FXML
+    private Label lblUsernameOS;
+    @FXML
+    private Label lblUsernameDC;
+    @FXML
+    private Label lblDomainOS;
+    @FXML
+    private Label lblPrivileges;
+    @FXML
+    private Label lblServerVersion;
 
     @FXML
     private void handleConnect(ActionEvent actionEvent) throws IOException {
@@ -37,5 +50,4 @@ public class InputPane {
         Repository.disconnect();
         System.exit(0);
     }
-
 }

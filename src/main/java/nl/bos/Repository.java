@@ -7,18 +7,20 @@ import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfLoginInfo;
 import lombok.extern.java.Log;
 
-import static nl.bos.ICredentials.*;
-
 @Log
 public class Repository {
     private static Repository repository;
     private IDfSessionManager sMgr;
     private IDfSession session;
+    private static String repositoryName;
+    private static String userName;
+    private static String passkey;
+    private static String domain;
 
     private Repository() {
         try {
-            this.sMgr = createSessionManager(REPO_NAME, REPO_USERNAME, REPO_PASSKEY, null);
-            this.session = createSession(REPO_NAME);
+            this.sMgr = createSessionManager(repositoryName, userName, passkey, domain);
+            this.session = createSession(repositoryName);
         } catch (DfException e) {
             log.info(e.getMessage());
         }
@@ -41,6 +43,13 @@ public class Repository {
         IDfClientX clientx = new DfClientX();
         IDfClient client = clientx.getLocalClient();
         return client.getDocbaseMap();
+    }
+
+    public static void setCredentials(String repositoryName, String userName, String passkey, String domain) {
+        Repository.repositoryName = repositoryName;
+        Repository.userName = userName;
+        Repository.passkey = passkey;
+        Repository.domain = domain;
     }
 
     private IDfSession createSession(String repoName) throws DfException {
