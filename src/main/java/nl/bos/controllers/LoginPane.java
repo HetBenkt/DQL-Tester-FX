@@ -11,8 +11,10 @@ import javafx.scene.input.KeyEvent;
 import lombok.extern.java.Log;
 import nl.bos.Repository;
 
+import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 @Log
@@ -52,7 +54,7 @@ public class LoginPane implements Initializable {
     }
 
     public void initialize(URL location, ResourceBundle resources) {
-        lblVersion.setText("1.0");
+        lblVersion.setText(getProjectVersion());
         try {
             IDfDocbaseMap repositoryMap = Repository.obtainRepositoryMap();
             //noinspection deprecation
@@ -71,6 +73,17 @@ public class LoginPane implements Initializable {
         } catch (Exception e) {
             log.info(e.getMessage());
         }
+    }
+
+    private String getProjectVersion() {
+        final Properties properties = new Properties();
+        try {
+            properties.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
+            return properties.getProperty("version");
+        } catch (IOException e) {
+            log.info(e.getMessage());
+        }
+        return "";
     }
 
     public void handleConnectButton(KeyEvent keyEvent) {
