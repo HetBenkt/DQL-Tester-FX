@@ -8,6 +8,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import lombok.extern.java.Log;
 import nl.bos.Repository;
 
@@ -39,13 +41,15 @@ public class LoginPane implements Initializable {
     private void handleConnect(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
         Repository.setCredentials(chbRepository.getValue().toString(), txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
-        InputPane.getLoginStage().close();
+        Stage loginStage = InputPane.getLoginStage();
+        loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
     @FXML
     private void handleCancel(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
-        InputPane.getLoginStage().close();
+        Stage loginStage = InputPane.getLoginStage();
+        loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
     @FXML
