@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import lombok.Getter;
 import lombok.extern.java.Log;
 import nl.bos.Repository;
 
@@ -26,15 +27,18 @@ public class LoginPane implements Initializable {
     @FXML
     private Label lblServer;
     @FXML
+    @Getter
     private ChoiceBox chbRepository;
     @FXML
     private Button btnConnect;
     @FXML
+    @Getter
     private TextField txtUsername;
     @FXML
     private PasswordField txtPassword;
     @FXML
     private TextField txtDomain;
+    @Getter
     private String hostName;
 
     @FXML

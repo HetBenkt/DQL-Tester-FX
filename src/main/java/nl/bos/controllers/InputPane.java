@@ -33,6 +33,7 @@ public class InputPane implements EventHandler<WindowEvent> {
     private Label lblPrivileges;
     @FXML
     private Label lblServerVersion;
+    private FXMLLoader fxmlLoader;
 
     @FXML
     private void handleConnect(ActionEvent actionEvent) throws IOException {
@@ -41,7 +42,8 @@ public class InputPane implements EventHandler<WindowEvent> {
         loginStage = new Stage();
         loginStage.initModality(Modality.APPLICATION_MODAL);
         loginStage.setTitle("Documentum Login");
-        VBox loginPane = FXMLLoader.load(getClass().getResource("/nl/bos/views/LoginPane.fxml"));
+        fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/LoginPane.fxml"));
+        VBox loginPane = fxmlLoader.load();
         loginStage.setScene(new Scene(loginPane));
         loginStage.setOnCloseRequest(this);
         loginStage.showAndWait();
@@ -56,5 +58,12 @@ public class InputPane implements EventHandler<WindowEvent> {
 
     public void handle(WindowEvent event) {
         log.info(String.valueOf(event.getSource()));
+        LoginPane loginPaneController = fxmlLoader.getController();
+        lblStatus.setText(String.valueOf(loginPaneController.getChbRepository().getValue()));
+        lblUsernameOS.setText("dummy");
+        lblUsernameDC.setText(loginPaneController.getTxtUsername().getText());
+        lblDomainOS.setText(loginPaneController.getHostName());
+        lblPrivileges.setText("dummy");
+        lblServerVersion.setText("dummy");
     }
 }
