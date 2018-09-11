@@ -1,5 +1,7 @@
 package nl.bos.controllers;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -16,7 +18,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 @Log
-public class BodyPane implements Initializable {
+public class BodyPane implements Initializable, ChangeListener {
     @FXML
     private VBox vboxBody;
     @FXML
@@ -32,8 +34,16 @@ public class BodyPane implements Initializable {
         try {
             BorderPane inputPane = FXMLLoader.load(getClass().getResource("/nl/bos/views/InputPane.fxml"));
             vboxBody.getChildren().add(inputPane);
+
+            cmbHistory.getSelectionModel().selectedIndexProperty().addListener(this);
         } catch (IOException e) {
             log.info(e.getMessage());
         }
+    }
+
+    public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+        String selectedHistoryItem = String.valueOf(cmbHistory.getItems().get((Integer) newValue));
+        log.info(selectedHistoryItem);
+        taStatement.setText(selectedHistoryItem);
     }
 }
