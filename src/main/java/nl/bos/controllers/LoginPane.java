@@ -44,7 +44,9 @@ public class LoginPane implements Initializable {
     @FXML
     private void handleConnect(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
-        Repository.setCredentials(chbRepository.getValue().toString(), txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
+        String selectedRepository = chbRepository.getValue().toString();
+        lblServer.setText(String.format("Connection to '%s'", selectedRepository));
+        Repository.setCredentials(selectedRepository, txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
         Stage loginStage = InputPane.getLoginStage();
         loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }

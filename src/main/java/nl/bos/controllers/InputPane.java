@@ -1,11 +1,13 @@
 package nl.bos.controllers;
 
+import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -13,6 +15,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import lombok.Getter;
 import lombok.extern.java.Log;
+import nl.bos.Main;
 import nl.bos.Repository;
 
 import java.io.IOException;
@@ -33,6 +36,11 @@ public class InputPane implements EventHandler<WindowEvent> {
     private Label lblPrivileges;
     @FXML
     private Label lblServerVersion;
+    @FXML
+    private Button btnFlushCache;
+    @FXML
+    private Button btnReadQuery;
+
     private FXMLLoader fxmlLoader;
 
     @FXML
@@ -58,12 +66,28 @@ public class InputPane implements EventHandler<WindowEvent> {
 
     public void handle(WindowEvent event) {
         log.info(String.valueOf(event.getSource()));
+
         LoginPane loginPaneController = fxmlLoader.getController();
+
         lblStatus.setText(String.valueOf(loginPaneController.getChbRepository().getValue()));
         lblUsernameOS.setText("dummy");
         lblUsernameDC.setText(loginPaneController.getTxtUsername().getText());
         lblDomainOS.setText(loginPaneController.getHostName());
         lblPrivileges.setText("dummy");
         lblServerVersion.setText("dummy");
+
+        btnReadQuery.setDisable(false);
+        btnFlushCache.setDisable(false);
+    }
+
+    public void handleReadQuery(ActionEvent actionEvent) throws DfException {
+        log.info(String.valueOf(actionEvent.getSource()));
+        BodyPane bodyPaneController = Main.getBodyPaneLoader().getController();
+        String statement = bodyPaneController.getTaStatement().getText();
+        Repository repository = Repository.getRepositoryCon();
+        IDfCollection query = repository.query(statement);
+        while (query.next()) {
+            log.info(query.getString("r_object_id"));
+        }
     }
 }
