@@ -81,7 +81,8 @@ public class InputPane implements EventHandler<WindowEvent> {
         btnFlushCache.setDisable(false);
     }
 
-    public void handleReadQuery(ActionEvent actionEvent) throws DfException {
+    @FXML
+    private void handleReadQuery(ActionEvent actionEvent) throws DfException {
         log.info(String.valueOf(actionEvent.getSource()));
 
         BodyPane bodyPaneController = Main.getBodyPaneLoader().getController();
@@ -107,5 +108,11 @@ public class InputPane implements EventHandler<WindowEvent> {
                 return false;
         }
         return true;
+    }
+
+    @FXML
+    private void handleClearQuery(ActionEvent actionEvent) {
+        BodyPane bodyPaneController = Main.getBodyPaneLoader().getController();
+        bodyPaneController.getTaStatement().clear();
     }
 }
