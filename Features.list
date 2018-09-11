@@ -1,8 +1,8 @@
-todo: Save history queries in a properties file for next time
+todo: Save history queries in a properties file for next time -> check the order and onSelect from combobox shows wrong data!!
 todo: Maximize 50 history queries in combobox
 todo: Create a disconnect button
 todo: Update the status fields and buttons on InputPane after login
 todo: Handle wrong credentials
-todo: Make a quick way to login from DEV-perspective
+todo: Make a quick way to login from DEV-perspective -> Creating Profile Specific Configuration Files With Maven
 todo: Add the serverMap and ConnectionBrokerMap screens
 todo: Exit with 'Are you sure?'
