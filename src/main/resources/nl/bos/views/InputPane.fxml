@@ -15,7 +15,7 @@
                 <Button fx:id="btnFlushCache" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
                         text="Flush Cache"/>
                 <Button fx:id="btnClearQuery" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                        text="Clear Query"/>
+                        onAction="#handleClearQuery" text="Clear Query"/>
             </children>
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
