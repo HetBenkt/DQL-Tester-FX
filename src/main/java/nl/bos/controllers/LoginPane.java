@@ -101,7 +101,8 @@ public class LoginPane implements Initializable {
         return "";
     }
 
-    public void handleConnectButton(KeyEvent keyEvent) {
+    @FXML
+    private void handleConnectButton(KeyEvent keyEvent) {
         if (txtUsername.getText().length() > 0 && txtPassword.getText().length() > 0)
             btnConnect.setDisable(false);
         else
