@@ -2,6 +2,7 @@ package nl.bos.controllers;
 
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -82,12 +83,29 @@ public class InputPane implements EventHandler<WindowEvent> {
 
     public void handleReadQuery(ActionEvent actionEvent) throws DfException {
         log.info(String.valueOf(actionEvent.getSource()));
+
         BodyPane bodyPaneController = Main.getBodyPaneLoader().getController();
         String statement = bodyPaneController.getTaStatement().getText();
+
         Repository repository = Repository.getRepositoryCon();
         IDfCollection query = repository.query(statement);
         while (query.next()) {
             log.info(query.getString("r_object_id"));
         }
+
+        ObservableList items = bodyPaneController.getCmbHistory().getItems();
+        if (statementNotExists(items, statement)) {
+            items.add(statement);
+            bodyPaneController.getCmbHistory().setItems(items);
+        }
+    }
+
+    private boolean statementNotExists(ObservableList items, String statement) {
+        for (int i = 0; i < items.size(); i++) {
+            String historyStatement = (String) items.get(i);
+            if (historyStatement.equalsIgnoreCase(statement))
+                return false;
+        }
+        return true;
     }
 }
