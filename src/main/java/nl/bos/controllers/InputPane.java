@@ -19,7 +19,10 @@ import lombok.extern.java.Log;
 import nl.bos.Main;
 import nl.bos.Repository;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Properties;
+import java.util.UUID;
 
 @Log
 public class InputPane implements EventHandler<WindowEvent> {
@@ -87,6 +90,7 @@ public class InputPane implements EventHandler<WindowEvent> {
 
         BodyPane bodyPaneController = Main.getBodyPaneLoader().getController();
         String statement = bodyPaneController.getTaStatement().getText();
+        Properties history = bodyPaneController.getHistory();
 
         Repository repository = Repository.getRepositoryCon();
         IDfCollection query = repository.query(statement);
@@ -97,6 +101,12 @@ public class InputPane implements EventHandler<WindowEvent> {
         ObservableList items = bodyPaneController.getCmbHistory().getItems();
         if (statementNotExists(items, statement)) {
             items.add(0, statement);
+            history.put("q." + UUID.randomUUID(), statement);
+            try {
+                history.store(new FileOutputStream("history.properties"), null);
+            } catch (IOException e) {
+                log.info(e.getMessage());
+            }
             bodyPaneController.getCmbHistory().setItems(items);
         }
     }
