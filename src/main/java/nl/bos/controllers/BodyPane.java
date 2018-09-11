@@ -23,6 +23,7 @@ public class BodyPane implements Initializable {
     @Getter
     private TextArea taStatement;
     @FXML
+    @Getter
     private ChoiceBox cmbHistory;
     @FXML
     private TableView tbResult;
