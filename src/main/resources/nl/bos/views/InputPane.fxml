@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -12,7 +11,7 @@
               BorderPane.alignment="TOP_CENTER">
             <children>
                 <Button fx:id="btnReadQuery" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                        text="ReadQuery"/>
+                        onAction="#handleReadQuery" text="ReadQuery"/>
                 <Button fx:id="btnFlushCache" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
                         text="Flush Cache"/>
                 <Button fx:id="btnClearQuery" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
