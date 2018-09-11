@@ -95,7 +95,7 @@ public class InputPane implements EventHandler<WindowEvent> {
 
         ObservableList items = bodyPaneController.getCmbHistory().getItems();
         if (statementNotExists(items, statement)) {
-            items.add(statement);
+            items.add(0, statement);
             bodyPaneController.getCmbHistory().setItems(items);
         }
     }
