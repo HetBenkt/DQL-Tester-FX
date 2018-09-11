@@ -71,11 +71,11 @@ public class InputPane implements EventHandler<WindowEvent> {
         LoginPane loginPaneController = fxmlLoader.getController();
 
         lblStatus.setText(String.valueOf(loginPaneController.getChbRepository().getValue()));
-        lblUsernameOS.setText("dummy");
+        lblUsernameOS.setText("dummyUserNameOS");
         lblUsernameDC.setText(loginPaneController.getTxtUsername().getText());
         lblDomainOS.setText(loginPaneController.getHostName());
-        lblPrivileges.setText("dummy");
-        lblServerVersion.setText("dummy");
+        lblPrivileges.setText("dummyPrivileges");
+        lblServerVersion.setText("dummyServerVersion");
 
         btnReadQuery.setDisable(false);
         btnFlushCache.setDisable(false);
