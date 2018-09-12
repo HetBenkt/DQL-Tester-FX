@@ -14,13 +14,19 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import lombok.Getter;
 import lombok.extern.java.Log;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ResourceBundle;
 
 @Log
 public class BodyPane implements Initializable, ChangeListener {
@@ -35,7 +41,7 @@ public class BodyPane implements Initializable, ChangeListener {
     @FXML
     private TableView tbResult;
     @Getter
-    private Properties history = new Properties();
+    private JSONObject jsonObject;
 
     public void initialize(URL location, ResourceBundle resources) {
         try {
@@ -45,39 +51,45 @@ public class BodyPane implements Initializable, ChangeListener {
             log.info(e.getMessage());
         }
         cmbHistory.getSelectionModel().selectedIndexProperty().addListener(this);
-        loadHistory();
-    }
 
-    private void loadHistory() {
         try {
-            InputStream in = new FileInputStream("history.properties");
-            if (in != null) {
-                history.load(in);
-                List<String> statements = getPropertyList(history, "q");
-                ObservableList value = FXCollections.observableList(statements);
-                cmbHistory.setItems(value);
-            }
+            loadHistory();
         } catch (IOException e) {
             log.info(e.getMessage());
-            File file = new File("history.properties");
-            try {
-                if (file.createNewFile())
-                    log.info("History file created.");
-            } catch (IOException e1) {
-                log.info(e1.getMessage());
-            }
-
+            createHistoryFile();
+        } catch (ParseException e) {
+            log.info(e.getMessage());
         }
     }
 
-    private List<String> getPropertyList(Properties properties, String name) {
-        List<String> result = new ArrayList<String>();
-        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-            if (((String) entry.getKey()).startsWith(name)) {
-                result.add((String) entry.getValue());
-            }
+    private void createHistoryFile() {
+        jsonObject = new JSONObject();
+        JSONArray list = new JSONArray();
+        jsonObject.put("queries", list);
+
+        try (FileWriter file = new FileWriter("history.json")) {
+            file.write(jsonObject.toJSONString());
+            file.flush();
+        } catch (IOException ioe) {
+            log.info(ioe.getMessage());
         }
-        return result;
+    }
+
+    private void loadHistory() throws IOException, ParseException {
+        JSONParser parser = new JSONParser();
+        Object obj = parser.parse(new FileReader("history.json"));
+
+        jsonObject = (JSONObject) obj;
+        log.info(jsonObject.toJSONString());
+
+        JSONArray msg = (JSONArray) jsonObject.get("queries");
+        Iterator<String> iterator = msg.iterator();
+        List<String> statements = new ArrayList<>();
+        while (iterator.hasNext()) {
+            statements.add(iterator.next());
+        }
+        ObservableList value = FXCollections.observableList(statements);
+        cmbHistory.setItems(value);
     }
 
     public void changed(ObservableValue observable, Object oldValue, Object newValue) {

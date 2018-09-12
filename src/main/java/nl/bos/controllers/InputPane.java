@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -18,11 +19,11 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import nl.bos.Main;
 import nl.bos.Repository;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Properties;
-import java.util.UUID;
 
 @Log
 public class InputPane implements EventHandler<WindowEvent> {
@@ -90,7 +91,7 @@ public class InputPane implements EventHandler<WindowEvent> {
 
         BodyPane bodyPaneController = Main.getBodyPaneLoader().getController();
         String statement = bodyPaneController.getTaStatement().getText();
-        Properties history = bodyPaneController.getHistory();
+        JSONObject jsonObject = bodyPaneController.getJsonObject();
 
         Repository repository = Repository.getRepositoryCon();
         IDfCollection query = repository.query(statement);
@@ -98,16 +99,20 @@ public class InputPane implements EventHandler<WindowEvent> {
             log.info(query.getString("r_object_id"));
         }
 
-        ObservableList items = bodyPaneController.getCmbHistory().getItems();
+        ChoiceBox cmbHistory = bodyPaneController.getCmbHistory();
+        ObservableList items = cmbHistory.getItems();
         if (statementNotExists(items, statement)) {
             items.add(0, statement);
-            history.put("q." + UUID.randomUUID(), statement);
-            try {
-                history.store(new FileOutputStream("history.properties"), null);
+            cmbHistory.setValue(statement);
+            JSONArray queries = (JSONArray) jsonObject.get("queries");
+            queries.add(0, statement);
+            try (FileWriter file = new FileWriter("history.json")) {
+                file.write(jsonObject.toJSONString());
+                file.flush();
             } catch (IOException e) {
-                log.info(e.getMessage());
+                e.printStackTrace();
             }
-            bodyPaneController.getCmbHistory().setItems(items);
+            cmbHistory.setItems(items);
         }
     }
 
