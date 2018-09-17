@@ -70,19 +70,21 @@ public class InputPane implements EventHandler<WindowEvent> {
     }
 
     public void handle(WindowEvent event) {
-        log.info(String.valueOf(event.getSource()));
+        if (Repository.isConnectionValid()) {
+            log.info(String.valueOf(event.getSource()));
 
-        LoginPane loginPaneController = fxmlLoader.getController();
+            LoginPane loginPaneController = fxmlLoader.getController();
 
-        lblStatus.setText(String.valueOf(loginPaneController.getChbRepository().getValue()));
-        lblUsernameOS.setText("dummyUserNameOS");
-        lblUsernameDC.setText(loginPaneController.getTxtUsername().getText());
-        lblDomainOS.setText(loginPaneController.getHostName());
-        lblPrivileges.setText("dummyPrivileges");
-        lblServerVersion.setText("dummyServerVersion");
+            lblStatus.setText(String.valueOf(loginPaneController.getChbRepository().getValue()));
+            lblUsernameOS.setText("dummyUserNameOS");
+            lblUsernameDC.setText(loginPaneController.getTxtUsername().getText());
+            lblDomainOS.setText(loginPaneController.getHostName());
+            lblPrivileges.setText("dummyPrivileges");
+            lblServerVersion.setText("dummyServerVersion");
 
-        btnReadQuery.setDisable(false);
-        btnFlushCache.setDisable(false);
+            btnReadQuery.setDisable(false);
+            btnFlushCache.setDisable(false);
+        }
     }
 
     @FXML
@@ -94,11 +96,10 @@ public class InputPane implements EventHandler<WindowEvent> {
         JSONObject jsonObject = bodyPaneController.getJsonObject();
 
         Repository repository = Repository.getRepositoryCon();
-        IDfCollection query = repository.query(statement);
-        while (query.next()) {
-            log.info(query.getString("r_object_id"));
-        }
-
+        IDfCollection result = repository.query(statement);
+        updateResultTable(result);
+        result.close();
+        
         ChoiceBox cmbHistory = bodyPaneController.getCmbHistory();
         ObservableList items = cmbHistory.getItems();
         if (statementNotExists(items, statement)) {
@@ -114,6 +115,10 @@ public class InputPane implements EventHandler<WindowEvent> {
             }
             cmbHistory.setItems(items);
         }
+    }
+
+    private void updateResultTable(IDfCollection result) {
+        //TODO
     }
 
     private boolean statementNotExists(ObservableList items, String statement) {
