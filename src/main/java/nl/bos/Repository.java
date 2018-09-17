@@ -5,12 +5,15 @@ import com.documentum.com.IDfClientX;
 import com.documentum.fc.client.*;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfLoginInfo;
+import lombok.Getter;
 import lombok.extern.java.Log;
 
 @Log
 public class Repository {
     private static Repository repository;
+    public static String errorMessage = "";
     private IDfSessionManager sMgr;
+    @Getter
     private IDfSession session;
     private static String repositoryName;
     private static String userName;
@@ -23,6 +26,7 @@ public class Repository {
             this.session = createSession(repositoryName);
         } catch (DfException e) {
             log.info(e.getMessage());
+            errorMessage = e.getMessage();
         }
     }
 
@@ -80,5 +84,14 @@ public class Repository {
         log.info(String.format("Query executed %s", query));
 
         return collection;
+    }
+
+    public static boolean isConnectionValid() {
+        repository = Repository.getRepositoryCon();
+        if (repository.getSession() == null) {
+            repository = null;
+            return false;
+        }
+        return true;
     }
 }

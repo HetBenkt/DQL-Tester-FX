@@ -47,8 +47,16 @@ public class LoginPane implements Initializable {
         String selectedRepository = chbRepository.getValue().toString();
         lblServer.setText(String.format("Connection to '%s'", selectedRepository));
         Repository.setCredentials(selectedRepository, txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
-        Stage loginStage = InputPane.getLoginStage();
-        loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
+        if (Repository.isConnectionValid()) {
+            Stage loginStage = InputPane.getLoginStage();
+            loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Information Dialog");
+            alert.setHeaderText(null);
+            alert.setContentText(Repository.errorMessage);
+            alert.showAndWait();
+        }
     }
 
     @FXML
