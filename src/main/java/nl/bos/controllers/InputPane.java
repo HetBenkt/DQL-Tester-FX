@@ -42,8 +42,10 @@ public class InputPane implements EventHandler<WindowEvent> {
     @FXML
     private Label lblServerVersion;
     @FXML
+    @Getter
     private Button btnFlushCache;
     @FXML
+    @Getter
     private Button btnReadQuery;
 
     private FXMLLoader fxmlLoader;
@@ -71,8 +73,6 @@ public class InputPane implements EventHandler<WindowEvent> {
 
     public void handle(WindowEvent event) {
         if (Repository.isConnectionValid()) {
-            log.info(String.valueOf(event.getSource()));
-
             LoginPane loginPaneController = fxmlLoader.getController();
 
             lblStatus.setText(String.valueOf(loginPaneController.getChbRepository().getValue()));
@@ -117,8 +117,10 @@ public class InputPane implements EventHandler<WindowEvent> {
         }
     }
 
-    private void updateResultTable(IDfCollection result) {
-        //TODO
+    private void updateResultTable(IDfCollection result) throws DfException {
+        while (result.next()) {
+            log.info(result.getString("r_object_id"));
+        }
     }
 
     private boolean statementNotExists(ObservableList items, String statement) {
