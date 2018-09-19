@@ -42,10 +42,13 @@ public class BodyPane implements Initializable, ChangeListener {
     private TableView tbResult;
     @Getter
     private JSONObject jsonObject;
+    @Getter
+    private FXMLLoader fxmlLoader;
 
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            BorderPane inputPane = FXMLLoader.load(getClass().getResource("/nl/bos/views/InputPane.fxml"));
+            fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/InputPane.fxml"));
+            BorderPane inputPane = fxmlLoader.load();
             vboxBody.getChildren().add(inputPane);
         } catch (IOException e) {
             log.info(e.getMessage());
