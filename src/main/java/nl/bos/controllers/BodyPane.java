@@ -109,6 +109,9 @@ public class BodyPane implements Initializable, ChangeListener {
     }
 
     public void updateResultTable(IDfCollection collection) throws DfException {
+        tbResult.getItems().clear();
+        tbResult.getColumns().clear();
+
         List<TableColumn> columns = new ArrayList<>();
         ObservableList<ObservableList> rows = FXCollections.observableArrayList();
 
