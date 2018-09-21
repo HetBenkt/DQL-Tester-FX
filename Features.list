@@ -2,6 +2,5 @@ todo: Maximize 50 history queries in combobox
 todo: Create a disconnect button
 todo: Update the status fields and buttons on InputPane after login
 todo: Add the serverMap and ConnectionBrokerMap screens
-todo: Exit with 'Are you sure?'
 todo: Fill result table with data
 todo: Do a DFC trace why connection takes soo long

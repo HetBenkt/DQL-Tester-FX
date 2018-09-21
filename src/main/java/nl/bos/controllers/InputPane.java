@@ -8,9 +8,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -24,6 +22,7 @@ import org.json.simple.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Optional;
 
 @Log
 public class InputPane implements EventHandler<WindowEvent> {
@@ -67,8 +66,19 @@ public class InputPane implements EventHandler<WindowEvent> {
     @FXML
     private void handleExit(ActionEvent actionEvent) throws DfException {
         log.info(String.valueOf(actionEvent.getSource()));
-        Repository.disconnect();
-        System.exit(0);
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Quit the application...");
+        alert.setHeaderText(null);
+        alert.setContentText("Are you sure?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK) {
+            Repository.disconnect();
+            System.exit(0);
+        } else {
+            alert.close();
+        }
     }
 
     public void handle(WindowEvent event) {
