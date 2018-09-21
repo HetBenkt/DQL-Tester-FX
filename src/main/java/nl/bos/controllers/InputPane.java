@@ -107,7 +107,7 @@ public class InputPane implements EventHandler<WindowEvent> {
 
         Repository repository = Repository.getRepositoryCon();
         IDfCollection result = repository.query(statement);
-        updateResultTable(result);
+        bodyPaneController.updateResultTable(result);
         result.close();
         
         ChoiceBox cmbHistory = bodyPaneController.getCmbHistory();
@@ -124,12 +124,6 @@ public class InputPane implements EventHandler<WindowEvent> {
                 e.printStackTrace();
             }
             cmbHistory.setItems(items);
-        }
-    }
-
-    private void updateResultTable(IDfCollection result) throws DfException {
-        while (result.next()) {
-            log.info(result.getString("r_object_id"));
         }
     }
 
