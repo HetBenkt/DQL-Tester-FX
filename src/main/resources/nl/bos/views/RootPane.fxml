@@ -8,28 +8,18 @@
             fx:controller="nl.bos.controllers.RootPane">
     <top>
         <MenuBar BorderPane.alignment="CENTER">
-            <menus>
-                <Menu mnemonicParsing="false" text="Tools">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Browse Repository"/>
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Administration">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Manage Jobs"/>
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Info">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Get Last SQL"/>
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Special">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Enable SQL Trace"/>
-                    </items>
-                </Menu>
-            </menus>
+            <Menu mnemonicParsing="false" text="Tools">
+                <MenuItem mnemonicParsing="false" text="Browse Repository"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Administration">
+                <MenuItem mnemonicParsing="false" text="Manage Jobs"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Info">
+                <MenuItem mnemonicParsing="false" text="Get Last SQL"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Special">
+                <MenuItem mnemonicParsing="false" text="Enable SQL Trace"/>
+            </Menu>
         </MenuBar>
     </top>
 </BorderPane>
