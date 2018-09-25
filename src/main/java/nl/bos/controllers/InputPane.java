@@ -118,24 +118,38 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
         JSONObject jsonObject = bodyPaneController.getJsonObject();
 
         Repository repository = Repository.getRepositoryCon();
-        IDfCollection result = repository.query(statement);
-        bodyPaneController.updateResultTable(result);
-        result.close();
-
-        ChoiceBox cmbHistory = bodyPaneController.getCmbHistory();
-        ObservableList items = cmbHistory.getItems();
-        if (statementNotExists(items, statement)) {
-            items.add(0, statement);
-            cmbHistory.setValue(statement);
-            JSONArray queries = (JSONArray) jsonObject.get("queries");
-            queries.add(0, statement);
-            try (FileWriter file = new FileWriter("history.json")) {
-                file.write(jsonObject.toJSONString());
-                file.flush();
-            } catch (IOException e) {
-                log.finest(e.getMessage());
+        IDfCollection result = null;
+        try {
+            result = repository.query(statement);
+        } catch (DfException dfe) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Information Dialog");
+            alert.setHeaderText(null);
+            alert.setContentText(dfe.getMessage());
+            alert.showAndWait();
+        } finally {
+            if (result != null) {
+                bodyPaneController.updateResultTable(result);
+                result.close();
             }
-            cmbHistory.setItems(items);
+        }
+
+        if (result != null) {
+            ChoiceBox cmbHistory = bodyPaneController.getCmbHistory();
+            ObservableList items = cmbHistory.getItems();
+            if (statementNotExists(items, statement)) {
+                items.add(0, statement);
+                cmbHistory.setValue(statement);
+                JSONArray queries = (JSONArray) jsonObject.get("queries");
+                queries.add(0, statement);
+                try (FileWriter file = new FileWriter("history.json")) {
+                    file.write(jsonObject.toJSONString());
+                    file.flush();
+                } catch (IOException e) {
+                    log.finest(e.getMessage());
+                }
+                cmbHistory.setItems(items);
+            }
         }
     }
 
