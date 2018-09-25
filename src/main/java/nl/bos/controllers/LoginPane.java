@@ -61,7 +61,7 @@ public class LoginPane implements Initializable {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Information Dialog");
             alert.setHeaderText(null);
-            alert.setContentText(Repository.errorMessage);
+            alert.setContentText(Repository.getErrorMessage());
             alert.showAndWait();
         }
     }
@@ -84,7 +84,7 @@ public class LoginPane implements Initializable {
     }
 
     public void initialize(URL location, ResourceBundle resources) {
-        if (Repository.session != null && Repository.session.isConnected()) {
+        if (Repository.getSession() != null && Repository.getSession().isConnected()) {
             btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
             btnDisconnect.setManaged(true);
 

@@ -5,30 +5,22 @@
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="vboxBody" BorderPane.alignment="CENTER"
       xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.BodyPane">
-    <children>
-        <SplitPane dividerPositions="0.6" orientation="VERTICAL">
-            <items>
-                <VBox>
-                    <children>
-                        <Label text="Result"/>
-                        <TableView fx:id="tbResult" VBox.vgrow="ALWAYS"/>
-                    </children>
-                    <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                    </padding>
-                </VBox>
-                <VBox>
-                    <children>
-                        <Label text="DQL/SQL Statement"/>
-                        <TextArea fx:id="taStatement" VBox.vgrow="ALWAYS"/>
-                        <Label text="DQL/SQL History"/>
-                        <ChoiceBox fx:id="cmbHistory"/>
-                    </children>
-                    <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                    </padding>
-                </VBox>
-            </items>
-        </SplitPane>
-    </children>
+    <SplitPane dividerPositions="0.6" orientation="VERTICAL">
+        <VBox>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+            <Label text="Result"/>
+            <TableView fx:id="tbResult" VBox.vgrow="ALWAYS"/>
+        </VBox>
+        <VBox>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+            <Label text="DQL/SQL Statement"/>
+            <TextArea fx:id="taStatement" VBox.vgrow="ALWAYS"/>
+            <Label text="DQL/SQL History"/>
+            <ChoiceBox fx:id="cmbHistory"/>
+        </VBox>
+    </SplitPane>
 </VBox>

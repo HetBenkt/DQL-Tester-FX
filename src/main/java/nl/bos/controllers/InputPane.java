@@ -74,7 +74,7 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
         alert.setContentText("Are you sure?");
 
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             Repository.disconnect();
             System.exit(0);
         } else {
@@ -84,17 +84,17 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
 
     public void handle(WindowEvent event) {
         LoginPane loginPaneController = fxmlLoader.getController();
-        if (Repository.session != null && Repository.session.isConnected()) {
+        if (Repository.getSession() != null && Repository.getSession().isConnected()) {
             updateNodes(String.valueOf(loginPaneController.getChbRepository().getValue()), "dummyUserNameOS", loginPaneController.getTxtUsername().getText(), loginPaneController.getHostName(), "dummyPrivileges", "dummyServerVersion", true);
         } else {
             updateNodes("Offline", "OS Username", "DC Username", "OS Domain", "Privileges", "Server Version", false);
         }
     }
 
-    private void updateNodes(String status, String UsernameOS, String UsernameDC, String domainOS, String privileges, String serverVersion, boolean isConnected) {
+    private void updateNodes(String status, String usernameOS, String usernameDC, String domainOS, String privileges, String serverVersion, boolean isConnected) {
         lblStatus.setText(status);
-        lblUsernameOS.setText(UsernameOS);
-        lblUsernameDC.setText(UsernameDC);
+        lblUsernameOS.setText(usernameOS);
+        lblUsernameDC.setText(usernameDC);
         lblDomainOS.setText(domainOS);
         lblPrivileges.setText(privileges);
         lblServerVersion.setText(serverVersion);
@@ -140,8 +140,8 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
     }
 
     private boolean statementNotExists(ObservableList items, String statement) {
-        for (int i = 0; i < items.size(); i++) {
-            String historyStatement = (String) items.get(i);
+        for (Object item : items) {
+            String historyStatement = (String) item;
             if (historyStatement.equalsIgnoreCase(statement))
                 return false;
         }

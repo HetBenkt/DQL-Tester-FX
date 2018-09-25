@@ -5,14 +5,17 @@ import com.documentum.com.IDfClientX;
 import com.documentum.fc.client.*;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfLoginInfo;
+import lombok.Getter;
 import lombok.extern.java.Log;
 
 @Log
 public class Repository {
     private static Repository repository;
-    public static String errorMessage = "";
+    @Getter
+    private static String errorMessage = "";
     private IDfSessionManager sMgr;
-    public static IDfSession session;
+    @Getter
+    private static IDfSession session;
     private static String repositoryName;
     private static String userName;
     private static String passkey;
