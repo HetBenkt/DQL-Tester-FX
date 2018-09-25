@@ -1,6 +1,7 @@
 package nl.bos.controllers;
 
 import com.documentum.fc.client.IDfDocbaseMap;
+import com.documentum.fc.common.DfException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -32,6 +33,8 @@ public class LoginPane implements Initializable {
     @FXML
     private Button btnConnect;
     @FXML
+    private Button btnDisconnect;
+    @FXML
     @Getter
     private TextField txtUsername;
     @FXML
@@ -40,6 +43,10 @@ public class LoginPane implements Initializable {
     private TextField txtDomain;
     @Getter
     private String hostName;
+    @FXML
+    private CheckBox chkSaveLoginData;
+    @FXML
+    private CheckBox chkUseWindowsLogin;
 
     @FXML
     private void handleConnect(ActionEvent actionEvent) {
@@ -77,7 +84,26 @@ public class LoginPane implements Initializable {
     }
 
     public void initialize(URL location, ResourceBundle resources) {
+        if (Repository.session != null && Repository.session.isConnected()) {
+            btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
+            btnDisconnect.setManaged(true);
+
+            btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
+            btnConnect.setManaged(false);
+
+            chbRepository.setDisable(true);
+            txtUsername.setDisable(true);
+            txtPassword.setDisable(true);
+            txtDomain.setDisable(true);
+            chkSaveLoginData.setDisable(true);
+            chkUseWindowsLogin.setDisable(true);
+        } else {
+            btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
+            btnDisconnect.setManaged(false);
+        }
+
         lblVersion.setText(getProjectVersion());
+
         try {
             IDfDocbaseMap repositoryMap = Repository.obtainRepositoryMap();
             //noinspection deprecation
@@ -115,5 +141,13 @@ public class LoginPane implements Initializable {
             btnConnect.setDisable(false);
         else
             btnConnect.setDisable(true);
+    }
+
+    @FXML
+    private void handleDisconnect(ActionEvent actionEvent) throws DfException {
+        log.info(String.valueOf(actionEvent.getSource()));
+        Repository.disconnect();
+        Stage loginStage = InputPane.getLoginStage();
+        loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 }

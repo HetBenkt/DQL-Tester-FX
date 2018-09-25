@@ -5,7 +5,6 @@ import com.documentum.com.IDfClientX;
 import com.documentum.fc.client.*;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfLoginInfo;
-import lombok.Getter;
 import lombok.extern.java.Log;
 
 @Log
@@ -13,8 +12,7 @@ public class Repository {
     private static Repository repository;
     public static String errorMessage = "";
     private IDfSessionManager sMgr;
-    @Getter
-    private IDfSession session;
+    public static IDfSession session;
     private static String repositoryName;
     private static String userName;
     private static String passkey;
@@ -23,7 +21,7 @@ public class Repository {
     private Repository() {
         try {
             this.sMgr = createSessionManager(repositoryName, userName, passkey, domain);
-            this.session = createSession(repositoryName);
+            session = createSession(repositoryName);
         } catch (DfException e) {
             log.info(e.getMessage());
             errorMessage = e.getMessage();
@@ -38,8 +36,9 @@ public class Repository {
     }
 
     public static void disconnect() throws DfException {
-        if (repository != null && repository.session != null && repository.session.isConnected()) {
-            repository.session.disconnect();
+        if (repository != null && session != null && session.isConnected()) {
+            session.disconnect();
+            repository = null;
         }
     }
 
@@ -75,23 +74,23 @@ public class Repository {
         return newSessionManager;
     }
 
+    public static boolean isConnectionValid() {
+        repository = Repository.getRepositoryCon();
+        if (session == null || !session.isConnected()) {
+            repository = null;
+            return false;
+        }
+        return true;
+    }
+
     public IDfCollection query(String query) throws DfException {
         IDfClientX clientx = new DfClientX();
         IDfQuery q = clientx.getQuery();
         q.setDQL(query);
 
-        IDfCollection collection = q.execute(repository.session, IDfQuery.DF_READ_QUERY);
+        IDfCollection collection = q.execute(session, IDfQuery.DF_READ_QUERY);
         log.info(String.format("Query executed %s", query));
 
         return collection;
-    }
-
-    public static boolean isConnectionValid() {
-        repository = Repository.getRepositoryCon();
-        if (repository.getSession() == null) {
-            repository = null;
-            return false;
-        }
-        return true;
     }
 }

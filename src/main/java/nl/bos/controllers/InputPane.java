@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -22,10 +23,12 @@ import org.json.simple.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 @Log
-public class InputPane implements EventHandler<WindowEvent> {
+public class InputPane implements Initializable, EventHandler<WindowEvent> {
     @Getter
     private static Stage loginStage;
     @FXML
@@ -46,21 +49,19 @@ public class InputPane implements EventHandler<WindowEvent> {
     @FXML
     @Getter
     private Button btnReadQuery;
+    @FXML
+    @Getter
+    private Button btnConnect;
+    @FXML
+    @Getter
+    private Button btnDisconnect;
 
     private FXMLLoader fxmlLoader;
 
     @FXML
     private void handleConnect(ActionEvent actionEvent) throws IOException {
         log.info(String.valueOf(actionEvent.getSource()));
-
-        loginStage = new Stage();
-        loginStage.initModality(Modality.APPLICATION_MODAL);
-        loginStage.setTitle("Documentum Login");
-        fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/LoginPane.fxml"));
-        VBox loginPane = fxmlLoader.load();
-        loginStage.setScene(new Scene(loginPane));
-        loginStage.setOnCloseRequest(this);
-        loginStage.showAndWait();
+        showLoginStage();
     }
 
     @FXML
@@ -82,19 +83,30 @@ public class InputPane implements EventHandler<WindowEvent> {
     }
 
     public void handle(WindowEvent event) {
-        if (Repository.isConnectionValid()) {
-            LoginPane loginPaneController = fxmlLoader.getController();
-
-            lblStatus.setText(String.valueOf(loginPaneController.getChbRepository().getValue()));
-            lblUsernameOS.setText("dummyUserNameOS");
-            lblUsernameDC.setText(loginPaneController.getTxtUsername().getText());
-            lblDomainOS.setText(loginPaneController.getHostName());
-            lblPrivileges.setText("dummyPrivileges");
-            lblServerVersion.setText("dummyServerVersion");
-
-            btnReadQuery.setDisable(false);
-            btnFlushCache.setDisable(false);
+        LoginPane loginPaneController = fxmlLoader.getController();
+        if (Repository.session != null && Repository.session.isConnected()) {
+            updateNodes(String.valueOf(loginPaneController.getChbRepository().getValue()), "dummyUserNameOS", loginPaneController.getTxtUsername().getText(), loginPaneController.getHostName(), "dummyPrivileges", "dummyServerVersion", true);
+        } else {
+            updateNodes("Offline", "OS Username", "DC Username", "OS Domain", "Privileges", "Server Version", false);
         }
+    }
+
+    private void updateNodes(String status, String UsernameOS, String UsernameDC, String domainOS, String privileges, String serverVersion, boolean isConnected) {
+        lblStatus.setText(status);
+        lblUsernameOS.setText(UsernameOS);
+        lblUsernameDC.setText(UsernameDC);
+        lblDomainOS.setText(domainOS);
+        lblPrivileges.setText(privileges);
+        lblServerVersion.setText(serverVersion);
+
+        btnReadQuery.setDisable(!isConnected);
+        btnFlushCache.setDisable(!isConnected);
+
+        btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
+        btnDisconnect.setManaged(isConnected);
+
+        btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
+        btnConnect.setManaged(!isConnected);
     }
 
     @FXML
@@ -109,7 +121,7 @@ public class InputPane implements EventHandler<WindowEvent> {
         IDfCollection result = repository.query(statement);
         bodyPaneController.updateResultTable(result);
         result.close();
-        
+
         ChoiceBox cmbHistory = bodyPaneController.getCmbHistory();
         ObservableList items = cmbHistory.getItems();
         if (statementNotExists(items, statement)) {
@@ -121,7 +133,7 @@ public class InputPane implements EventHandler<WindowEvent> {
                 file.write(jsonObject.toJSONString());
                 file.flush();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.finest(e.getMessage());
             }
             cmbHistory.setItems(items);
         }
@@ -140,5 +152,27 @@ public class InputPane implements EventHandler<WindowEvent> {
     private void handleClearQuery(ActionEvent actionEvent) {
         BodyPane bodyPaneController = Main.getBodyPaneLoader().getController();
         bodyPaneController.getTaStatement().clear();
+    }
+
+    @FXML
+    private void handleDisconnect(ActionEvent actionEvent) throws IOException {
+        showLoginStage();
+    }
+
+    private void showLoginStage() throws IOException {
+        loginStage = new Stage();
+        loginStage.initModality(Modality.APPLICATION_MODAL);
+        loginStage.setTitle("Documentum Login");
+        fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/LoginPane.fxml"));
+        VBox loginPane = fxmlLoader.load();
+        loginStage.setScene(new Scene(loginPane));
+        loginStage.setOnCloseRequest(this);
+        loginStage.showAndWait();
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
+        btnDisconnect.setManaged(false);
     }
 }

@@ -3,6 +3,7 @@ package nl.bos;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -44,6 +45,14 @@ public class Main extends Application {
             InputPane inputPaneController = bodyPaneController.getFxmlLoader().getController();
             inputPaneController.getBtnReadQuery().setDisable(false);
             inputPaneController.getBtnFlushCache().setDisable(false);
+
+            Button btnDisconnect = inputPaneController.getBtnDisconnect();
+            btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
+            btnDisconnect.setManaged(true);
+
+            Button btnConnect = inputPaneController.getBtnConnect();
+            btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
+            btnConnect.setManaged(false);
         }
 
         rootPane.setCenter(bodyLayout);

@@ -24,7 +24,9 @@
                     <children>
                         <Button fx:id="btnConnect" defaultButton="true" disable="true" mnemonicParsing="false"
                                 onAction="#handleConnect" text="Connect"/>
-                        <Button fx:id="btmCancel" cancelButton="true" mnemonicParsing="false" onAction="#handleCancel"
+                        <Button fx:id="btnDisconnect" defaultButton="true" mnemonicParsing="false"
+                                onAction="#handleDisconnect" text="Disconnect" visible="false"/>
+                        <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#handleCancel"
                                 text="Cancel"/>
                     </children>
                 </HBox>
