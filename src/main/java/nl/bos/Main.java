@@ -11,12 +11,15 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import nl.bos.controllers.BodyPane;
 import nl.bos.controllers.InputPane;
+import nl.bos.controllers.RootPane;
 
 @Log
 public class Main extends Application {
     @Getter
     private static FXMLLoader bodyPaneLoader;
     private static boolean devModeEnabled = false;
+    @Getter
+    private static FXMLLoader rootPaneLoader;
 
     public static void main(String[] args) {
         if (args.length > 0) {
@@ -36,7 +39,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        BorderPane rootPane = FXMLLoader.load(getClass().getResource("/nl/bos/views/RootPane.fxml"));
+        rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RootPane.fxml"));
+        BorderPane rootPane = rootPaneLoader.load();
+        RootPane rootPaneLoaderController = rootPaneLoader.getController();
         bodyPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/BodyPane.fxml"));
         VBox bodyLayout = bodyPaneLoader.load();
 
@@ -53,12 +58,15 @@ public class Main extends Application {
             Button btnConnect = inputPaneController.getBtnConnect();
             btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
             btnConnect.setManaged(false);
+
+            rootPaneLoaderController.getMenubar().setDisable(false);
         }
 
         rootPane.setCenter(bodyLayout);
 
         primaryStage.setTitle("DQL Tester 16.4");
         primaryStage.setScene(new Scene(rootPane));
+
         primaryStage.show();
     }
 }

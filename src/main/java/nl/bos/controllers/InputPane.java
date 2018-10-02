@@ -107,6 +107,9 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
 
         btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
         btnConnect.setManaged(!isConnected);
+
+        RootPane rootPaneLoaderController = Main.getRootPaneLoader().getController();
+        rootPaneLoaderController.getMenubar().setDisable(!isConnected);
     }
 
     @FXML

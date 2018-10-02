@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity" prefHeight="850.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.121"
+      fx:controller="nl.bos.controllers.RepositoryBrowser">
+    <children>
+        <TreeView fx:id="treeview"/>
+        <HBox spacing="10.0">
+            <children>
+                <VBox spacing="11.0">
+                    <children>
+                        <Label text="Object ID"/>
+                        <Label text="Object Type"/>
+                        <Label text="Content Type"/>
+                        <Label text="Content Size"/>
+                        <Label text="Creation Date"/>
+                        <Label text="Modify Date"/>
+                    </children>
+                    <padding>
+                        <Insets top="5.0"/>
+                    </padding>
+                </VBox>
+                <VBox spacing="3.0">
+                    <children>
+                        <TextField/>
+                        <TextField/>
+                        <TextField/>
+                        <TextField/>
+                        <TextField/>
+                        <TextField/>
+                    </children>
+                </VBox>
+                <VBox spacing="11.0">
+                    <children>
+                        <Label text="Lock Owner"/>
+                        <Label text="Lock Machine"/>
+                        <Label text="Lock Date"/>
+                        <Label text="ACL Name"/>
+                        <Label text="Permission"/>
+                        <Label text="Version"/>
+                    </children>
+                    <padding>
+                        <Insets top="5.0"/>
+                    </padding>
+                </VBox>
+                <VBox spacing="3.0">
+                    <children>
+                        <TextField/>
+                        <TextField/>
+                        <TextField/>
+                        <TextField/>
+                        <TextField/>
+                        <TextField/>
+                    </children>
+                </VBox>
+                <VBox spacing="5.0">
+                    <children>
+                        <CheckBox mnemonicParsing="false" text="Show All Versions"/>
+                        <CheckBox mnemonicParsing="false" selected="true" text="Show All Cabinets"/>
+                        <CheckBox mnemonicParsing="false" selected="true" text="Read-only Mode"/>
+                        <Button fx:id="btnFlushCache" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                text="Flush Cache">
+                            <VBox.margin>
+                                <Insets top="20.0"/>
+                            </VBox.margin>
+                        </Button>
+                        <Button fx:id="btnExit" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                                onAction="#handleExit" text="Exit"/>
+                    </children>
+                </VBox>
+            </children>
+            <padding>
+                <Insets left="10.0"/>
+            </padding>
+            <VBox.margin>
+                <Insets top="10.0"/>
+            </VBox.margin>
+        </HBox>
+        <Label text="# items found">
+            <padding>
+                <Insets left="10.0" top="20.0"/>
+            </padding>
+        </Label>
+    </children>
+</VBox>
