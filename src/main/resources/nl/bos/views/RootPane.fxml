@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
             minWidth="-Infinity" prefHeight="900.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8.0.121"
             fx:controller="nl.bos.controllers.RootPane">
     <top>
-        <MenuBar BorderPane.alignment="CENTER">
+        <MenuBar fx:id="menubar" disable="true" BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="Tools">
-                <MenuItem mnemonicParsing="false" text="Browse Repository"/>
+                <MenuItem mnemonicParsing="false" text="Browse Repository" onAction="#browseRepository"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Administration">
                 <MenuItem mnemonicParsing="false" text="Manage Jobs"/>

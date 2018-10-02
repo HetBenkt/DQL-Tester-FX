@@ -1,4 +1,6 @@
-todo: Implement 'Browse repository'
+todo: Implement 'Browse repository' -> replace dummy in title screen!
 todo: Implement 'Manage Jobs'
+todo: Handle exit with red-crosses -> close repository connection like this exit button! -> Also check other dialogs on this behavior!
 todo: Maximize 50 history queries in combobox
 todo: Update the status fields and buttons on InputPane after login
+todo: Hit <Enter> to login
