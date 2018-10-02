@@ -20,6 +20,9 @@ public class Repository {
     private static String userName;
     private static String passkey;
     private static String domain;
+    private static IDfClientX clientx = new DfClientX();
+    private static IDfClient client = null;
+
 
     private Repository() {
         try {
@@ -46,8 +49,8 @@ public class Repository {
     }
 
     public static IDfDocbaseMap obtainRepositoryMap() throws DfException {
-        IDfClientX clientx = new DfClientX();
-        IDfClient client = clientx.getLocalClient();
+        if (client == null)
+            client = clientx.getLocalClient();
         return client.getDocbaseMap();
     }
 
@@ -58,13 +61,18 @@ public class Repository {
         Repository.domain = domain;
     }
 
+    public static IDfTypedObject obtainServerMap(String selectedRepository) throws DfException {
+        if (client == null)
+            client = clientx.getLocalClient();
+        return client.getServerMap(selectedRepository);
+    }
+
     private IDfSession createSession(String repoName) throws DfException {
         return this.sMgr.getSession(repoName);
     }
 
     private IDfSessionManager createSessionManager(String repoName, String repoUsername, String repoPasskey, String repoDomain) throws DfException {
-        IDfClientX clientx = new DfClientX();
-        IDfClient client = clientx.getLocalClient();
+        client = clientx.getLocalClient();
 
         IDfSessionManager newSessionManager = client.newSessionManager();
 
