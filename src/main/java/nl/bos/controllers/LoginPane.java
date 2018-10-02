@@ -1,7 +1,9 @@
 package nl.bos.controllers;
 
 import com.documentum.fc.client.IDfDocbaseMap;
+import com.documentum.fc.client.IDfTypedObject;
 import com.documentum.fc.common.DfException;
+import com.documentum.fc.common.IDfAttr;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -9,6 +11,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import lombok.Getter;
@@ -74,13 +78,70 @@ public class LoginPane implements Initializable {
     }
 
     @FXML
-    private void handleServerMap(ActionEvent actionEvent) {
+    private void handleServerMap(ActionEvent actionEvent) throws DfException {
         log.info(String.valueOf(actionEvent.getSource()));
+
+        String selectedRepository = chbRepository.getValue().toString();
+        IDfTypedObject serverMap = Repository.obtainServerMap(selectedRepository);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Info");
+        alert.setHeaderText(String.format("Server Map for Repository >> %s <<", selectedRepository));
+        alert.getDialogPane().setContent(formatContent(serverMap));
+        alert.showAndWait();
+    }
+
+    private HBox formatContent(IDfTypedObject typedObject) throws DfException {
+        HBox hBox = new HBox();
+        hBox.setSpacing(10);
+        VBox labels = new VBox();
+        VBox values = new VBox();
+
+        for (int i = 0; i < typedObject.getAttrCount(); i++) {
+            IDfAttr attr = typedObject.getAttr(i);
+            labels.getChildren().add(new Label(String.format("%s:", attr.getName())));
+
+            Label label = new Label();
+            switch (attr.getDataType()) {
+                case IDfAttr.DM_BOOLEAN:
+                    label.setText(String.valueOf(typedObject.getBoolean(attr.getName())));
+                    break;
+                case IDfAttr.DM_DOUBLE:
+                    label.setText(String.valueOf(typedObject.getDouble(attr.getName())));
+                    break;
+                case IDfAttr.DM_ID:
+                    label.setText(String.valueOf(typedObject.getId(attr.getName())));
+                    break;
+                case IDfAttr.DM_INTEGER:
+                    label.setText(String.valueOf(typedObject.getInt(attr.getName())));
+                    break;
+                case IDfAttr.DM_STRING:
+                    label.setText(String.valueOf(typedObject.getString(attr.getName())));
+                    break;
+                case IDfAttr.DM_TIME:
+                    label.setText(String.valueOf(typedObject.getTime(attr.getName())));
+                    break;
+                default:
+                    log.finest("Error occurred while displaying the results.");
+                    break;
+            }
+            values.getChildren().add(label);
+        }
+        hBox.getChildren().addAll(labels, values);
+        return hBox;
     }
 
     @FXML
-    private void handleConnectionBrokerMap(ActionEvent actionEvent) {
+    private void handleConnectionBrokerMap(ActionEvent actionEvent) throws DfException {
         log.info(String.valueOf(actionEvent.getSource()));
+
+        IDfDocbaseMap repositoryMap = Repository.obtainRepositoryMap();
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Info");
+        alert.setHeaderText("Connection Broker Map");
+        alert.getDialogPane().setContent(formatContent(repositoryMap));
+        alert.showAndWait();
     }
 
     public void initialize(URL location, ResourceBundle resources) {
