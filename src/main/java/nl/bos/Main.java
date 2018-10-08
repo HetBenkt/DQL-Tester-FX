@@ -1,5 +1,6 @@
 package nl.bos;
 
+import com.documentum.fc.common.DfException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -23,12 +24,18 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         if (args.length > 0) {
-            Repository.setCredentials(args[0], args[1], args[2], "");
-            if (Repository.isConnectionValid()) {
-                log.info("Developer connection created");
-                devModeEnabled = true;
-            } else {
-                log.info("Login with connect button");
+            Repository repositoryCon = Repository.getRepositoryCon();
+            repositoryCon.setCredentials(args[0], args[1], args[2], "");
+            try {
+                repositoryCon.createSessionManager();
+                if (repositoryCon.isConnectionValid()) {
+                    log.info("Developer connection created");
+                    devModeEnabled = true;
+                } else {
+                    log.info("Login with connect button");
+                }
+            } catch (DfException dfe) {
+                log.finest(dfe.getMessage());
             }
         } else {
             log.info("Login with connect button");

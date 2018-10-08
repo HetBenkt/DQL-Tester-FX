@@ -57,6 +57,7 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
     private Button btnDisconnect;
 
     private FXMLLoader fxmlLoader;
+    private Repository repositoryCon = Repository.getRepositoryCon();
 
     @FXML
     private void handleConnect(ActionEvent actionEvent) throws IOException {
@@ -65,7 +66,7 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
     }
 
     @FXML
-    private void handleExit(ActionEvent actionEvent) throws DfException {
+    private void handleExit(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -75,7 +76,7 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            Repository.disconnect();
+            repositoryCon.disconnect();
             System.exit(0);
         } else {
             alert.close();
@@ -84,7 +85,7 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
 
     public void handle(WindowEvent event) {
         LoginPane loginPaneController = fxmlLoader.getController();
-        if (Repository.getSession() != null && Repository.getSession().isConnected()) {
+        if (repositoryCon.getSession() != null && repositoryCon.getSession().isConnected()) {
             updateNodes(String.valueOf(loginPaneController.getChbRepository().getValue()), "dummyUserNameOS", loginPaneController.getTxtUsername().getText(), loginPaneController.getHostName(), "dummyPrivileges", "dummyServerVersion", true);
         } else {
             updateNodes("Offline", "OS Username", "DC Username", "OS Domain", "Privileges", "Server Version", false);
@@ -120,10 +121,9 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
         String statement = bodyPaneController.getTaStatement().getText();
         JSONObject jsonObject = bodyPaneController.getJsonObject();
 
-        Repository repository = Repository.getRepositoryCon();
         IDfCollection result = null;
         try {
-            result = repository.query(statement);
+            result = repositoryCon.query(statement);
         } catch (DfException dfe) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Information Dialog");

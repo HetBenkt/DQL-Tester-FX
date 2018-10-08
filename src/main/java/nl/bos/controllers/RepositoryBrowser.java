@@ -5,7 +5,6 @@ import com.documentum.fc.common.DfException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
@@ -20,9 +19,7 @@ import java.util.ResourceBundle;
 public class RepositoryBrowser implements Initializable {
     @FXML
     private TreeView treeview;
-    private final Node cabinetIcon = new ImageView(
-            new Image(getClass().getClassLoader().getResourceAsStream("cabinet_16.png"))
-    );
+
     @FXML
     private void handleExit(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
@@ -31,15 +28,15 @@ public class RepositoryBrowser implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         log.info(String.valueOf(location));
+        Repository repositoryCon = Repository.getRepositoryCon();
 
-        TreeItem<String> rootItem = new TreeItem<String>("Dummy");
+        TreeItem<String> rootItem = new TreeItem<>(repositoryCon.getRepositoryName());
         rootItem.setExpanded(true);
 
-        Repository repository = Repository.getRepositoryCon();
         try {
-            IDfCollection cabinets = repository.query("select r_object_id, object_name, is_private from dm_cabinet order by object_name");
+            IDfCollection cabinets = repositoryCon.query("select r_object_id, object_name, is_private from dm_cabinet order by object_name");
             while (cabinets.next()) {
-                TreeItem<String> item = new TreeItem<String>(cabinets.getString("object_name"), new ImageView(
+                TreeItem<String> item = new TreeItem<>(cabinets.getString("object_name"), new ImageView(
                         new Image(getClass().getClassLoader().getResourceAsStream("cabinet_16.png"))));
                 rootItem.getChildren().add(item);
             }

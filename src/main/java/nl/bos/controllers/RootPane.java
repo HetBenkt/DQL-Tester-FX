@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import lombok.Getter;
 import lombok.extern.java.Log;
+import nl.bos.Repository;
 
 import java.io.IOException;
 
@@ -26,7 +27,8 @@ public class RootPane implements EventHandler<WindowEvent> {
 
         Stage browseRepositoryStage = new Stage();
         browseRepositoryStage.initModality(Modality.APPLICATION_MODAL);
-        browseRepositoryStage.setTitle(String.format("Repository Browser - %s (%s)", "dummy", "dummy"));
+        Repository repositoryCon = Repository.getRepositoryCon();
+        browseRepositoryStage.setTitle(String.format("Repository Browser - %s (%s)", repositoryCon.getRepositoryName(), repositoryCon.getUserName()));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RepositoryBrowser.fxml"));
         VBox repositoryBrowser = fxmlLoader.load();
         browseRepositoryStage.setScene(new Scene(repositoryBrowser));
