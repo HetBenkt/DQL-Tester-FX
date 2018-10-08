@@ -12,26 +12,21 @@ import lombok.extern.java.Log;
 public class Repository {
     private static Repository repository;
     @Getter
-    private static String errorMessage = "";
-    private IDfSessionManager sMgr;
+    private String errorMessage = "";
+    private IDfSessionManager sessionManager;
     @Getter
-    private static IDfSession session;
-    private static String repositoryName;
-    private static String userName;
-    private static String passkey;
-    private static String domain;
+    private IDfSession session;
+    @Getter
+    private String repositoryName;
+    @Getter
+    private String userName;
+    private String passkey;
+    private String domain;
     private static IDfClientX clientx = new DfClientX();
     private static IDfClient client = null;
 
 
     private Repository() {
-        try {
-            this.sMgr = createSessionManager(repositoryName, userName, passkey, domain);
-            session = createSession(repositoryName);
-        } catch (DfException e) {
-            log.info(e.getMessage());
-            errorMessage = e.getMessage();
-        }
     }
 
     public static synchronized Repository getRepositoryCon() {
@@ -41,61 +36,62 @@ public class Repository {
         return repository;
     }
 
-    public static void disconnect() throws DfException {
+    public void disconnect() {
         if (repository != null && session != null && session.isConnected()) {
-            session.disconnect();
-            repository = null;
+            sessionManager.release(session);
+            sessionManager.clearIdentity(repositoryName);
         }
     }
 
-    public static IDfDocbaseMap obtainRepositoryMap() throws DfException {
+    public IDfDocbaseMap obtainRepositoryMap() throws DfException {
         if (client == null)
             client = clientx.getLocalClient();
         return client.getDocbaseMap();
     }
 
-    public static void setCredentials(String repositoryName, String userName, String passkey, String domain) {
-        Repository.repositoryName = repositoryName;
-        Repository.userName = userName;
-        Repository.passkey = passkey;
-        Repository.domain = domain;
+    public void setCredentials(String repositoryName, String userName, String passkey, String domain) {
+        this.repositoryName = repositoryName;
+        this.userName = userName;
+        this.passkey = passkey;
+        this.domain = domain;
     }
 
-    public static IDfTypedObject obtainServerMap(String selectedRepository) throws DfException {
+    public IDfTypedObject obtainServerMap(String selectedRepository) throws DfException {
         if (client == null)
             client = clientx.getLocalClient();
         return client.getServerMap(selectedRepository);
     }
 
-    private IDfSession createSession(String repoName) throws DfException {
-        return this.sMgr.getSession(repoName);
+    public void createSession() {
+        try {
+            session = sessionManager.getSession(repositoryName);
+        } catch (DfServiceException e) {
+            log.finest(e.getMessage());
+            errorMessage = e.getMessage();
+            sessionManager.clearIdentity(repositoryName);
+        }
     }
 
-    private IDfSessionManager createSessionManager(String repoName, String repoUsername, String repoPasskey, String repoDomain) throws DfException {
-        client = clientx.getLocalClient();
-
-        IDfSessionManager newSessionManager = client.newSessionManager();
+    public void createSessionManager() throws DfException {
+        if (sessionManager == null) {
+            client = clientx.getLocalClient();
+            sessionManager = client.newSessionManager();
+        }
 
         IDfLoginInfo loginInfoObj = clientx.getLoginInfo();
-        loginInfoObj.setUser(repoUsername);
-        loginInfoObj.setPassword(repoPasskey);
-        loginInfoObj.setDomain(repoDomain);
+        loginInfoObj.setUser(userName);
+        loginInfoObj.setPassword(passkey);
+        loginInfoObj.setDomain(domain);
 
-        newSessionManager.setIdentity(repoName, loginInfoObj);
-        return newSessionManager;
+        sessionManager.setIdentity(repositoryName, loginInfoObj);
     }
 
-    public static boolean isConnectionValid() {
-        repository = Repository.getRepositoryCon();
-        if (session == null || !session.isConnected()) {
-            repository = null;
-            return false;
-        }
-        return true;
+    public boolean isConnectionValid() {
+        createSession();
+        return session != null && session.isConnected();
     }
 
     public IDfCollection query(String query) throws DfException {
-        IDfClientX clientx = new DfClientX();
         IDfQuery q = clientx.getQuery();
         q.setDQL(query);
 

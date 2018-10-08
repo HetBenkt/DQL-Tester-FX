@@ -52,20 +52,23 @@ public class LoginPane implements Initializable {
     @FXML
     private CheckBox chkUseWindowsLogin;
 
+    private Repository repositoryCon = Repository.getRepositoryCon();
+
     @FXML
-    private void handleConnect(ActionEvent actionEvent) {
+    private void handleConnect(ActionEvent actionEvent) throws DfException {
         log.info(String.valueOf(actionEvent.getSource()));
         String selectedRepository = chbRepository.getValue().toString();
         lblServer.setText(String.format("Connection to '%s'", selectedRepository));
-        Repository.setCredentials(selectedRepository, txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
-        if (Repository.isConnectionValid()) {
+        repositoryCon.setCredentials(selectedRepository, txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
+        repositoryCon.createSessionManager();
+        if (repositoryCon.isConnectionValid()) {
             Stage loginStage = InputPane.getLoginStage();
             loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Information Dialog");
             alert.setHeaderText(null);
-            alert.setContentText(Repository.getErrorMessage());
+            alert.setContentText(repositoryCon.getErrorMessage());
             alert.showAndWait();
         }
     }
@@ -82,7 +85,7 @@ public class LoginPane implements Initializable {
         log.info(String.valueOf(actionEvent.getSource()));
 
         String selectedRepository = chbRepository.getValue().toString();
-        IDfTypedObject serverMap = Repository.obtainServerMap(selectedRepository);
+        IDfTypedObject serverMap = repositoryCon.obtainServerMap(selectedRepository);
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Info");
@@ -135,7 +138,7 @@ public class LoginPane implements Initializable {
     private void handleConnectionBrokerMap(ActionEvent actionEvent) throws DfException {
         log.info(String.valueOf(actionEvent.getSource()));
 
-        IDfDocbaseMap repositoryMap = Repository.obtainRepositoryMap();
+        IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Info");
@@ -145,28 +148,28 @@ public class LoginPane implements Initializable {
     }
 
     public void initialize(URL location, ResourceBundle resources) {
-        if (Repository.getSession() != null && Repository.getSession().isConnected()) {
-            btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
-            btnDisconnect.setManaged(true);
-
-            btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
-            btnConnect.setManaged(false);
-
-            chbRepository.setDisable(true);
-            txtUsername.setDisable(true);
-            txtPassword.setDisable(true);
-            txtDomain.setDisable(true);
-            chkSaveLoginData.setDisable(true);
-            chkUseWindowsLogin.setDisable(true);
-        } else {
-            btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
-            btnDisconnect.setManaged(false);
-        }
-
-        lblVersion.setText(getProjectVersion());
-
         try {
-            IDfDocbaseMap repositoryMap = Repository.obtainRepositoryMap();
+            if (repositoryCon.getSession() != null && repositoryCon.getSession().isConnected()) {
+                btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
+                btnDisconnect.setManaged(true);
+
+                btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
+                btnConnect.setManaged(false);
+
+                chbRepository.setDisable(true);
+                txtUsername.setDisable(true);
+                txtPassword.setDisable(true);
+                txtDomain.setDisable(true);
+                chkSaveLoginData.setDisable(true);
+                chkUseWindowsLogin.setDisable(true);
+            } else {
+                btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
+                btnDisconnect.setManaged(false);
+            }
+
+            lblVersion.setText(getProjectVersion());
+
+            IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
             //noinspection deprecation
             hostName = repositoryMap.getHostName();
             lblServer.setText(hostName);
@@ -205,9 +208,9 @@ public class LoginPane implements Initializable {
     }
 
     @FXML
-    private void handleDisconnect(ActionEvent actionEvent) throws DfException {
+    private void handleDisconnect(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
-        Repository.disconnect();
+        repositoryCon.disconnect();
         Stage loginStage = InputPane.getLoginStage();
         loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
