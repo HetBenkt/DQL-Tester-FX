@@ -44,7 +44,7 @@ public class BodyPane implements Initializable, ChangeListener {
     private TextArea taStatement;
     @FXML
     @Getter
-    private ChoiceBox cmbHistory;
+    private ChoiceBox<String> cmbHistory;
     @FXML
     private TableView tbResult;
     @Getter
@@ -98,7 +98,7 @@ public class BodyPane implements Initializable, ChangeListener {
         while (iterator.hasNext()) {
             statements.add(iterator.next());
         }
-        ObservableList value = FXCollections.observableList(statements);
+        ObservableList<String> value = FXCollections.observableList(statements);
         cmbHistory.setItems(value);
     }
 
@@ -108,7 +108,7 @@ public class BodyPane implements Initializable, ChangeListener {
         taStatement.setText(selectedHistoryItem);
     }
 
-    public void updateResultTable(IDfCollection collection) throws DfException {
+    void updateResultTable(IDfCollection collection) throws DfException {
         tbResult.getItems().clear();
         tbResult.getColumns().clear();
 

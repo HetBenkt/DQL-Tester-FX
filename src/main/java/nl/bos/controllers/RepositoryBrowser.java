@@ -18,7 +18,7 @@ import java.util.ResourceBundle;
 @Log
 public class RepositoryBrowser implements Initializable {
     @FXML
-    private TreeView treeview;
+    private TreeView<String> treeview;
 
     @FXML
     private void handleExit(ActionEvent actionEvent) {
@@ -28,7 +28,7 @@ public class RepositoryBrowser implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         log.info(String.valueOf(location));
-        Repository repositoryCon = Repository.getRepositoryCon();
+        Repository repositoryCon = Repository.getInstance();
 
         TreeItem<String> rootItem = new TreeItem<>(repositoryCon.getRepositoryName());
         rootItem.setExpanded(true);

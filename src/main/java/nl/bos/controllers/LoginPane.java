@@ -33,7 +33,7 @@ public class LoginPane implements Initializable {
     private Label lblServer;
     @FXML
     @Getter
-    private ChoiceBox chbRepository;
+    private ChoiceBox<String> chbRepository;
     @FXML
     private Button btnConnect;
     @FXML
@@ -52,12 +52,12 @@ public class LoginPane implements Initializable {
     @FXML
     private CheckBox chkUseWindowsLogin;
 
-    private Repository repositoryCon = Repository.getRepositoryCon();
+    private Repository repositoryCon = Repository.getInstance();
 
     @FXML
     private void handleConnect(ActionEvent actionEvent) throws DfException {
         log.info(String.valueOf(actionEvent.getSource()));
-        String selectedRepository = chbRepository.getValue().toString();
+        String selectedRepository = chbRepository.getValue();
         lblServer.setText(String.format("Connection to '%s'", selectedRepository));
         repositoryCon.setCredentials(selectedRepository, txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
         repositoryCon.createSessionManager();
@@ -84,7 +84,7 @@ public class LoginPane implements Initializable {
     private void handleServerMap(ActionEvent actionEvent) throws DfException {
         log.info(String.valueOf(actionEvent.getSource()));
 
-        String selectedRepository = chbRepository.getValue().toString();
+        String selectedRepository = chbRepository.getValue();
         IDfTypedObject serverMap = repositoryCon.obtainServerMap(selectedRepository);
 
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -150,42 +150,47 @@ public class LoginPane implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         try {
             if (repositoryCon.getSession() != null && repositoryCon.getSession().isConnected()) {
-                btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
-                btnDisconnect.setManaged(true);
-
-                btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
-                btnConnect.setManaged(false);
-
-                chbRepository.setDisable(true);
-                txtUsername.setDisable(true);
-                txtPassword.setDisable(true);
-                txtDomain.setDisable(true);
-                chkSaveLoginData.setDisable(true);
-                chkUseWindowsLogin.setDisable(true);
+                setFieldsConnect(true);
             } else {
-                btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
-                btnDisconnect.setManaged(false);
+                setFieldsConnect(false);
             }
 
             lblVersion.setText(getProjectVersion());
 
-            IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
-            //noinspection deprecation
-            hostName = repositoryMap.getHostName();
-            lblServer.setText(hostName);
+            if (repositoryCon.getClient() != null) {
+                IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
+                //noinspection deprecation
+                hostName = repositoryMap.getHostName();
+                lblServer.setText(hostName);
 
-            log.info(MessageFormat.format("Repositories for Connection Broker: {0}", hostName));
-            log.info(MessageFormat.format("Total number of Repostories: {0}", repositoryMap.getDocbaseCount()));
-            for (int i = 0; i < repositoryMap.getDocbaseCount(); i++) {
-                log.info(MessageFormat.format("Repository {0}", (i + 1) + ": " + repositoryMap.getDocbaseName(i)));
-                ObservableList repositories = FXCollections.observableArrayList();
-                repositories.add(repositoryMap.getDocbaseName(i));
-                chbRepository.setItems(repositories);
-                chbRepository.setValue(chbRepository.getItems().get(0));
+                log.info(MessageFormat.format("Repositories for Connection Broker: {0}", hostName));
+                log.info(MessageFormat.format("Total number of Repostories: {0}", repositoryMap.getDocbaseCount()));
+                for (int i = 0; i < repositoryMap.getDocbaseCount(); i++) {
+                    log.info(MessageFormat.format("Repository {0}", (i + 1) + ": " + repositoryMap.getDocbaseName(i)));
+                    ObservableList<String> repositories = FXCollections.observableArrayList();
+                    repositories.add(repositoryMap.getDocbaseName(i));
+                    chbRepository.setItems(repositories);
+                    chbRepository.setValue(chbRepository.getItems().get(0));
+                }
             }
         } catch (Exception e) {
             log.info(e.getMessage());
         }
+    }
+
+    private void setFieldsConnect(boolean connected) {
+        btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
+        btnDisconnect.setManaged(connected);
+
+        btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
+        btnConnect.setManaged(!connected);
+
+        chbRepository.setDisable(connected);
+        txtUsername.setDisable(connected);
+        txtPassword.setDisable(connected);
+        txtDomain.setDisable(connected);
+        chkSaveLoginData.setDisable(connected);
+        chkUseWindowsLogin.setDisable(connected);
     }
 
     private String getProjectVersion() {

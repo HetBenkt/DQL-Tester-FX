@@ -27,7 +27,7 @@ public class RootPane implements EventHandler<WindowEvent> {
 
         Stage browseRepositoryStage = new Stage();
         browseRepositoryStage.initModality(Modality.APPLICATION_MODAL);
-        Repository repositoryCon = Repository.getRepositoryCon();
+        Repository repositoryCon = Repository.getInstance();
         browseRepositoryStage.setTitle(String.format("Repository Browser - %s (%s)", repositoryCon.getRepositoryName(), repositoryCon.getUserName()));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RepositoryBrowser.fxml"));
         VBox repositoryBrowser = fxmlLoader.load();

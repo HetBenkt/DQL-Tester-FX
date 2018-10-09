@@ -22,14 +22,15 @@ public class Repository {
     private String userName;
     private String passkey;
     private String domain;
-    private static IDfClientX clientx = new DfClientX();
-    private static IDfClient client = null;
+    private IDfClientX clientx = new DfClientX();
+    @Getter
+    private IDfClient client = null;
 
 
     private Repository() {
     }
 
-    public static synchronized Repository getRepositoryCon() {
+    public static synchronized Repository getInstance() {
         if (repository == null) {
             repository = new Repository();
         }
@@ -62,7 +63,7 @@ public class Repository {
         return client.getServerMap(selectedRepository);
     }
 
-    public void createSession() {
+    private void createSession() {
         try {
             session = sessionManager.getSession(repositoryName);
         } catch (DfServiceException e) {
@@ -70,6 +71,10 @@ public class Repository {
             errorMessage = e.getMessage();
             sessionManager.clearIdentity(repositoryName);
         }
+    }
+
+    public void setClient() throws DfException {
+        client = clientx.getLocalClient();
     }
 
     public void createSessionManager() throws DfException {

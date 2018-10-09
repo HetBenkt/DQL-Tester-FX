@@ -16,15 +16,26 @@ import nl.bos.controllers.RootPane;
 
 @Log
 public class Main extends Application {
-    @Getter
-    private static FXMLLoader bodyPaneLoader;
+    private static Main mainClass;
     private static boolean devModeEnabled = false;
     @Getter
-    private static FXMLLoader rootPaneLoader;
+    private FXMLLoader bodyPaneLoader;
+    @Getter
+    private FXMLLoader rootPaneLoader;
 
+    public Main() {
+        mainClass = this;
+    }
+
+    public static synchronized Main getInstance() {
+        if (mainClass == null) {
+            mainClass = new Main();
+        }
+        return mainClass;
+    }
     public static void main(String[] args) {
         if (args.length > 0) {
-            Repository repositoryCon = Repository.getRepositoryCon();
+            Repository repositoryCon = Repository.getInstance();
             repositoryCon.setCredentials(args[0], args[1], args[2], "");
             try {
                 repositoryCon.createSessionManager();

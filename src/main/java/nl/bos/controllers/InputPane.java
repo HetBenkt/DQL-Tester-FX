@@ -30,7 +30,7 @@ import java.util.ResourceBundle;
 @Log
 public class InputPane implements Initializable, EventHandler<WindowEvent> {
     @Getter
-    private static Stage loginStage;
+    private static Stage loginStage = new Stage();
     @FXML
     private Label lblStatus;
     @FXML
@@ -57,12 +57,25 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
     private Button btnDisconnect;
 
     private FXMLLoader fxmlLoader;
-    private Repository repositoryCon = Repository.getRepositoryCon();
+    private Repository repositoryCon = Repository.getInstance();
+    private Main main = Main.getInstance();
+
+    public InputPane() throws IOException {
+        loginStage.initModality(Modality.APPLICATION_MODAL);
+        loginStage.setTitle("Documentum Login");
+        fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/LoginPane.fxml"));
+        VBox loginPane = fxmlLoader.load();
+        loginStage.setScene(new Scene(loginPane));
+        loginStage.setOnCloseRequest(this);
+    }
 
     @FXML
-    private void handleConnect(ActionEvent actionEvent) throws IOException {
+    private void handleConnect(ActionEvent actionEvent) throws DfException {
         log.info(String.valueOf(actionEvent.getSource()));
-        showLoginStage();
+        repositoryCon.setClient();
+        LoginPane loginPaneController = fxmlLoader.getController();
+        loginPaneController.initialize(null, null);
+        loginStage.showAndWait();
     }
 
     @FXML
@@ -109,7 +122,7 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
         btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
         btnConnect.setManaged(!isConnected);
 
-        RootPane rootPaneLoaderController = Main.getRootPaneLoader().getController();
+        RootPane rootPaneLoaderController = main.getRootPaneLoader().getController();
         rootPaneLoaderController.getMenubar().setDisable(!isConnected);
     }
 
@@ -117,7 +130,7 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
     private void handleReadQuery(ActionEvent actionEvent) throws DfException {
         log.info(String.valueOf(actionEvent.getSource()));
 
-        BodyPane bodyPaneController = Main.getBodyPaneLoader().getController();
+        BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
         String statement = bodyPaneController.getTaStatement().getText();
         JSONObject jsonObject = bodyPaneController.getJsonObject();
 
@@ -138,8 +151,8 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
         }
 
         if (result != null) {
-            ChoiceBox cmbHistory = bodyPaneController.getCmbHistory();
-            ObservableList items = cmbHistory.getItems();
+            ChoiceBox<String> cmbHistory = bodyPaneController.getCmbHistory();
+            ObservableList<String> items = cmbHistory.getItems();
             if (statementNotExists(items, statement)) {
                 items.add(0, statement);
                 cmbHistory.setValue(statement);
@@ -167,23 +180,14 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
 
     @FXML
     private void handleClearQuery(ActionEvent actionEvent) {
-        BodyPane bodyPaneController = Main.getBodyPaneLoader().getController();
+        BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
         bodyPaneController.getTaStatement().clear();
     }
 
     @FXML
-    private void handleDisconnect(ActionEvent actionEvent) throws IOException {
-        showLoginStage();
-    }
-
-    private void showLoginStage() throws IOException {
-        loginStage = new Stage();
-        loginStage.initModality(Modality.APPLICATION_MODAL);
-        loginStage.setTitle("Documentum Login");
-        fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/LoginPane.fxml"));
-        VBox loginPane = fxmlLoader.load();
-        loginStage.setScene(new Scene(loginPane));
-        loginStage.setOnCloseRequest(this);
+    private void handleDisconnect(ActionEvent actionEvent) {
+        LoginPane loginPaneController = fxmlLoader.getController();
+        loginPaneController.initialize(null, null);
         loginStage.showAndWait();
     }
 
