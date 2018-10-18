@@ -21,18 +21,24 @@ public class RootPane implements EventHandler<WindowEvent> {
     @FXML
     @Getter
     private MenuBar menubar;
+    @Getter
+    private static Stage browseRepositoryStage = new Stage();
+
+    public RootPane() {
+        browseRepositoryStage.initModality(Modality.APPLICATION_MODAL);
+
+    }
 
     public void browseRepository(ActionEvent actionEvent) throws IOException {
         log.info(String.valueOf(actionEvent.getSource()));
 
-        Stage browseRepositoryStage = new Stage();
-        browseRepositoryStage.initModality(Modality.APPLICATION_MODAL);
         Repository repositoryCon = Repository.getInstance();
         browseRepositoryStage.setTitle(String.format("Repository Browser - %s (%s)", repositoryCon.getRepositoryName(), repositoryCon.getUserName()));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RepositoryBrowser.fxml"));
         VBox repositoryBrowser = fxmlLoader.load();
         browseRepositoryStage.setScene(new Scene(repositoryBrowser));
         browseRepositoryStage.setOnCloseRequest(this);
+
         browseRepositoryStage.showAndWait();
     }
 
