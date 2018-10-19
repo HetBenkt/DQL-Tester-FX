@@ -1,4 +1,7 @@
 todo: Implement 'Browse repository'
+--> icons
+--> object name
+--> folder and document in 1 sysobject query
 todo: Implement 'Manage Jobs'
 todo: Handle exit with red-crosses -> close repository connection like this exit button! -> Also check other dialogs on this behavior!
 todo: Maximize 50 history queries in combobox
