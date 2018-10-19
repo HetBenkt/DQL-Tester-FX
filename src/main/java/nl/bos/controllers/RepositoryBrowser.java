@@ -35,7 +35,7 @@ public class RepositoryBrowser implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         log.info(String.valueOf(location));
-        MyTreeItem rootItem = new MyTreeItem(repositoryCon.getRepositoryName(), "repository", new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("repository_16.png"))), String.format("/%s", repositoryCon.getRepositoryName()));
+        MyTreeItem rootItem = new MyTreeItem(repositoryCon.getRepositoryName(), "repository", new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("repository_16.png"))), "");
         rootItem.setExpanded(true);
         treeview.setRoot(buildFileSystemBrowser(rootItem));
     }

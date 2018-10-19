@@ -41,24 +41,35 @@ public class MyTreeItem extends TreeItem<String> {
                     children.add(child);
                 }
             } else if (parent.getType().equals("cabinet")) {
-                IDfCollection folders = repositoryCon.query("select r_object_id, object_name from dm_folder order by object_name");
+                IDfCollection folders = repositoryCon.query(String.format("select r_object_id, object_name from dm_folder where cabinet('%s') order by object_name", parent.getPath()));
                 while (folders.next()) {
                     MyTreeItem child = new MyTreeItem(folders.getString("object_name"), "folder", new ImageView(
                             new Image(getClass().getClassLoader().getResourceAsStream("folder_16.png"))), String.format("%s/%s", parent.getPath(), folders.getString("object_name")));
                     children.add(child);
                 }
-            } else if (parent.getType().equals("document")) {
-                IDfCollection documents = repositoryCon.query("select r_object_id, object_name from dm_document order by object_name");
-                while (documents.next()) {
-                    MyTreeItem child = new MyTreeItem(documents.getString("object_name"), "folder", new ImageView(
-                            new Image(getClass().getClassLoader().getResourceAsStream("document_16.png"))), String.format("%s/%s", parent.getPath(), documents.getString("object_name")));
+                addDocuments(children, parent);
+            } else if (parent.getType().equals("folder")) {
+                IDfCollection folders = repositoryCon.query(String.format("select r_object_id, object_name from dm_folder where folder('%s') order by object_name", parent.getPath()));
+                while (folders.next()) {
+                    MyTreeItem child = new MyTreeItem(folders.getString("object_name"), "folder", new ImageView(
+                            new Image(getClass().getClassLoader().getResourceAsStream("folder_16.png"))), String.format("%s/%s", parent.getPath(), folders.getString("object_name")));
                     children.add(child);
                 }
+                addDocuments(children, parent);
             }
         } catch (DfException e) {
             log.finest(e.getMessage());
         }
 
         return children;
+    }
+
+    private void addDocuments(List<MyTreeItem> children, MyTreeItem parent) throws DfException {
+        IDfCollection documents = repositoryCon.query(String.format("select r_object_id, object_name from dm_sysobject where folder('%s') and r_object_type != 'dm_folder' order by object_name", parent.getPath()));
+        while (documents.next()) {
+            MyTreeItem child = new MyTreeItem(documents.getString("object_name"), "document", new ImageView(
+                    new Image(getClass().getClassLoader().getResourceAsStream("document_16.png"))), String.format("%s/%s", parent.getPath(), documents.getString("object_name")));
+            children.add(child);
+        }
     }
 }
