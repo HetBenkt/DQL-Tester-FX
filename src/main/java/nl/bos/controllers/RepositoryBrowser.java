@@ -1,5 +1,7 @@
 package nl.bos.controllers;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -20,7 +22,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 @Log
-public class RepositoryBrowser implements Initializable {
+public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem<MyTreeItem>> {
     @FXML
     private TreeView<MyTreeItem> treeview;
     private Repository repositoryCon = Repository.getInstance();
@@ -35,9 +37,9 @@ public class RepositoryBrowser implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         log.info(String.valueOf(location));
-        MyTreeItem rootItem = new MyTreeItem(repositoryCon.getRepositoryName(), "repository", new ImageView(new Image(getClass().getClassLoader().getResourceAsStream("repository_16.png"))), "");
-        rootItem.setExpanded(true);
+        MyTreeItem rootItem = new MyTreeItem(repositoryCon.getRepositoryName(), "repository", "");
         treeview.setRoot(buildFileSystemBrowser(rootItem));
+        treeview.getSelectionModel().selectedItemProperty().addListener(this);
     }
 
     private TreeItem<MyTreeItem> buildFileSystemBrowser(MyTreeItem treeItem) {
@@ -49,8 +51,8 @@ public class RepositoryBrowser implements Initializable {
     // anonymously, but this could be better abstracted by creating a
     // 'FileTreeItem' subclass of TreeItem. However, this is left as an exercise
     // for the reader.
-    private TreeItem<MyTreeItem> createNode(final MyTreeItem f) {
-        return new TreeItem<MyTreeItem>(f) {
+    private TreeItem<MyTreeItem> createNode(final MyTreeItem treeItem) {
+        return new TreeItem<MyTreeItem>(treeItem, new ImageView(new Image(getClass().getClassLoader().getResourceAsStream(String.format("%s_16.png", treeItem.getType()))))) {
             // We cache whether the File is a leaf or not. A File is a leaf if
             // it is not a directory and does not have any files contained within
             // it. We cache this as isLeaf() is called often, and doing the
@@ -103,5 +105,10 @@ public class RepositoryBrowser implements Initializable {
                 return FXCollections.emptyObservableList();
             }
         };
+    }
+
+    @Override
+    public void changed(ObservableValue<? extends TreeItem<MyTreeItem>> observable, TreeItem<MyTreeItem> oldValue, TreeItem<MyTreeItem> newValue) {
+        log.info(String.format("Selected item: %s", newValue.getValue().getName()));
     }
 }

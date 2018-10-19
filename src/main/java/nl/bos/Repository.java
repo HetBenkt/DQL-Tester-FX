@@ -101,7 +101,7 @@ public class Repository {
         q.setDQL(query);
 
         IDfCollection collection = q.execute(session, IDfQuery.DF_READ_QUERY);
-        log.info(String.format("Query executed %s", query));
+        log.finest(String.format("Query executed: %s", query));
 
         return collection;
     }
