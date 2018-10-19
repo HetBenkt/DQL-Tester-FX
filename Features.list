@@ -1,11 +1,10 @@
-todo: Implement 'Browse repository'
---> icons
---> object name
---> folder and document in 1 sysobject query
+todo: Extend 'Browse repository'
+--> click event that fills fields below
+--> right-click for a dump action
+--> dm_cabinet is_private icon
 todo: Implement 'Manage Jobs'
 todo: Handle exit with red-crosses -> close repository connection like this exit button! -> Also check other dialogs on this behavior!
 todo: Maximize 50 history queries in combobox
 todo: Update the status fields and buttons on InputPane after login
 todo: Hit <Enter> to login
 todo: right-click in table-cell for object dump action
-todo: dm_cabinet is_private icon
