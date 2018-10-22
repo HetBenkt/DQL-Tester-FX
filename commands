@@ -1,6 +1,0 @@
-mvn install:install-file -Dfile=dfc.jar -DgroupId=com.documentum -DartifactId=dfc -Dversion=16.4.0000.0185 -Dpackaging=jar
-mvn install:install-file -Dfile=aspectjrt.jar -DgroupId=org.aspectj -DartifactId=tools -Dversion=1.8.10 -Dpackaging=jar
-mvn install:install-file -Dfile=commons-lang-2.4.jar -DgroupId=org.apache -DartifactId=commons-lang -Dversion=2.4 -Dpackaging=jar
-mvn install:install-file -Dfile=log4j.jar -DgroupId=org.apache -DartifactId=log4j -Dversion=1.2.13 -Dpackaging=jar
-mvn install:install-file -Dfile=certj.jar -DgroupId=com.rsa -DartifactId=certj -Dversion=6.2.1 -Dpackaging=jar
-mvn install:install-file -Dfile=cryptoj.jar -DgroupId=com.rsa -DartifactId=cryptoj -Dversion=6.2.2 -Dpackaging=jar
