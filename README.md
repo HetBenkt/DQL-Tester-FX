@@ -23,7 +23,7 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
 * DFC libraries. These can be downloaded from the opentext support site (https://mysupport.opentext.com)
 
 ### How to run the application:
-1. Download the latest release to the local drive (https://help.github.com/articles/creating-releases)
+1. Download the latest release to the local drive (https://github.com/HetBenkt/DQL-Tester-FX/releases)
 2. In the download directory create a sub directory named: `lib`
 3. Copy the following downloaded DFC jar files in this `lib` directory
     * aspectjrt.jar
@@ -66,7 +66,7 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
     ```
 4. Start a CMD prompt and give these commands (point to your own path as these are samples)
 * `cd "c:\DQL Tester FX"`
->It's the location of the downloaded `DQLTesterFX-1.0-SNAPSHOT.jar` and just created `lib` and `config` directory
-* `"c:\jre1.8.0_161\bin\java.exe" -cp DQLTesterFX-1.0-SNAPSHOT.jar;lib/*;config nl.bos.Main`
+>It's the location of the downloaded `DQLTesterFX-xxx.jar` and just created `lib` and `config` directory
+* `"c:\jre1.8.0_161\bin\java.exe" -cp DQLTesterFX-xxx.jar;lib/*;config nl.bos.Main`
 >For a direct login, pass 3 parameters: 
-* `"c:\jre1.8.0_161\bin\java.exe" -cp DQLTesterFX-1.0-SNAPSHOT.jar;lib/*;config nl.bos.Main <REPOSITORY_NAME> <USERNAME> <PASSWORD>`
+* `"c:\jre1.8.0_161\bin\java.exe" -cp DQLTesterFX-xxx.jar;lib/*;config nl.bos.Main <REPOSITORY_NAME> <USERNAME> <PASSWORD>`
