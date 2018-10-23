@@ -1,12 +1,12 @@
-## DQL Tester FX
-###### With new technologies, new tools will be created!
+# DQL Tester FX
+#### With new technologies, new tools will be created!
 This slogan made me start this project where we want to create a new version of the good old 'DQL Tester' tool.
 
 'DQL Tester' supports the administration tasks on a Documentum environment. With this project a new version of 'DQL Tester' is under construction and made available for everyone who wants to join our development team.
 
 The 'FX' postfix in the title makes it clear we use the new JavaFX technology to create standalone applications. 
 
-#### Feature list
+### Feature list
 * Execute DQL queries with the result in a table view
 * Browse the repository
 * Dump and modify properties
@@ -17,12 +17,12 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
 * Execute API and DQL scripts
      
 
-#### Requirements for this application
+### Requirements for this application
 * A Java Runtime Environment (JRE) (e.g. jre1.8.0_161)
 * A runnable OpenText Documentum environment that can be pinged by hostname or IP-address from the machine where this application will be executed
 * DFC libraries. These can be downloaded from the opentext support site (https://mysupport.opentext.com)
 
-#### How to run the application:
+### How to run the application:
 1. Download the latest release to the local drive (https://help.github.com/articles/creating-releases)
 2. In the download directory create a sub directory named: `lib`
 3. Copy the following downloaded DFC jar files in this `lib` directory
