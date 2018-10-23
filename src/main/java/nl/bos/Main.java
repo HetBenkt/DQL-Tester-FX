@@ -82,7 +82,7 @@ public class Main extends Application {
 
         rootPane.setCenter(bodyLayout);
 
-        primaryStage.setTitle("DQL Tester 16.4");
+        primaryStage.setTitle("DQL Tester FX");
         primaryStage.setScene(new Scene(rootPane));
 
         primaryStage.show();
