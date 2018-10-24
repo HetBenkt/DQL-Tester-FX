@@ -64,6 +64,7 @@ Now the application can be run, changed, committed (and pushed) and repackaged w
 * Can be logged in the 'User stories' project 
     * https://github.com/HetBenkt/DQL-Tester-FX/projects/1
     * Make sure to make a good description so others know what to be done
-
+### Wiki
+* https://github.com/HetBenkt/DQL-Tester-FX/wiki 
 ### Communication channels
 * This will be available in the future when communication will be an issue
