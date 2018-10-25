@@ -2,7 +2,7 @@
 ### Cloning the project
 * Start IntelliJ
 * On the 'Welcome' screen: Check out from Version Control -> Git
-    * URL: https://github.com/HetBenkt/DQL-Tester-FX.git
+    * URL: `https://github.com/HetBenkt/DQL-Tester-FX.git`
     * Directory: Your own local location
 * Hit 'Clone'
 * Hit 'Yes' to create an IntelliJ project
@@ -58,13 +58,11 @@ Create 2 new propery files
 	
 Now the application can be run, changed, committed (and pushed) and repackaged with Maven!
 ### Issues
-* Can be raised in
-    * https://github.com/HetBenkt/DQL-Tester-FX/issues 
+* Can be raised in [Issues](https://github.com/HetBenkt/DQL-Tester-FX/issues) 
 ### Features
-* Can be logged in the 'User stories' project 
-    * https://github.com/HetBenkt/DQL-Tester-FX/projects/1
+* Can be logged in the project [User stories](https://github.com/HetBenkt/DQL-Tester-FX/projects/1)
     * Make sure to make a good description so others know what to be done
 ### Wiki
-* https://github.com/HetBenkt/DQL-Tester-FX/wiki 
+* [Wiki](https://github.com/HetBenkt/DQL-Tester-FX/wiki) 
 ### Communication channels
 * This will be available in the future when communication will be an issue

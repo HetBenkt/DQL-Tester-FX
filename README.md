@@ -20,10 +20,10 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
 ### Requirements for this application
 * A Java Runtime Environment (JRE) (e.g. jre1.8.0_161)
 * A runnable OpenText Documentum environment that can be pinged by hostname or IP-address from the machine where this application will be executed
-* DFC libraries. These can be downloaded from the opentext support site (https://mysupport.opentext.com)
+* DFC libraries. These can be downloaded from [OpenText My Support](https://mysupport.opentext.com)
 
 ### How to run the application:
-1. Download the latest release to the local drive (https://github.com/HetBenkt/DQL-Tester-FX/releases)
+1. Download the latest [release](https://github.com/HetBenkt/DQL-Tester-FX/releases) to the local drive from
 2. In the download directory create a sub directory named: `lib`
 3. Copy the following downloaded DFC jar files in this `lib` directory
     * aspectjrt.jar
@@ -33,8 +33,8 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
     * dfc.jar
     * log4j.jar
 4. Copy the following jar files in this `lib` directory from the download locations
-    * json-simple-1.1.1.jar (https://code.google.com/archive/p/json-simple/)
-    * lombok-1.16.0.jar (https://projectlombok.org/all-versions)
+    * [json-simple-1.1.1.jar](https://code.google.com/archive/p/json-simple/)
+    * [lombok-1.16.0.jar](https://projectlombok.org/all-versions)
 5. In the download directory create a sub directory named: `config`
 6. Create a new file called `dfc.properties` in the `config` directory with this content
     ```
