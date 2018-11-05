@@ -11,6 +11,18 @@
 * Click Next (keep the default settings on the 'Select Maven projects' screen)
 * Click Next (keep the default settings on the 'Project name' screen)
 * Click Finish -> The project will be created now
+### IntelliJ plugins that are used
+* Start IntelliJ
+* Open 'File' > 'Settings'
+* Go to the 'Plugins' section
+* Download/install and enable these extra plugins
+    * Lombok Plugin (and enable annotation processing for the project)
+    * Coverage
+    * Emma
+    * SonarLint
+### Non public dependencies (Documentum Foundation Classes)
+Documentum appications are required to use DFC libraries. These can be downloaded from [OpenText My Support](https://mysupport.opentext.com)
+The pom.xml refers to these libraries from your local .m2 maven repository. To install external/downloaded jar dependencies to your local maven repository use the commands from the Wiki page [Maven commands](https://github.com/HetBenkt/DQL-Tester-FX/wiki/Maven-commands)
 ### Run the application
 * Add 2 run configurations (Run -> Edit Configurations...)
 
@@ -57,6 +69,14 @@ Create 2 new propery files
     ```
 	
 Now the application can be run, changed, committed (and pushed) and repackaged with Maven!
+### Code coverage
+Make sure the 'Coverage' and 'Emmo' plugins are enabled
+* Add a run configurations (Run -> Edit Configurations...)
+
+> * Hit the '+' sign to add a new 'JUnit'
+> * Give it a name: All in project
+> * Leave the Package empty
+> * Search for tests: In whole project
 ### Issues
 * Can be raised in [Issues](https://github.com/HetBenkt/DQL-Tester-FX/issues) 
 ### Features
