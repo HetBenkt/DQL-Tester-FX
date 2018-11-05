@@ -1,16 +1,21 @@
 package nl.bos.controllers;
 
+import com.documentum.fc.client.DfACL;
+import com.documentum.fc.client.IDfPersistentObject;
+import com.documentum.fc.common.DfException;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import lombok.extern.java.Log;
@@ -21,11 +26,40 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static nl.bos.Constants.TYPE_REPOSITORY;
+
 @Log
-public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem<MyTreeItem>> {
+public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem<MyTreeItem>>, EventHandler<ActionEvent> {
     @FXML
     private TreeView<MyTreeItem> treeview;
+    @FXML
+    private TextField txtObjectId;
+    @FXML
+    private TextField txtObjectType;
+    @FXML
+    private TextField txtContentType;
+    @FXML
+    private TextField txtContentSize;
+    @FXML
+    private TextField txtCreationDate;
+    @FXML
+    private TextField txtModifyDate;
+    @FXML
+    private TextField txtLockOwner;
+    @FXML
+    private TextField txtLockMachine;
+    @FXML
+    private TextField txtLockDate;
+    @FXML
+    private TextField txtAclName;
+    @FXML
+    private TextField txtPermission;
+    @FXML
+    private TextField txtVersion;
+
     private Repository repositoryCon = Repository.getInstance();
+    private ContextMenu rootContextMenu = new ContextMenu();
+    private TreeItem<MyTreeItem> selected;
 
     @FXML
     private void handleExit(ActionEvent actionEvent) {
@@ -37,9 +71,27 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         log.info(String.valueOf(location));
-        MyTreeItem rootItem = new MyTreeItem(repositoryCon.getRepositoryName(), "repository", "");
+
+        MenuItem miDump = new MenuItem("Dump");
+        miDump.setOnAction(this);
+        rootContextMenu.getItems().add(miDump);
+
+        MyTreeItem rootItem = new MyTreeItem(null, repositoryCon.getRepositoryName(), TYPE_REPOSITORY, "");
         treeview.setRoot(buildFileSystemBrowser(rootItem));
         treeview.getSelectionModel().selectedItemProperty().addListener(this);
+        treeview.addEventHandler(MouseEvent.MOUSE_RELEASED, me -> {
+            if (me.getButton() == MouseButton.SECONDARY) {
+                selected = treeview.getSelectionModel().getSelectedItem();
+                //item is selected - this prevents fail when clicking on empty space
+                if (selected != null) {
+                    //open context menu on current screen position
+                    rootContextMenu.show(treeview, me.getScreenX(), me.getScreenY());
+                }
+            } else {
+                //any other click cause hiding menu
+                rootContextMenu.hide();
+            }
+        });
     }
 
     private TreeItem<MyTreeItem> buildFileSystemBrowser(MyTreeItem treeItem) {
@@ -68,6 +120,7 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
             private boolean isFirstTimeChildren = true;
             private boolean isFirstTimeLeaf = true;
 
+
             @Override
             public ObservableList<TreeItem<MyTreeItem>> getChildren() {
                 if (isFirstTimeChildren) {
@@ -91,13 +144,13 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
             }
 
             private ObservableList<TreeItem<MyTreeItem>> buildChildren(TreeItem<MyTreeItem> parent) {
-                MyTreeItem treeItem = parent.getValue();
-                if (treeItem != null && treeItem.isDirectory()) {
-                    List<MyTreeItem> treeItems = treeItem.listObjects(treeItem);
+                MyTreeItem parentItem = parent.getValue();
+                if (parentItem != null && parentItem.isDirectory()) {
+                    List<MyTreeItem> treeItems = parentItem.listObjects(parentItem);
                     if (treeItems != null) {
                         ObservableList<TreeItem<MyTreeItem>> children = FXCollections.observableArrayList();
-                        for (MyTreeItem childFile : treeItems) {
-                            children.add(createNode(childFile));
+                        for (MyTreeItem treeItem : treeItems) {
+                            children.add(createNode(treeItem));
                         }
                         return children;
                     }
@@ -109,6 +162,77 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
 
     @Override
     public void changed(ObservableValue<? extends TreeItem<MyTreeItem>> observable, TreeItem<MyTreeItem> oldValue, TreeItem<MyTreeItem> newValue) {
-        log.info(String.format("Selected item: %s", newValue.getValue().getName()));
+        MyTreeItem selectedItem = newValue.getValue();
+        log.info(String.format("Selected item: %s", selectedItem.getName()));
+        IDfPersistentObject selectedObject = selectedItem.getObject();
+        if (selectedObject != null) {
+            try {
+                txtObjectId.setText(selectedObject.getObjectId().getId());
+                txtObjectType.setText(selectedObject.getType().getName());
+                txtContentType.setText(selectedObject.getString("a_content_type"));
+                txtContentSize.setText(selectedObject.getString("r_content_size"));
+                txtCreationDate.setText(selectedObject.getTime("r_creation_date").asString(""));
+                txtModifyDate.setText(selectedObject.getTime("r_modify_date").asString(""));
+                txtLockOwner.setText(selectedObject.getString("r_lock_owner"));
+                txtLockMachine.setText(selectedObject.getString("r_lock_machine"));
+                txtLockDate.setText(selectedObject.getTime("r_lock_date").asString(""));
+                txtAclName.setText(selectedObject.getString("acl_name"));
+                txtPermission.setText(convertPermitToLabel(selectedObject.getInt("owner_permit")));
+                txtVersion.setText(getRepeatingValue(selectedObject, "r_version_label"));
+            } catch (DfException e) {
+                log.finest(e.getMessage());
+            }
+        } else {
+            txtObjectId.setText("");
+            txtObjectType.setText("");
+            txtContentType.setText("");
+            txtContentSize.setText("");
+            txtCreationDate.setText("");
+            txtModifyDate.setText("");
+            txtLockOwner.setText("");
+            txtLockMachine.setText("");
+            txtLockDate.setText("");
+            txtAclName.setText("");
+            txtPermission.setText("");
+            txtVersion.setText("");
+        }
+    }
+
+    private String getRepeatingValue(IDfPersistentObject object, String attribute) throws DfException {
+        int count = object.getValueCount(attribute);
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            result.append(object.getRepeatingString(attribute, i));
+            if (i != count - 1)
+                result.append(", ");
+        }
+        return String.valueOf(result);
+    }
+
+    private String convertPermitToLabel(int permit) {
+        if (permit == DfACL.DF_PERMIT_NONE)
+            return DfACL.DF_PERMIT_NONE_STR;
+        if (permit == DfACL.DF_PERMIT_BROWSE)
+            return DfACL.DF_PERMIT_BROWSE_STR;
+        if (permit == DfACL.DF_PERMIT_READ)
+            return DfACL.DF_PERMIT_READ_STR;
+        if (permit == DfACL.DF_PERMIT_RELATE)
+            return DfACL.DF_PERMIT_RELATE_STR;
+        if (permit == DfACL.DF_PERMIT_VERSION)
+            return DfACL.DF_PERMIT_VERSION_STR;
+        if (permit == DfACL.DF_PERMIT_WRITE)
+            return DfACL.DF_PERMIT_WRITE_STR;
+        if (permit == DfACL.DF_PERMIT_DELETE)
+            return DfACL.DF_PERMIT_DELETE_STR;
+        return "";
+    }
+
+    @Override
+    public void handle(ActionEvent event) {
+        try {
+            log.info(selected.getValue().getObject().getObjectId().getId());
+        } catch (DfException e) {
+            log.finest(e.getMessage());
+        }
     }
 }
