@@ -2,49 +2,41 @@ package nl.bos.controllers;
 
 import com.documentum.fc.client.IDfPersistentObject;
 import com.documentum.fc.common.DfException;
-import javafx.embed.swing.JFXPanel;
+import com.sun.javafx.application.PlatformImpl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-import javax.swing.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
 public class RepositoryBrowserTest {
 
     @Mock
     private IDfPersistentObject object;
+    @InjectMocks
+    private RepositoryBrowser repositoryBrowser;
 
     @BeforeClass
-    public static void initToolkit()
-            throws InterruptedException {
-        final CountDownLatch latch = new CountDownLatch(1);
-        SwingUtilities.invokeLater(() -> {
-            new JFXPanel();
-            latch.countDown();
+    public static void initToolkit() {
+        PlatformImpl.startup(() -> {
         });
-
-        if (!latch.await(5L, TimeUnit.SECONDS))
-            throw new ExceptionInInitializerError();
     }
 
     @Test
     public void getRepeatingValue() throws DfException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        when(object.getValueCount(any())).thenReturn(3);
-        when(object.getRepeatingString(any(), anyInt())).thenReturn("dummy");
+        PowerMockito.when(object.getValueCount(any())).thenReturn(3);
+        PowerMockito.when(object.getRepeatingString(any(), anyInt())).thenReturn("dummy");
 
-        RepositoryBrowser repositoryBrowser = new RepositoryBrowser();
         Class<? extends RepositoryBrowser> repositoryBrowserClass = repositoryBrowser.getClass();
         Method getRepeatingValue = repositoryBrowserClass.getDeclaredMethod("getRepeatingValue", IDfPersistentObject.class, String.class);
         getRepeatingValue.setAccessible(true);

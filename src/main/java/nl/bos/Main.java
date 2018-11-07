@@ -86,5 +86,6 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(rootPane));
 
         primaryStage.show();
+        primaryStage.toFront();
     }
 }

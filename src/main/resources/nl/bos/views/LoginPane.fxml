@@ -28,10 +28,10 @@
         <CheckBox fx:id="chkUseWindowsLogin" mnemonicParsing="false" text="Use Windows Login"/>
         <CheckBox fx:id="chkSaveLoginData" mnemonicParsing="false" text="Save Login Data"/>
         <HBox spacing="5.0">
-            <Button fx:id="btnConnect" defaultButton="true" disable="true" mnemonicParsing="false"
-                    onAction="#handleConnect" text="Connect"/>
-            <Button fx:id="btnDisconnect" defaultButton="true" mnemonicParsing="false"
-                    onAction="#handleDisconnect" text="Disconnect" visible="false"/>
+            <Button fx:id="btnLogin" defaultButton="true" disable="true" mnemonicParsing="false"
+                    onAction="#handleLogin" text="Connect"/>
+            <Button fx:id="btnLogout" defaultButton="true" mnemonicParsing="false"
+                    onAction="#handleLogout" text="Disconnect" visible="false"/>
             <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#handleCancel"
                     text="Cancel"/>
         </HBox>

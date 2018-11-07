@@ -35,9 +35,9 @@ public class LoginPane implements Initializable {
     @Getter
     private ChoiceBox<String> chbRepository;
     @FXML
-    private Button btnConnect;
+    private Button btnLogin;
     @FXML
-    private Button btnDisconnect;
+    private Button btnLogout;
     @FXML
     @Getter
     private TextField txtUsername;
@@ -55,7 +55,7 @@ public class LoginPane implements Initializable {
     private Repository repositoryCon = Repository.getInstance();
 
     @FXML
-    private void handleConnect(ActionEvent actionEvent) throws DfException {
+    private void handleLogin(ActionEvent actionEvent) throws DfException {
         log.info(String.valueOf(actionEvent.getSource()));
         String selectedRepository = chbRepository.getValue();
         lblServer.setText(String.format("Connection to '%s'", selectedRepository));
@@ -179,11 +179,11 @@ public class LoginPane implements Initializable {
     }
 
     private void setFieldsConnect(boolean connected) {
-        btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
-        btnDisconnect.setManaged(connected);
+        btnLogout.managedProperty().bindBidirectional(btnLogout.visibleProperty());
+        btnLogout.setManaged(connected);
 
-        btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
-        btnConnect.setManaged(!connected);
+        btnLogin.managedProperty().bindBidirectional(btnLogin.visibleProperty());
+        btnLogin.setManaged(!connected);
 
         chbRepository.setDisable(connected);
         txtUsername.setDisable(connected);
@@ -207,13 +207,13 @@ public class LoginPane implements Initializable {
     @FXML
     private void handleConnectButton(KeyEvent keyEvent) {
         if (txtUsername.getText().length() > 0 && txtPassword.getText().length() > 0)
-            btnConnect.setDisable(false);
+            btnLogin.setDisable(false);
         else
-            btnConnect.setDisable(true);
+            btnLogin.setDisable(true);
     }
 
     @FXML
-    private void handleDisconnect(ActionEvent actionEvent) {
+    private void handleLogout(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
         repositoryCon.disconnect();
         Stage loginStage = InputPane.getLoginStage();

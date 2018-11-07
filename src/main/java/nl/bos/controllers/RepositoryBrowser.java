@@ -70,14 +70,13 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        log.info(String.valueOf(location));
-
         MenuItem miDump = new MenuItem("Dump");
         miDump.setOnAction(this);
         rootContextMenu.getItems().add(miDump);
 
         MyTreeItem rootItem = new MyTreeItem(null, repositoryCon.getRepositoryName(), TYPE_REPOSITORY, "");
-        treeview.setRoot(buildFileSystemBrowser(rootItem));
+        TreeItem<MyTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
+        treeview.setRoot(treeItemBrowser);
         treeview.getSelectionModel().selectedItemProperty().addListener(this);
         treeview.addEventHandler(MouseEvent.MOUSE_RELEASED, me -> {
             if (me.getButton() == MouseButton.SECONDARY) {
@@ -94,7 +93,7 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
         });
     }
 
-    private TreeItem<MyTreeItem> buildFileSystemBrowser(MyTreeItem treeItem) {
+    private TreeItem<MyTreeItem> buildTreeItemBrowser(MyTreeItem treeItem) {
         return createNode(treeItem);
     }
 
@@ -104,60 +103,9 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
     // 'FileTreeItem' subclass of TreeItem. However, this is left as an exercise
     // for the reader.
     private TreeItem<MyTreeItem> createNode(final MyTreeItem treeItem) {
-        return new TreeItem<MyTreeItem>(treeItem, new ImageView(new Image(getClass().getClassLoader().getResourceAsStream(String.format("%s_16.png", treeItem.getType()))))) {
-            // We cache whether the File is a leaf or not. A File is a leaf if
-            // it is not a directory and does not have any files contained within
-            // it. We cache this as isLeaf() is called often, and doing the
-            // actual check on File is expensive.
-            private boolean isLeaf;
-
-            // We do the children and leaf testing only once, and then set these
-            // booleans to false so that we do not check again during this
-            // run. A more complete implementation may need to handle more
-            // dynamic file system situations (such as where a folder has files
-            // added after the TreeView is shown). Again, this is left as an
-            // exercise for the reader.
-            private boolean isFirstTimeChildren = true;
-            private boolean isFirstTimeLeaf = true;
-
-
-            @Override
-            public ObservableList<TreeItem<MyTreeItem>> getChildren() {
-                if (isFirstTimeChildren) {
-                    isFirstTimeChildren = false;
-
-                    // First getChildren() call, so we actually go off and
-                    // determine the children of the File contained in this TreeItem.
-                    super.getChildren().setAll(buildChildren(this));
-                }
-                return super.getChildren();
-            }
-
-            @Override
-            public boolean isLeaf() {
-                if (isFirstTimeLeaf) {
-                    isFirstTimeLeaf = false;
-                    MyTreeItem treeItem = getValue();
-                    isLeaf = !treeItem.isDirectory();
-                }
-                return isLeaf;
-            }
-
-            private ObservableList<TreeItem<MyTreeItem>> buildChildren(TreeItem<MyTreeItem> parent) {
-                MyTreeItem parentItem = parent.getValue();
-                if (parentItem != null && parentItem.isDirectory()) {
-                    List<MyTreeItem> treeItems = parentItem.listObjects(parentItem);
-                    if (treeItems != null) {
-                        ObservableList<TreeItem<MyTreeItem>> children = FXCollections.observableArrayList();
-                        for (MyTreeItem treeItem : treeItems) {
-                            children.add(createNode(treeItem));
-                        }
-                        return children;
-                    }
-                }
-                return FXCollections.emptyObservableList();
-            }
-        };
+        ImageView imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream(String.format("%s_16.png", treeItem.getType()))));
+        MyTreeNode myTreeNode = new MyTreeNode(treeItem, imageView);
+        return myTreeNode;
     }
 
     @Override
@@ -233,6 +181,67 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
             log.info(selected.getValue().getObject().getObjectId().getId());
         } catch (DfException e) {
             log.finest(e.getMessage());
+        }
+    }
+
+    private class MyTreeNode extends TreeItem<MyTreeItem> {
+        // We cache whether the File is a leaf or not. A File is a leaf if
+        // it is not a directory and does not have any files contained within
+        // it. We cache this as isLeaf() is called often, and doing the
+        // actual check on File is expensive.
+        private boolean isLeaf;
+
+        // We do the children and leaf testing only once, and then set these
+        // booleans to false so that we do not check again during this
+        // run. A more complete implementation may need to handle more
+        // dynamic file system situations (such as where a folder has files
+        // added after the TreeView is shown). Again, this is left as an
+        // exercise for the reader.
+        private boolean isFirstTimeChildren;
+        private boolean isFirstTimeLeaf;
+
+        public MyTreeNode(MyTreeItem treeItem, ImageView imageView) {
+            super(treeItem, imageView);
+            isFirstTimeChildren = true;
+            isFirstTimeLeaf = true;
+        }
+
+
+        @Override
+        public ObservableList<TreeItem<MyTreeItem>> getChildren() {
+            if (isFirstTimeChildren) {
+                isFirstTimeChildren = false;
+
+                // First getChildren() call, so we actually go off and
+                // determine the children of the File contained in this TreeItem.
+                super.getChildren().setAll(buildChildren(this));
+            }
+            return super.getChildren();
+        }
+
+        @Override
+        public boolean isLeaf() {
+            if (isFirstTimeLeaf) {
+                isFirstTimeLeaf = false;
+                MyTreeItem treeItem = getValue();
+                isLeaf = !treeItem.isDirectory();
+            }
+            return isLeaf;
+        }
+
+        private ObservableList<TreeItem<MyTreeItem>> buildChildren(TreeItem<MyTreeItem> parent) {
+            MyTreeItem parentItem = parent.getValue();
+            if (parentItem != null && parentItem.isDirectory()) {
+                List<MyTreeItem> treeItems = parentItem.listObjects(parentItem);
+                if (treeItems != null) {
+                    ObservableList<TreeItem<MyTreeItem>> children = FXCollections.observableArrayList();
+                    for (MyTreeItem treeItem : treeItems) {
+                        children.add(createNode(treeItem));
+                    }
+                    return children;
+                }
+            }
+            return FXCollections.emptyObservableList();
         }
     }
 }
