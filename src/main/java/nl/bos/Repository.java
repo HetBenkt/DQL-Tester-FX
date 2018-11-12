@@ -22,7 +22,7 @@ public class Repository {
     private String userName;
     private String passkey;
     private String domain;
-    private IDfClientX clientx = new DfClientX();
+    private IDfClientX clientX = new DfClientX();
     @Getter
     private IDfClient client = null;
 
@@ -46,7 +46,7 @@ public class Repository {
 
     public IDfDocbaseMap obtainRepositoryMap() throws DfException {
         if (client == null)
-            client = clientx.getLocalClient();
+            client = clientX.getLocalClient();
         return client.getDocbaseMap();
     }
 
@@ -59,7 +59,7 @@ public class Repository {
 
     public IDfTypedObject obtainServerMap(String selectedRepository) throws DfException {
         if (client == null)
-            client = clientx.getLocalClient();
+            client = clientX.getLocalClient();
         return client.getServerMap(selectedRepository);
     }
 
@@ -74,16 +74,16 @@ public class Repository {
     }
 
     public void setClient() throws DfException {
-        client = clientx.getLocalClient();
+        client = clientX.getLocalClient();
     }
 
     public void createSessionManager() throws DfException {
         if (sessionManager == null) {
-            client = clientx.getLocalClient();
+            client = clientX.getLocalClient();
             sessionManager = client.newSessionManager();
         }
 
-        IDfLoginInfo loginInfoObj = clientx.getLoginInfo();
+        IDfLoginInfo loginInfoObj = clientX.getLoginInfo();
         loginInfoObj.setUser(userName);
         loginInfoObj.setPassword(passkey);
         loginInfoObj.setDomain(domain);
@@ -97,7 +97,7 @@ public class Repository {
     }
 
     public IDfCollection query(String query) throws DfException {
-        IDfQuery q = clientx.getQuery();
+        IDfQuery q = clientX.getQuery();
         q.setDQL(query);
 
         IDfCollection collection = q.execute(session, IDfQuery.DF_READ_QUERY);

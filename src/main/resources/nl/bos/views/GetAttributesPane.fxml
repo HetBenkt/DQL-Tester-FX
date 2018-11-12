@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/8.0.121"
+      fx:controller="nl.bos.controllers.GetAttributesPane">
+    <TextArea prefHeight="500.0">
+        <VBox.margin>
+            <Insets left="5.0" right="5.0" top="5.0"/>
+        </VBox.margin>
+    </TextArea>
+    <HBox spacing="10.0">
+        <Button fx:id="btnFind" mnemonicParsing="false" text="Find"/>
+        <Button fx:id="btnFindPrevious" mnemonicParsing="false" text="&lt;"/>
+        <Button fx:id="btnFindNext" mnemonicParsing="false" text="&gt;"/>
+        <CheckBox fx:id="chkCaseSensitive" mnemonicParsing="false" text="Case Sensitive"/>
+        <TextField fx:id="txtSearch" prefColumnCount="30"/>
+        <VBox.margin>
+            <Insets left="5.0" right="5.0" top="10.0"/>
+        </VBox.margin>
+    </HBox>
+    <HBox spacing="10.0">
+        <VBox spacing="5.0">
+            <Label text="Get Attributes for Object ID"/>
+            <HBox spacing="5.0">
+                <Label text="Object ID"/>
+                <TextField fx:id="txtObjectId"/>
+                <Button fx:id="btnDump" mnemonicParsing="false" text="Dump"/>
+            </HBox>
+        </VBox>
+        <VBox spacing="5.0">
+            <CheckBox fx:id="chkUseAPIkill" mnemonicParsing="false" selected="true"
+                      text="Use API Method 'kill' to remove object from cache"/>
+            <CheckBox fx:id="chkFilterList" mnemonicParsing="false" text="Filter Attributes List"/>
+        </VBox>
+        <VBox alignment="BOTTOM_RIGHT">
+            <children>
+                <Button fx:id="btnExit" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#handleExit" text="Exit">
+                    <VBox.margin>
+                        <Insets/>
+                    </VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+        <VBox.margin>
+            <Insets left="5.0" right="5.0" top="10.0"/>
+        </VBox.margin>
+    </HBox>
+</VBox>

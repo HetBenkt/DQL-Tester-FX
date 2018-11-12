@@ -40,32 +40,21 @@ public class MyTreeItem extends TreeItem<String> {
     }
 
     public List<MyTreeItem> listObjects(MyTreeItem parent) {
-        List<MyTreeItem> children = new ArrayList();
+        List<MyTreeItem> children = new ArrayList<>();
 
         try {
-            if (parent.getType().equals(TYPE_REPOSITORY)) {
+            if (TYPE_REPOSITORY.equals(parent.getType())) {
                 IDfCollection cabinets = repositoryCon.query("select r_object_id, object_name, is_private from dm_cabinet order by object_name");
                 while (cabinets.next()) {
                     IDfPersistentObject cabinet = repositoryCon.getSession().getObject(new DfId(cabinets.getString(ATTR_R_OBJECT_ID)));
-                    MyTreeItem child = new MyTreeItem(cabinet, cabinets.getString(ATTR_OBJECT_NAME), "cabinet", String.format(PATH_FORMAT, parent.getPath(), cabinets.getString(ATTR_OBJECT_NAME)));
+                    MyTreeItem child = new MyTreeItem(cabinet, cabinets.getString(ATTR_OBJECT_NAME), TYPE_CABINET, String.format(PATH_FORMAT, parent.getPath(), cabinets.getString(ATTR_OBJECT_NAME)));
                     children.add(child);
                 }
-            } else if (parent.getType().equals("cabinet")) {
-                IDfCollection folders = repositoryCon.query(String.format("select r_object_id, object_name from dm_folder where cabinet('%s') order by object_name", parent.getPath()));
-                while (folders.next()) {
-                    IDfPersistentObject folder = repositoryCon.getSession().getObject(new DfId(folders.getString(ATTR_R_OBJECT_ID)));
-                    MyTreeItem child = new MyTreeItem(folder, folders.getString(ATTR_OBJECT_NAME), TYPE_FOLDER, String.format(PATH_FORMAT, parent.getPath(), folders.getString(ATTR_OBJECT_NAME)));
-                    children.add(child);
-                }
-                addDocuments(children, parent);
-            } else if (parent.getType().equals(TYPE_FOLDER)) {
-                IDfCollection folders = repositoryCon.query(String.format("select r_object_id, object_name from dm_folder where folder('%s') order by object_name", parent.getPath()));
-                while (folders.next()) {
-                    IDfPersistentObject folder = repositoryCon.getSession().getObject(new DfId(folders.getString(ATTR_R_OBJECT_ID)));
-                    MyTreeItem child = new MyTreeItem(folder, folders.getString(ATTR_OBJECT_NAME), TYPE_FOLDER, String.format(PATH_FORMAT, parent.getPath(), folders.getString(ATTR_OBJECT_NAME)));
-                    children.add(child);
-                }
-                addDocuments(children, parent);
+
+            } else if (TYPE_CABINET.equals(parent.getType())) {
+                addNodesToParent(parent, children, "cabinet");
+            } else if (TYPE_FOLDER.equals(parent.getType())) {
+                addNodesToParent(parent, children, "folder");
             }
         } catch (DfException e) {
             log.finest(e.getMessage());
@@ -74,11 +63,21 @@ public class MyTreeItem extends TreeItem<String> {
         return children;
     }
 
+    private void addNodesToParent(MyTreeItem parent, List<MyTreeItem> children, String type) throws DfException {
+        IDfCollection folders = repositoryCon.query(String.format("select r_object_id, object_name from dm_folder where %s('%s') order by object_name", type, parent.getPath()));
+        while (folders.next()) {
+            IDfPersistentObject folder = repositoryCon.getSession().getObject(new DfId(folders.getString(ATTR_R_OBJECT_ID)));
+            MyTreeItem child = new MyTreeItem(folder, folders.getString(ATTR_OBJECT_NAME), TYPE_FOLDER, String.format(PATH_FORMAT, parent.getPath(), folders.getString(ATTR_OBJECT_NAME)));
+            children.add(child);
+        }
+        addDocuments(children, parent);
+    }
+
     private void addDocuments(List<MyTreeItem> children, MyTreeItem parent) throws DfException {
         IDfCollection documents = repositoryCon.query(String.format("select r_object_id, object_name from dm_sysobject where folder('%s') and r_object_type != 'dm_folder' order by object_name", parent.getPath()));
         while (documents.next()) {
             IDfPersistentObject document = repositoryCon.getSession().getObject(new DfId(documents.getString(ATTR_R_OBJECT_ID)));
-            MyTreeItem child = new MyTreeItem(document, documents.getString(ATTR_OBJECT_NAME), "document", String.format(PATH_FORMAT, parent.getPath(), documents.getString(ATTR_OBJECT_NAME)));
+            MyTreeItem child = new MyTreeItem(document, documents.getString(ATTR_OBJECT_NAME), TYPE_DOCUMENT, String.format(PATH_FORMAT, parent.getPath(), documents.getString(ATTR_OBJECT_NAME)));
             children.add(child);
         }
     }

@@ -7,7 +7,7 @@
       minWidth="-Infinity" prefHeight="850.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.121"
       fx:controller="nl.bos.controllers.RepositoryBrowser">
     <children>
-        <TreeView fx:id="treeview"/>
+        <TreeView fx:id="treeView"/>
         <HBox spacing="10.0">
             <children>
                 <VBox spacing="11.0">

@@ -10,14 +10,16 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import lombok.extern.java.Log;
 import nl.bos.MyTreeItem;
 import nl.bos.Repository;
@@ -26,12 +28,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import static nl.bos.Constants.TYPE_REPOSITORY;
+import static nl.bos.Constants.*;
 
 @Log
 public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem<MyTreeItem>>, EventHandler<ActionEvent> {
     @FXML
-    private TreeView<MyTreeItem> treeview;
+    private TreeView<MyTreeItem> treeView;
     @FXML
     private TextField txtObjectId;
     @FXML
@@ -56,6 +58,8 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
     private TextField txtPermission;
     @FXML
     private TextField txtVersion;
+    @FXML
+    private Button btnExit;
 
     private Repository repositoryCon = Repository.getInstance();
     private ContextMenu rootContextMenu = new ContextMenu();
@@ -64,27 +68,28 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
     @FXML
     private void handleExit(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
-        Stage browseRepositoryStage = RootPane.getBrowseRepositoryStage();
-        browseRepositoryStage.fireEvent(new WindowEvent(browseRepositoryStage, WindowEvent.WINDOW_CLOSE_REQUEST));
+        log.info(String.valueOf(actionEvent.getSource()));
+        Stage stage = (Stage) btnExit.getScene().getWindow();
+        stage.close();
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        MenuItem miDump = new MenuItem("Dump");
+        MenuItem miDump = new MenuItem("Get Attributes");
         miDump.setOnAction(this);
         rootContextMenu.getItems().add(miDump);
 
         MyTreeItem rootItem = new MyTreeItem(null, repositoryCon.getRepositoryName(), TYPE_REPOSITORY, "");
         TreeItem<MyTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
-        treeview.setRoot(treeItemBrowser);
-        treeview.getSelectionModel().selectedItemProperty().addListener(this);
-        treeview.addEventHandler(MouseEvent.MOUSE_RELEASED, me -> {
+        treeView.setRoot(treeItemBrowser);
+        treeView.getSelectionModel().selectedItemProperty().addListener(this);
+        treeView.addEventHandler(MouseEvent.MOUSE_RELEASED, me -> {
             if (me.getButton() == MouseButton.SECONDARY) {
-                selected = treeview.getSelectionModel().getSelectedItem();
+                selected = treeView.getSelectionModel().getSelectedItem();
                 //item is selected - this prevents fail when clicking on empty space
-                if (selected != null) {
+                if (selected != null && !selected.getValue().getType().equals(TYPE_REPOSITORY)) {
                     //open context menu on current screen position
-                    rootContextMenu.show(treeview, me.getScreenX(), me.getScreenY());
+                    rootContextMenu.show(treeView, me.getScreenX(), me.getScreenY());
                 }
             } else {
                 //any other click cause hiding menu
@@ -103,9 +108,19 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
     // 'FileTreeItem' subclass of TreeItem. However, this is left as an exercise
     // for the reader.
     private TreeItem<MyTreeItem> createNode(final MyTreeItem treeItem) {
-        ImageView imageView = new ImageView(new Image(getClass().getClassLoader().getResourceAsStream(String.format("%s_16.png", treeItem.getType()))));
-        MyTreeNode myTreeNode = new MyTreeNode(treeItem, imageView);
-        return myTreeNode;
+        Image image = new Image(getClass().getClassLoader().getResourceAsStream(String.format("nl/bos/icons/type/t_%s_16.gif", treeItem.getType())));
+        try {
+            if (treeItem.getType().equals(TYPE_CABINET)) {
+                boolean isPrivate = treeItem.getObject().getBoolean(ATTR_IS_PRIVATE);
+                if (isPrivate)
+                    image = new Image(getClass().getClassLoader().getResourceAsStream("nl/bos/icons/type/t_mycabinet_16.gif"));
+
+            }
+        } catch (DfException e) {
+            log.finest(e.getMessage());
+        }
+        ImageView imageView = new ImageView(image);
+        return new MyTreeNode(treeItem, imageView);
     }
 
     @Override
@@ -179,7 +194,13 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
     public void handle(ActionEvent event) {
         try {
             log.info(selected.getValue().getObject().getObjectId().getId());
-        } catch (DfException e) {
+            Stage dumpAttributes = new Stage();
+            dumpAttributes.setTitle(String.format("Attributes List - %s", selected.getValue().getObject().getObjectId().getId()));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributesPane.fxml"));
+            VBox loginPane = fxmlLoader.load();
+            dumpAttributes.setScene(new Scene(loginPane));
+            dumpAttributes.showAndWait();
+        } catch (Exception e) {
             log.finest(e.getMessage());
         }
     }
