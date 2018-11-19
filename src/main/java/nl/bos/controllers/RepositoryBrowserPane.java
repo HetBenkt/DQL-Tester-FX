@@ -31,7 +31,7 @@ import java.util.ResourceBundle;
 import static nl.bos.Constants.*;
 
 @Log
-public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem<MyTreeItem>>, EventHandler<ActionEvent> {
+public class RepositoryBrowserPane implements Initializable, ChangeListener<TreeItem<MyTreeItem>>, EventHandler<ActionEvent> {
     @FXML
     private TreeView<MyTreeItem> treeView;
     @FXML
@@ -198,7 +198,10 @@ public class RepositoryBrowser implements Initializable, ChangeListener<TreeItem
             dumpAttributes.setTitle(String.format("Attributes List - %s", selected.getValue().getObject().getObjectId().getId()));
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributesPane.fxml"));
             VBox loginPane = fxmlLoader.load();
-            dumpAttributes.setScene(new Scene(loginPane));
+            Scene scene = new Scene(loginPane);
+            dumpAttributes.setScene(scene);
+            GetAttributesPane controller = fxmlLoader.getController();
+            controller.initTextArea(selected.getValue().getObject());
             dumpAttributes.showAndWait();
         } catch (Exception e) {
             log.finest(e.getMessage());

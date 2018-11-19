@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity" prefHeight="850.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.121"
+      fx:controller="nl.bos.controllers.RepositoryBrowserPane">
+    <TreeView fx:id="treeView"/>
+    <HBox spacing="10.0">
+        <padding>
+            <Insets left="10.0"/>
+        </padding>
+        <VBox.margin>
+            <Insets top="10.0"/>
+        </VBox.margin>
+        <VBox spacing="11.0">
+            <padding>
+                <Insets top="5.0"/>
+            </padding>
+            <Label text="Object ID"/>
+            <Label text="Object Type"/>
+            <Label text="Content Type"/>
+            <Label text="Content Size"/>
+            <Label text="Creation Date"/>
+            <Label text="Modify Date"/>
+        </VBox>
+        <VBox spacing="3.0">
+            <TextField fx:id="txtObjectId" editable="false"/>
+            <TextField fx:id="txtObjectType" editable="false"/>
+            <TextField fx:id="txtContentType" editable="false"/>
+            <TextField fx:id="txtContentSize" editable="false"/>
+            <TextField fx:id="txtCreationDate" editable="false"/>
+            <TextField fx:id="txtModifyDate" editable="false"/>
+        </VBox>
+        <VBox spacing="11.0">
+            <padding>
+                <Insets top="5.0"/>
+            </padding>
+            <Label text="Lock Owner"/>
+            <Label text="Lock Machine"/>
+            <Label text="Lock Date"/>
+            <Label text="ACL Name"/>
+            <Label text="Permission"/>
+            <Label text="Version"/>
+        </VBox>
+        <VBox spacing="3.0">
+            <TextField fx:id="txtLockOwner" editable="false"/>
+            <TextField fx:id="txtLockMachine" editable="false"/>
+            <TextField fx:id="txtLockDate" editable="false"/>
+            <TextField fx:id="txtAclName" editable="false"/>
+            <TextField fx:id="txtPermission" editable="false"/>
+            <TextField fx:id="txtVersion" editable="false"/>
+        </VBox>
+        <VBox spacing="5.0">
+            <CheckBox mnemonicParsing="false" text="Show All Versions"/>
+            <CheckBox mnemonicParsing="false" selected="true" text="Show All Cabinets"/>
+            <CheckBox mnemonicParsing="false" selected="true" text="Read-only Mode"/>
+            <Button fx:id="btnFlushCache" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    text="Flush Cache">
+                <VBox.margin>
+                    <Insets top="20.0"/>
+                </VBox.margin>
+            </Button>
+            <Button fx:id="btnExit" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#handleExit" text="Exit"/>
+        </VBox>
+    </HBox>
+    <Label text="# items found">
+        <padding>
+            <Insets left="10.0" top="20.0"/>
+        </padding>
+    </Label>
+</VBox>

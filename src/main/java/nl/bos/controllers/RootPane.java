@@ -26,7 +26,7 @@ public class RootPane {
         Stage browseRepositoryStage = new Stage();
         browseRepositoryStage.initModality(Modality.APPLICATION_MODAL);
         browseRepositoryStage.setTitle(String.format("Repository Browser - %s (%s)", repositoryCon.getRepositoryName(), repositoryCon.getUserName()));
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RepositoryBrowser.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RepositoryBrowserPane.fxml"));
         VBox repositoryBrowser = fxmlLoader.load();
         browseRepositoryStage.setScene(new Scene(repositoryBrowser));
 

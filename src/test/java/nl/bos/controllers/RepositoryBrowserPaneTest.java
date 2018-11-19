@@ -19,12 +19,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 
 @RunWith(PowerMockRunner.class)
-public class RepositoryBrowserTest {
+public class RepositoryBrowserPaneTest {
 
     @Mock
     private IDfPersistentObject object;
     @InjectMocks
-    private RepositoryBrowser repositoryBrowser;
+    private RepositoryBrowserPane repositoryBrowserPane;
 
     @BeforeClass
     public static void initToolkit() {
@@ -37,10 +37,10 @@ public class RepositoryBrowserTest {
         PowerMockito.when(object.getValueCount(any())).thenReturn(3);
         PowerMockito.when(object.getRepeatingString(any(), anyInt())).thenReturn("dummy");
 
-        Class<? extends RepositoryBrowser> repositoryBrowserClass = repositoryBrowser.getClass();
+        Class<? extends RepositoryBrowserPane> repositoryBrowserClass = repositoryBrowserPane.getClass();
         Method getRepeatingValue = repositoryBrowserClass.getDeclaredMethod("getRepeatingValue", IDfPersistentObject.class, String.class);
         getRepeatingValue.setAccessible(true);
-        String value = (String) getRepeatingValue.invoke(repositoryBrowser, object, "r_version_label");
+        String value = (String) getRepeatingValue.invoke(repositoryBrowserPane, object, "r_version_label");
         assertEquals("dummy, dummy, dummy", value);
     }
 }

@@ -5,15 +5,15 @@
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/8.0.121"
       fx:controller="nl.bos.controllers.GetAttributesPane">
-    <TextArea prefHeight="500.0">
+    <TextArea fx:id="txaAttributes" editable="false" prefHeight="500.0">
         <VBox.margin>
             <Insets left="5.0" right="5.0" top="5.0"/>
         </VBox.margin>
     </TextArea>
     <HBox spacing="10.0">
-        <Button fx:id="btnFind" mnemonicParsing="false" text="Find"/>
-        <Button fx:id="btnFindPrevious" mnemonicParsing="false" text="&lt;"/>
-        <Button fx:id="btnFindNext" mnemonicParsing="false" text="&gt;"/>
+        <Button fx:id="btnFind" mnemonicParsing="false" onAction="#handleFind" text="Find"/>
+        <Button fx:id="btnFindPrevious" mnemonicParsing="false" onAction="#handleFindPrevious" text="&lt;"/>
+        <Button fx:id="btnFindNext" mnemonicParsing="false" onAction="#handleFindNext" text="&gt;"/>
         <CheckBox fx:id="chkCaseSensitive" mnemonicParsing="false" text="Case Sensitive"/>
         <TextField fx:id="txtSearch" prefColumnCount="30"/>
         <VBox.margin>
@@ -26,7 +26,7 @@
             <HBox spacing="5.0">
                 <Label text="Object ID"/>
                 <TextField fx:id="txtObjectId"/>
-                <Button fx:id="btnDump" mnemonicParsing="false" text="Dump"/>
+                <Button fx:id="btnDump" mnemonicParsing="false" onAction="#handleDump" text="Dump"/>
             </HBox>
         </VBox>
         <VBox spacing="5.0">
