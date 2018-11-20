@@ -98,71 +98,61 @@ public class GetAttributesPane {
     private void handleFind(ActionEvent actionEvent) {
         previousIndexes.clear();
         if (!chkCaseSensitive.isSelected()) {
-            Pattern pattern = Pattern.compile(txtSearch.getText().toUpperCase());
-            Matcher matcher = pattern.matcher(text.toString().replace("\n", " ").toUpperCase());
-            if (matcher.find(0)) {
-                previousIndexes.add(0);
-                lastIndex = matcher.end();
-                txaAttributes.selectRange(matcher.start(), lastIndex);
-            }
+            searchFind(txtSearch.getText().toUpperCase(), text.toString().replace("\n", " ").toUpperCase());
         } else {
-            Pattern pattern = Pattern.compile(txtSearch.getText());
-            Matcher matcher = pattern.matcher(text.toString().replace("\n", " "));
-            if (matcher.find(0)) {
-                previousIndexes.add(0);
-                lastIndex = matcher.end();
-                txaAttributes.selectRange(matcher.start(), lastIndex);
-            }
+            searchFind(txtSearch.getText(), text.toString().replace("\n", " "));
+        }
+    }
+
+    private void searchFind(String patternText, String matchText) {
+        Pattern pattern = Pattern.compile(patternText);
+        Matcher matcher = pattern.matcher(matchText);
+        if (matcher.find(0)) {
+            previousIndexes.add(0);
+            lastIndex = matcher.end();
+            txaAttributes.selectRange(matcher.start(), lastIndex);
         }
     }
 
     @FXML
     private void handleFindPrevious(ActionEvent actionEvent) {
         if (!chkCaseSensitive.isSelected()) {
-            Pattern pattern = Pattern.compile(txtSearch.getText().toUpperCase());
-            Matcher matcher = pattern.matcher(text.toString().replace("\n", " ").toUpperCase());
-            if (matcher.find(previousIndexes.get(previousIndexes.size() - 1))) {
-                if (previousIndexes.size() > 1)
-                    previousIndexes.remove(previousIndexes.size() - 1);
-                lastIndex = matcher.end();
-                txaAttributes.selectRange(matcher.start(), lastIndex);
-            }
+            searchFindPrevious(txtSearch.getText().toUpperCase(), text.toString().replace("\n", " ").toUpperCase());
         } else {
-            Pattern pattern = Pattern.compile(txtSearch.getText());
-            Matcher matcher = pattern.matcher(text.toString().replace("\n", " "));
-            if (matcher.find(previousIndexes.get(previousIndexes.size() - 1))) {
-                if (previousIndexes.size() > 1)
-                    previousIndexes.remove(previousIndexes.size() - 1);
-                lastIndex = matcher.end();
-                txaAttributes.selectRange(matcher.start(), lastIndex);
-            }
+            searchFindPrevious(txtSearch.getText(), text.toString().replace("\n", " "));
+        }
+    }
+
+    private void searchFindPrevious(String patternText, String matchText) {
+        Pattern pattern = Pattern.compile(patternText);
+        Matcher matcher = pattern.matcher(matchText);
+        if (matcher.find(previousIndexes.get(previousIndexes.size() - 1))) {
+            if (previousIndexes.size() > 1)
+                previousIndexes.remove(previousIndexes.size() - 1);
+            lastIndex = matcher.end();
+            txaAttributes.selectRange(matcher.start(), lastIndex);
         }
     }
 
     @FXML
     private void handleFindNext(ActionEvent actionEvent) {
         if (!chkCaseSensitive.isSelected()) {
-            Pattern pattern = Pattern.compile(txtSearch.getText().toUpperCase());
-            Matcher matcher = pattern.matcher(text.toString().replace("\n", " ").toUpperCase());
-            if (matcher.find(lastIndex)) {
-                int index = lastIndex - txtSearch.getText().length();
-                if (index < 0)
-                    index = 0;
-                previousIndexes.add(index);
-                lastIndex = matcher.end();
-                txaAttributes.selectRange(matcher.start(), lastIndex);
-            }
+            searchFindNext(txtSearch.getText().toUpperCase(), text.toString().replace("\n", " ").toUpperCase());
         } else {
-            Pattern pattern = Pattern.compile(txtSearch.getText());
-            Matcher matcher = pattern.matcher(text.toString().replace("\n", " "));
-            if (matcher.find(lastIndex)) {
-                int index = lastIndex - txtSearch.getText().length();
-                if (index < 0)
-                    index = 0;
-                previousIndexes.add(index);
-                lastIndex = matcher.end();
-                txaAttributes.selectRange(matcher.start(), lastIndex);
-            }
+            searchFindNext(txtSearch.getText(), text.toString().replace("\n", " "));
+        }
+    }
+
+    private void searchFindNext(String patternText, String matchText) {
+        Pattern pattern = Pattern.compile(patternText);
+        Matcher matcher = pattern.matcher(matchText);
+        if (matcher.find(lastIndex)) {
+            int index = lastIndex - txtSearch.getText().length();
+            if (index < 0)
+                index = 0;
+            previousIndexes.add(index);
+            lastIndex = matcher.end();
+            txaAttributes.selectRange(matcher.start(), lastIndex);
         }
     }
 
