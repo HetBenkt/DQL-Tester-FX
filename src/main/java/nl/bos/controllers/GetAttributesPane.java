@@ -6,6 +6,7 @@ import com.documentum.fc.common.IDfAttr;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -13,6 +14,8 @@ import lombok.extern.java.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Log
 public class GetAttributesPane {
@@ -22,11 +25,18 @@ public class GetAttributesPane {
     private Button btnExit;
     @FXML
     private TextArea txaAttributes;
+    @FXML
+    private TextField txtSearch;
+    @FXML
+    private CheckBox chkCaseSensitive;
 
     private List<IDfAttr> userAttributes = new ArrayList<>();
     private List<IDfAttr> systemAttributes = new ArrayList<>();
     private List<IDfAttr> appicationAttributes = new ArrayList<>();
     private List<IDfAttr> internalAttributes = new ArrayList<>();
+    private StringBuilder text = new StringBuilder();
+    private int lastIndex;
+    private List<Integer> previousIndexes = new ArrayList();
 
     @FXML
     private void handleExit(ActionEvent actionEvent) {
@@ -36,8 +46,6 @@ public class GetAttributesPane {
     }
 
     public void initTextArea(IDfPersistentObject object) throws DfException {
-        StringBuilder text = new StringBuilder();
-
         for (int i = 0; i <= object.getAttrCount(); i++) {
             IDfAttr attr = object.getAttr(i);
             if (attr.getName().startsWith("r_"))
@@ -88,21 +96,85 @@ public class GetAttributesPane {
 
     @FXML
     private void handleFind(ActionEvent actionEvent) {
-
+        previousIndexes.clear();
+        if (!chkCaseSensitive.isSelected()) {
+            Pattern pattern = Pattern.compile(txtSearch.getText().toUpperCase());
+            Matcher matcher = pattern.matcher(text.toString().replace("\n", " ").toUpperCase());
+            if (matcher.find(0)) {
+                previousIndexes.add(0);
+                lastIndex = matcher.end();
+                txaAttributes.selectRange(matcher.start(), lastIndex);
+            }
+        } else {
+            Pattern pattern = Pattern.compile(txtSearch.getText());
+            Matcher matcher = pattern.matcher(text.toString().replace("\n", " "));
+            if (matcher.find(0)) {
+                previousIndexes.add(0);
+                lastIndex = matcher.end();
+                txaAttributes.selectRange(matcher.start(), lastIndex);
+            }
+        }
     }
 
     @FXML
     private void handleFindPrevious(ActionEvent actionEvent) {
-
+        if (!chkCaseSensitive.isSelected()) {
+            Pattern pattern = Pattern.compile(txtSearch.getText().toUpperCase());
+            Matcher matcher = pattern.matcher(text.toString().replace("\n", " ").toUpperCase());
+            if (matcher.find(previousIndexes.get(previousIndexes.size() - 1))) {
+                if (previousIndexes.size() > 1)
+                    previousIndexes.remove(previousIndexes.size() - 1);
+                lastIndex = matcher.end();
+                txaAttributes.selectRange(matcher.start(), lastIndex);
+            }
+        } else {
+            Pattern pattern = Pattern.compile(txtSearch.getText());
+            Matcher matcher = pattern.matcher(text.toString().replace("\n", " "));
+            if (matcher.find(previousIndexes.get(previousIndexes.size() - 1))) {
+                if (previousIndexes.size() > 1)
+                    previousIndexes.remove(previousIndexes.size() - 1);
+                lastIndex = matcher.end();
+                txaAttributes.selectRange(matcher.start(), lastIndex);
+            }
+        }
     }
 
     @FXML
     private void handleFindNext(ActionEvent actionEvent) {
-
+        if (!chkCaseSensitive.isSelected()) {
+            Pattern pattern = Pattern.compile(txtSearch.getText().toUpperCase());
+            Matcher matcher = pattern.matcher(text.toString().replace("\n", " ").toUpperCase());
+            if (matcher.find(lastIndex)) {
+                int index = lastIndex - txtSearch.getText().length();
+                if (index < 0)
+                    index = 0;
+                previousIndexes.add(index);
+                lastIndex = matcher.end();
+                txaAttributes.selectRange(matcher.start(), lastIndex);
+            }
+        } else {
+            Pattern pattern = Pattern.compile(txtSearch.getText());
+            Matcher matcher = pattern.matcher(text.toString().replace("\n", " "));
+            if (matcher.find(lastIndex)) {
+                int index = lastIndex - txtSearch.getText().length();
+                if (index < 0)
+                    index = 0;
+                previousIndexes.add(index);
+                lastIndex = matcher.end();
+                txaAttributes.selectRange(matcher.start(), lastIndex);
+            }
+        }
     }
 
     @FXML
     private void handleDump(ActionEvent actionEvent) {
 
+    }
+
+    @FXML
+    private void handleCaseSensitive(ActionEvent actionEvent) {
+        lastIndex = 0;
+        previousIndexes.clear();
+        previousIndexes.add(lastIndex);
     }
 }
