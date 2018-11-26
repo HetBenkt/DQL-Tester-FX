@@ -2,15 +2,14 @@ package nl.bos.controllers;
 
 import com.documentum.fc.client.IDfPersistentObject;
 import com.documentum.fc.common.DfException;
+import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfAttr;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import lombok.extern.java.Log;
+import nl.bos.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,11 +31,13 @@ public class GetAttributesPane {
 
     private List<IDfAttr> userAttributes = new ArrayList<>();
     private List<IDfAttr> systemAttributes = new ArrayList<>();
-    private List<IDfAttr> appicationAttributes = new ArrayList<>();
+    private List<IDfAttr> applicationAttributes = new ArrayList<>();
     private List<IDfAttr> internalAttributes = new ArrayList<>();
     private StringBuilder text = new StringBuilder();
     private int lastIndex;
     private List<Integer> previousIndexes = new ArrayList();
+
+    private Repository repositoryCon = Repository.getInstance();
 
     @FXML
     private void handleExit(ActionEvent actionEvent) {
@@ -46,12 +47,19 @@ public class GetAttributesPane {
     }
 
     public void initTextArea(IDfPersistentObject object) throws DfException {
+        appendTextToStringBuilder(object);
+
+        txaAttributes.setText(String.valueOf(text));
+        txtObjectId.setText(object.getObjectId().getId());
+    }
+
+    private void appendTextToStringBuilder(IDfPersistentObject object) throws DfException {
         for (int i = 0; i <= object.getAttrCount(); i++) {
             IDfAttr attr = object.getAttr(i);
             if (attr.getName().startsWith("r_"))
                 systemAttributes.add(attr);
             else if (attr.getName().startsWith("a_"))
-                appicationAttributes.add(attr);
+                applicationAttributes.add(attr);
             else if (attr.getName().startsWith("i_"))
                 internalAttributes.add(attr);
             else
@@ -60,11 +68,8 @@ public class GetAttributesPane {
 
         appendAttributes("USER ATTRIBUTES\n\n", object, text, userAttributes);
         appendAttributes("\nSYSTEM ATTRIBUTES\n\n", object, text, systemAttributes);
-        appendAttributes("\nAPPLICATION ATTRIBUTES\n\n", object, text, appicationAttributes);
+        appendAttributes("\nAPPLICATION ATTRIBUTES\n\n", object, text, applicationAttributes);
         appendAttributes("\nINTERNAL ATTRIBUTES\n\n", object, text, internalAttributes);
-
-        txaAttributes.setText(String.valueOf(text));
-        txtObjectId.setText(object.getObjectId().getId());
     }
 
     private void appendAttributes(String title, IDfPersistentObject object, StringBuilder text, List<IDfAttr> attributes) throws DfException {
@@ -111,7 +116,17 @@ public class GetAttributesPane {
             previousIndexes.add(0);
             lastIndex = matcher.end();
             txaAttributes.selectRange(matcher.start(), lastIndex);
+        } else {
+            alertStringNotFound(String.format("String not found: %s", patternText));
         }
+    }
+
+    private void alertStringNotFound(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Information Dialog");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     @FXML
@@ -126,11 +141,15 @@ public class GetAttributesPane {
     private void searchFindPrevious(String patternText, String matchText) {
         Pattern pattern = Pattern.compile(patternText);
         Matcher matcher = pattern.matcher(matchText);
-        if (matcher.find(previousIndexes.get(previousIndexes.size() - 1))) {
-            if (previousIndexes.size() > 1)
-                previousIndexes.remove(previousIndexes.size() - 1);
-            lastIndex = matcher.end();
-            txaAttributes.selectRange(matcher.start(), lastIndex);
+        if (!previousIndexes.isEmpty()) {
+            if (matcher.find(previousIndexes.get(previousIndexes.size() - 1))) {
+                if (previousIndexes.size() > 1)
+                    previousIndexes.remove(previousIndexes.size() - 1);
+                lastIndex = matcher.end();
+                txaAttributes.selectRange(matcher.start(), lastIndex);
+            } else {
+                alertStringNotFound(String.format("String not found: %s", patternText));
+            }
         }
     }
 
@@ -153,12 +172,25 @@ public class GetAttributesPane {
             previousIndexes.add(index);
             lastIndex = matcher.end();
             txaAttributes.selectRange(matcher.start(), lastIndex);
+        } else {
+            alertStringNotFound("EOF reached!");
         }
     }
 
     @FXML
     private void handleDump(ActionEvent actionEvent) {
-
+        try {
+            IDfPersistentObject object = repositoryCon.getSession().getObject(new DfId(txtObjectId.getText()));
+            text.setLength(0);
+            userAttributes.clear();
+            applicationAttributes.clear();
+            internalAttributes.clear();
+            systemAttributes.clear();
+            appendTextToStringBuilder(object);
+            txaAttributes.setText(String.valueOf(text));
+        } catch (DfException e) {
+            alertStringNotFound(e.getMessage());
+        }
     }
 
     @FXML
