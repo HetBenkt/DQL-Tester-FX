@@ -74,7 +74,7 @@ public class MyTreeItem extends TreeItem<String> {
     }
 
     private void addDocuments(List<MyTreeItem> children, MyTreeItem parent) throws DfException {
-        IDfCollection documents = repositoryCon.query(String.format("select r_object_id, object_name from dm_sysobject where folder('%s') and r_object_type != 'dm_folder' order by object_name", parent.getPath()));
+        IDfCollection documents = repositoryCon.query(String.format("select r_object_id, object_name from dm_sysobject where folder('%s') and r_object_type != 'dm_folder' and r_object_type not in (select name from dm_type where super_name = 'dm_folder') order by object_name", parent.getPath()));
         while (documents.next()) {
             IDfPersistentObject document = repositoryCon.getSession().getObject(new DfId(documents.getString(ATTR_R_OBJECT_ID)));
             MyTreeItem child = new MyTreeItem(document, documents.getString(ATTR_OBJECT_NAME), TYPE_DOCUMENT, String.format(PATH_FORMAT, parent.getPath(), documents.getString(ATTR_OBJECT_NAME)));

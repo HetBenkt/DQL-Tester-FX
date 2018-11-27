@@ -60,6 +60,8 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
     private TextField txtVersion;
     @FXML
     private Button btnExit;
+    @FXML
+    private Label lblNrOfItems;
 
     private Repository repositoryCon = Repository.getInstance();
     private ContextMenu rootContextMenu = new ContextMenu();
@@ -81,6 +83,7 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
 
         MyTreeItem rootItem = new MyTreeItem(null, repositoryCon.getRepositoryName(), TYPE_REPOSITORY, "");
         TreeItem<MyTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
+        treeItemBrowser.setExpanded(true);
         treeView.setRoot(treeItemBrowser);
         treeView.getSelectionModel().selectedItemProperty().addListener(this);
         treeView.addEventHandler(MouseEvent.MOUSE_RELEASED, me -> {
@@ -257,6 +260,7 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
             MyTreeItem parentItem = parent.getValue();
             if (parentItem != null && parentItem.isDirectory()) {
                 List<MyTreeItem> treeItems = parentItem.listObjects(parentItem);
+                lblNrOfItems.setText(String.format("%s items found", treeItems.size()));
                 if (treeItems != null) {
                     ObservableList<TreeItem<MyTreeItem>> children = FXCollections.observableArrayList();
                     for (MyTreeItem treeItem : treeItems) {

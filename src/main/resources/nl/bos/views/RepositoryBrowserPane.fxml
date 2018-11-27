@@ -56,17 +56,16 @@
             <CheckBox mnemonicParsing="false" text="Show All Versions"/>
             <CheckBox mnemonicParsing="false" selected="true" text="Show All Cabinets"/>
             <CheckBox mnemonicParsing="false" selected="true" text="Read-only Mode"/>
-            <Button fx:id="btnFlushCache" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                    text="Flush Cache">
+            <Button fx:id="btnFlushCache" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Flush Cache">
                 <VBox.margin>
                     <Insets top="20.0"/>
                 </VBox.margin>
             </Button>
-            <Button fx:id="btnExit" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                    onAction="#handleExit" text="Exit"/>
+            <Button fx:id="btnExit" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleExit"
+                    text="Exit"/>
         </VBox>
     </HBox>
-    <Label text="# items found">
+    <Label fx:id="lblNrOfItems">
         <padding>
             <Insets left="10.0" top="20.0"/>
         </padding>
