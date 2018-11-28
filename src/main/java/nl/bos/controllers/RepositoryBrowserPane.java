@@ -121,8 +121,12 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
                 boolean isPrivate = treeItem.getObject().getBoolean(ATTR_IS_PRIVATE);
                 if (isPrivate)
                     image = new Image(getClass().getClassLoader().getResourceAsStream("nl/bos/icons/type/t_mycabinet_16.gif"));
-
+            } else if (treeItem.getType().equals(TYPE_DOCUMENT)) {
+                String lockOwner = treeItem.getObject().getString(ATTR_R_LOCK_OWNER);
+                if (!lockOwner.equals(""))
+                    image = new Image(getClass().getClassLoader().getResourceAsStream("nl/bos/icons/type/t_dm_document_lock_16.gif"));
             }
+
         } catch (DfException e) {
             log.finest(e.getMessage());
         }
