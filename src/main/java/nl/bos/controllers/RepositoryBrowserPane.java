@@ -65,7 +65,7 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
 
     private Repository repositoryCon = Repository.getInstance();
     private ContextMenu rootContextMenu = new ContextMenu();
-    private TreeItem<MyTreeItem> selected;
+    private MyTreeNode selected;
 
     @FXML
     private void handleExit(ActionEvent actionEvent) {
@@ -86,13 +86,17 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
         treeItemBrowser.setExpanded(true);
         treeView.setRoot(treeItemBrowser);
         treeView.getSelectionModel().selectedItemProperty().addListener(this);
-        treeView.addEventHandler(MouseEvent.MOUSE_RELEASED, me -> {
-            if (me.getButton() == MouseButton.SECONDARY) {
-                selected = treeView.getSelectionModel().getSelectedItem();
+        treeView.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent -> {
+            log.finest(String.format("Clickcount: %s", String.valueOf(mouseEvent.getClickCount())));
+            selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
+            if (selected != null && !selected.isExpanded())
+                selected.isFirstTimeChildren = true;
+            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
                 //item is selected - this prevents fail when clicking on empty space
                 if (selected != null && !selected.getValue().getType().equals(TYPE_REPOSITORY)) {
                     //open context menu on current screen position
-                    rootContextMenu.show(treeView, me.getScreenX(), me.getScreenY());
+                    rootContextMenu.show(treeView, mouseEvent.getScreenX(), mouseEvent.getScreenY());
                 }
             } else {
                 //any other click cause hiding menu
@@ -256,7 +260,7 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
             return isLeaf;
         }
 
-        private ObservableList<TreeItem<MyTreeItem>> buildChildren(TreeItem<MyTreeItem> parent) {
+        private ObservableList<TreeItem<MyTreeItem>> buildChildren(MyTreeNode parent) {
             MyTreeItem parentItem = parent.getValue();
             if (parentItem != null && parentItem.isDirectory()) {
                 List<MyTreeItem> treeItems = parentItem.listObjects(parentItem);
