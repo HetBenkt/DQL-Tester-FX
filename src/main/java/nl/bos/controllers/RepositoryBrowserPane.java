@@ -62,6 +62,12 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
     private Button btnExit;
     @FXML
     private Label lblNrOfItems;
+    @FXML
+    private CheckBox ckbShowAllCabinets;
+    @FXML
+    private CheckBox ckbShowAllVersions;
+
+    private MyTreeItem rootItem;
 
     private Repository repositoryCon = Repository.getInstance();
     private ContextMenu rootContextMenu = new ContextMenu();
@@ -81,7 +87,7 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
         miDump.setOnAction(this);
         rootContextMenu.getItems().add(miDump);
 
-        MyTreeItem rootItem = new MyTreeItem(null, repositoryCon.getRepositoryName(), TYPE_REPOSITORY, "");
+        rootItem = new MyTreeItem(null, repositoryCon.getRepositoryName(), TYPE_REPOSITORY, "");
         TreeItem<MyTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
         treeItemBrowser.setExpanded(true);
         treeView.setRoot(treeItemBrowser);
@@ -219,6 +225,13 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
         }
     }
 
+    @FXML
+    private void handleShowAllCabinets(ActionEvent actionEvent) {
+        TreeItem<MyTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
+        treeItemBrowser.setExpanded(true);
+        treeView.setRoot(treeItemBrowser);
+    }
+
     private class MyTreeNode extends TreeItem<MyTreeItem> {
         // We cache whether the File is a leaf or not. A File is a leaf if
         // it is not a directory and does not have any files contained within
@@ -267,7 +280,7 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
         private ObservableList<TreeItem<MyTreeItem>> buildChildren(MyTreeNode parent) {
             MyTreeItem parentItem = parent.getValue();
             if (parentItem != null && parentItem.isDirectory()) {
-                List<MyTreeItem> treeItems = parentItem.listObjects(parentItem);
+                List<MyTreeItem> treeItems = parentItem.listObjects(parentItem, ckbShowAllCabinets.isSelected(), ckbShowAllVersions.isSelected());
                 lblNrOfItems.setText(String.format("%s items found", treeItems.size()));
                 if (treeItems != null) {
                     ObservableList<TreeItem<MyTreeItem>> children = FXCollections.observableArrayList();
