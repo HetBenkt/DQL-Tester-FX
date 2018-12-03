@@ -20,8 +20,8 @@ public class RootPane {
     @Getter
     private MenuBar menubar;
 
-    public void browseRepository(ActionEvent actionEvent) throws IOException {
-        log.info(String.valueOf(actionEvent.getSource()));
+    @FXML
+    private void browseRepository(ActionEvent actionEvent) throws IOException {
         Repository repositoryCon = Repository.getInstance();
         Stage browseRepositoryStage = new Stage();
         browseRepositoryStage.initModality(Modality.APPLICATION_MODAL);
@@ -31,5 +31,18 @@ public class RootPane {
         browseRepositoryStage.setScene(new Scene(repositoryBrowser));
 
         browseRepositoryStage.showAndWait();
+    }
+
+    @FXML
+    private void manageJobs(ActionEvent actionEvent) throws IOException {
+        Repository repositoryCon = Repository.getInstance();
+        Stage jobEditorStage = new Stage();
+        jobEditorStage.initModality(Modality.APPLICATION_MODAL);
+        jobEditorStage.setTitle(String.format("Job Editor - %s", repositoryCon.getRepositoryName()));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/JobEditorPane.fxml"));
+        VBox jobEditor = fxmlLoader.load();
+        jobEditorStage.setScene(new Scene(jobEditor));
+
+        jobEditorStage.showAndWait();
     }
 }

@@ -11,7 +11,7 @@
                 <MenuItem mnemonicParsing="false" text="Browse Repository" onAction="#browseRepository"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Administration">
-                <MenuItem mnemonicParsing="false" text="Manage Jobs"/>
+                <MenuItem mnemonicParsing="false" text="Manage Jobs" onAction="#manageJobs"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Info">
                 <MenuItem mnemonicParsing="false" text="Get Last SQL"/>

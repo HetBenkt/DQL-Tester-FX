@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity" prefHeight="800.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8.0.121"
+      fx:controller="nl.bos.controllers.JobEditorPane">
+    <HBox>
+        <VBox spacing="5.0">
+            <HBox.margin>
+                <Insets left="5.0" right="5.0" top="5.0"/>
+            </HBox.margin>
+            <Label text="Job Type"/>
+            <TextField disable="true">
+                <VBox.margin>
+                    <Insets/>
+                </VBox.margin>
+            </TextField>
+        </VBox>
+        <VBox spacing="5.0">
+            <HBox.margin>
+                <Insets right="5.0" top="5.0"/>
+            </HBox.margin>
+            <ChoiceBox/>
+            <ListView/>
+        </VBox>
+        <VBox prefWidth="210.0" spacing="13.0">
+            <padding>
+                <Insets top="4.0"/>
+            </padding>
+            <HBox.margin>
+                <Insets top="5.0"/>
+            </HBox.margin>
+            <Label text="Object ID"/>
+            <Label text="Last Completion Date"/>
+            <Label text="Next Invocation Date"/>
+            <Label text="Runs Completed"/>
+            <Label text="Last Return Code"/>
+            <Label text="Name"/>
+            <Label text="Job Type"/>
+            <Label text="Description"/>
+            <Label text="Job State"/>
+            <Label text="Trace Level">
+                <VBox.margin>
+                    <Insets/>
+                </VBox.margin>
+            </Label>
+            <Label text="Designated Server"/>
+            <CheckBox mnemonicParsing="false" text="Watch Job"/>
+            <Label text="Start Date"/>
+            <Label text="Repeat"/>
+            <Label text="Frequency"/>
+            <Label text="End Date"/>
+            <Label text="Continuous Interval">
+                <VBox.margin>
+                    <Insets top="30.0"/>
+                </VBox.margin>
+            </Label>
+            <Label text="Method Name"/>
+            <Label text="Arguments"/>
+            <HBox spacing="5.0">
+                <VBox.margin>
+                    <Insets/>
+                </VBox.margin>
+                <Button mnemonicParsing="false" text="View Log"/>
+                <VBox spacing="5.0">
+                    <TextField disable="true" maxWidth="30.0" text="0"/>
+                    <TextField disable="true" maxWidth="30.0" text="0"/>
+                </VBox>
+            </HBox>
+        </VBox>
+        <VBox prefWidth="400.0" spacing="5.0">
+            <HBox.margin>
+                <Insets top="5.0"/>
+            </HBox.margin>
+            <TextField disable="true"/>
+            <TextField disable="true"/>
+            <TextField disable="true"/>
+            <TextField disable="true"/>
+            <HBox spacing="5.0">
+                <TextField disable="true"/>
+                <CheckBox disable="true" mnemonicParsing="false" text="Is Continued">
+                    <HBox.margin>
+                        <Insets top="3.0"/>
+                    </HBox.margin>
+                </CheckBox>
+            </HBox>
+            <TextField/>
+            <TextField/>
+            <TextField/>
+            <HBox spacing="5.0">
+                <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"/>
+                <RadioButton mnemonicParsing="false" text="Active">
+                    <HBox.margin>
+                        <Insets top="3.0"/>
+                    </HBox.margin>
+                </RadioButton>
+                <RadioButton mnemonicParsing="false" text="Inactive">
+                    <HBox.margin>
+                        <Insets top="3.0"/>
+                    </HBox.margin>
+                </RadioButton>
+                <TextField disable="true"/>
+            </HBox>
+            <HBox spacing="5.0">
+                <ChoiceBox/>
+                <CheckBox mnemonicParsing="false" text="Deactivate on Failure">
+                    <HBox.margin>
+                        <Insets top="3.0"/>
+                    </HBox.margin>
+                </CheckBox>
+            </HBox>
+            <ChoiceBox/>
+            <CheckBox mnemonicParsing="false" text="Run After Update"/>
+            <DatePicker>
+                <VBox.margin>
+                    <Insets top="5.0"/>
+                </VBox.margin>
+            </DatePicker>
+            <ChoiceBox/>
+            <TextField/>
+            <HBox spacing="5.0">
+                <RadioButton mnemonicParsing="false">
+                    <HBox.margin>
+                        <Insets top="3.0"/>
+                    </HBox.margin>
+                </RadioButton>
+                <DatePicker/>
+            </HBox>
+            <HBox spacing="5.0">
+                <RadioButton mnemonicParsing="false" text=" after">
+                    <HBox.margin>
+                        <Insets top="3.0"/>
+                    </HBox.margin>
+                </RadioButton>
+                <TextField/>
+                <Label text="times"/>
+            </HBox>
+            <HBox spacing="5.0">
+                <TextField/>
+                <CheckBox mnemonicParsing="false" text="Pass standard arguments">
+                    <HBox.margin>
+                        <Insets top="3.0"/>
+                    </HBox.margin>
+                </CheckBox>
+            </HBox>
+            <TextField/>
+            <ListView prefHeight="100.0"/>
+        </VBox>
+        <VBox spacing="5.0">
+            <HBox.margin>
+                <Insets left="5.0" top="5.0"/>
+            </HBox.margin>
+            <ImageView fitHeight="64.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true">
+                <Image url="@../icons/type/t_dm_job_16.gif"/>
+            </ImageView>
+            <Button mnemonicParsing="false" text="Edit">
+                <VBox.margin>
+                    <Insets top="230.0"/>
+                </VBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" text="Browse">
+                <VBox.margin>
+                    <Insets top="211.0"/>
+                </VBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" text="Edit list"/>
+        </VBox>
+    </HBox>
+    <HBox spacing="15.0">
+        <VBox.margin>
+            <Insets left="5.0" top="10.0"/>
+        </VBox.margin>
+        <Button mnemonicParsing="false" text="Refresh"/>
+        <Button mnemonicParsing="false" text="Copy Job"/>
+        <Button mnemonicParsing="false" text="Delete Job"/>
+        <Button mnemonicParsing="false" text="Export Job"/>
+        <Button mnemonicParsing="false" text="New Job"/>
+        <Button disable="true" mnemonicParsing="false" text="Update"/>
+        <Button mnemonicParsing="false" text="Exit"/>
+    </HBox>
+    <HBox spacing="5.0">
+        <VBox.margin>
+            <Insets top="5.0"/>
+        </VBox.margin>
+        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true"/>
+        <Label text="Status"/>
+    </HBox>
+</VBox>
