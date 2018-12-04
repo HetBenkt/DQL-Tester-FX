@@ -6,7 +6,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity" prefHeight="800.0" prefWidth="750.0" xmlns="http://javafx.com/javafx/8.0.121"
+      minWidth="-Infinity" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121"
       fx:controller="nl.bos.controllers.JobEditorPane">
     <HBox>
         <VBox spacing="5.0">
@@ -20,12 +20,12 @@
                 </VBox.margin>
             </TextField>
         </VBox>
-        <VBox spacing="5.0">
+        <VBox prefWidth="320.0" spacing="5.0">
             <HBox.margin>
                 <Insets right="5.0" top="5.0"/>
             </HBox.margin>
-            <ChoiceBox/>
-            <ListView/>
+            <ChoiceBox fx:id="cbJobsFilter"/>
+            <ListView fx:id="lvJobs" prefHeight="700.0"/>
         </VBox>
         <VBox prefWidth="210.0" spacing="13.0">
             <padding>
@@ -76,21 +76,21 @@
             <HBox.margin>
                 <Insets top="5.0"/>
             </HBox.margin>
-            <TextField disable="true"/>
-            <TextField disable="true"/>
-            <TextField disable="true"/>
-            <TextField disable="true"/>
+            <TextField fx:id="txtObjectId" editable="false"/>
+            <TextField fx:id="txtLastCompletionDate" editable="false"/>
+            <TextField fx:id="txtNextInvocationDate" editable="false"/>
+            <TextField fx:id="txtRunCompleted" editable="false"/>
             <HBox spacing="5.0">
-                <TextField disable="true"/>
-                <CheckBox disable="true" mnemonicParsing="false" text="Is Continued">
+                <TextField fx:id="txtLastReturnCode" editable="false"/>
+                <CheckBox fx:id="chkIsContinued" disable="true" mnemonicParsing="false" text="Is Continued">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
                 </CheckBox>
             </HBox>
-            <TextField/>
-            <TextField/>
-            <TextField/>
+            <TextField fx:id="txtName"/>
+            <TextField fx:id="txtType"/>
+            <TextField fx:id="txtDescription"/>
             <HBox spacing="5.0">
                 <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"/>
                 <RadioButton mnemonicParsing="false" text="Active">
