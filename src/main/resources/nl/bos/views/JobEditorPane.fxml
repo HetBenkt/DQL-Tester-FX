@@ -49,7 +49,7 @@
                 </VBox.margin>
             </Label>
             <Label text="Designated Server"/>
-            <CheckBox mnemonicParsing="false" text="Watch Job"/>
+            <CheckBox fx:id="cbWatchJob" disable="true" mnemonicParsing="false" text="Watch Job"/>
             <Label text="Start Date"/>
             <Label text="Repeat"/>
             <Label text="Frequency"/>
@@ -93,12 +93,15 @@
             <TextField fx:id="txtDescription"/>
             <HBox spacing="5.0">
                 <ImageView fitHeight="28.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true"/>
-                <RadioButton mnemonicParsing="false" text="Active">
+                <RadioButton fx:id="rbStateActive" mnemonicParsing="false" text="Active">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
+                    <toggleGroup>
+                        <ToggleGroup fx:id="jobState"/>
+                    </toggleGroup>
                 </RadioButton>
-                <RadioButton mnemonicParsing="false" text="Inactive">
+                <RadioButton fx:id="rbStateInactive" mnemonicParsing="false" text="Inactive" toggleGroup="$jobState">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
@@ -106,32 +109,35 @@
                 <TextField disable="true"/>
             </HBox>
             <HBox spacing="5.0">
-                <ChoiceBox/>
-                <CheckBox mnemonicParsing="false" text="Deactivate on Failure">
+                <ChoiceBox fx:id="cbTraceLevel"/>
+                <CheckBox fx:id="chkDeactivateOnFailure" mnemonicParsing="false" text="Deactivate on Failure">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
                 </CheckBox>
             </HBox>
-            <ChoiceBox/>
-            <CheckBox mnemonicParsing="false" text="Run After Update"/>
-            <DatePicker>
+            <ChoiceBox fx:id="cbDesignatedServer"/>
+            <CheckBox fx:id="cbRunAfterUpdate" mnemonicParsing="false" text="Run After Update"/>
+            <DatePicker fx:id="dpStartDate">
                 <VBox.margin>
                     <Insets top="5.0"/>
                 </VBox.margin>
             </DatePicker>
-            <ChoiceBox/>
-            <TextField/>
+            <ChoiceBox fx:id="cbRepeat"/>
+            <TextField fx:id="txtFrequency"/>
             <HBox spacing="5.0">
                 <RadioButton mnemonicParsing="false">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
+                    <toggleGroup>
+                        <ToggleGroup fx:id="jobEndDate"/>
+                    </toggleGroup>
                 </RadioButton>
                 <DatePicker/>
             </HBox>
             <HBox spacing="5.0">
-                <RadioButton mnemonicParsing="false" text=" after">
+                <RadioButton mnemonicParsing="false" text=" after" toggleGroup="$jobEndDate">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
@@ -140,15 +146,15 @@
                 <Label text="times"/>
             </HBox>
             <HBox spacing="5.0">
-                <TextField/>
-                <CheckBox mnemonicParsing="false" text="Pass standard arguments">
+                <TextField fx:id="txtContinuousInterval"/>
+                <CheckBox fx:id="cbPassStandardArguments" mnemonicParsing="false" text="Pass standard arguments">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
                 </CheckBox>
             </HBox>
-            <TextField/>
-            <ListView prefHeight="100.0"/>
+            <TextField fx:id="txtMethod" editable="false"/>
+            <ListView fx:id="lvArguments" prefHeight="100.0"/>
         </VBox>
         <VBox spacing="5.0">
             <HBox.margin>
