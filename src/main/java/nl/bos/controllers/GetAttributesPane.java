@@ -46,7 +46,7 @@ public class GetAttributesPane {
         stage.close();
     }
 
-    public void initTextArea(IDfPersistentObject object) throws DfException {
+    protected void initTextArea(IDfPersistentObject object) throws DfException {
         appendTextToStringBuilder(object);
 
         txaAttributes.setText(String.valueOf(text));

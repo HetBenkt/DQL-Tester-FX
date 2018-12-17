@@ -108,7 +108,7 @@ public class BodyPane implements Initializable, ChangeListener {
         taStatement.setText(selectedHistoryItem);
     }
 
-    void updateResultTable(IDfCollection collection) throws DfException {
+    protected void updateResultTable(IDfCollection collection) throws DfException {
         tbResult.getItems().clear();
         tbResult.getColumns().clear();
 

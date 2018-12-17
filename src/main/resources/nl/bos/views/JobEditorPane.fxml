@@ -13,7 +13,7 @@
                 <Insets left="5.0" right="5.0" top="5.0"/>
             </HBox.margin>
             <Label text="Job Type"/>
-            <TextField fx:id="txtNrOfJobsListed" editable="false">
+            <TextField fx:id="txtNrOfJobsListed" disable="true" editable="false">
                 <VBox.margin>
                     <Insets/>
                 </VBox.margin>

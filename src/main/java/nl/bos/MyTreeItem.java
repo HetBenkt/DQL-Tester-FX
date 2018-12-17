@@ -54,7 +54,7 @@ public class MyTreeItem extends TreeItem<String> {
                     MyTreeItem child = new MyTreeItem(cabinet, cabinets.getString(ATTR_OBJECT_NAME), TYPE_CABINET, String.format(PATH_FORMAT, parent.getPath(), cabinets.getString(ATTR_OBJECT_NAME)));
                     children.add(child);
                 }
-
+                cabinets.close();
             } else if (TYPE_CABINET.equals(parent.getType())) {
                 addNodesToParent(parent, children, "cabinet", showAllVersions);
             } else if (TYPE_FOLDER.equals(parent.getType())) {
@@ -74,6 +74,7 @@ public class MyTreeItem extends TreeItem<String> {
             MyTreeItem child = new MyTreeItem(folder, folders.getString(ATTR_OBJECT_NAME), TYPE_FOLDER, String.format(PATH_FORMAT, parent.getPath(), folders.getString(ATTR_OBJECT_NAME)));
             children.add(child);
         }
+        folders.close();
         addDocuments(children, parent, showAllVersions);
     }
 
@@ -88,5 +89,6 @@ public class MyTreeItem extends TreeItem<String> {
             MyTreeItem child = new MyTreeItem(document, documents.getString(ATTR_OBJECT_NAME), TYPE_DOCUMENT, String.format(PATH_FORMAT, parent.getPath(), documents.getString(ATTR_OBJECT_NAME)));
             children.add(child);
         }
+        documents.close();
     }
 }

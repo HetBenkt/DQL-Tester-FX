@@ -33,6 +33,7 @@ public class Main extends Application {
         }
         return mainClass;
     }
+
     public static void main(String[] args) {
         if (args.length > 0) {
             Repository repositoryCon = Repository.getInstance();

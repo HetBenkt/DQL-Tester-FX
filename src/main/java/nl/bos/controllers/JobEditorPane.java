@@ -24,12 +24,28 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 
+import static nl.bos.Constants.*;
+
 @Log
 public class JobEditorPane implements Initializable, ChangeListener {
+    private static final String MINUTES = "Minutes";
+    private static final String HOURS = "Hours";
+    private static final String DAYS = "Days";
+    private static final String WEEKS = "Weeks";
+    private static final String MONTHS = "Months";
+    private static final String YEARS = "Years";
+    private static final String DAY_OF_WEEK = "Day Of Week";
+    private static final String DAY_OF_MONTH = "Day Of Month";
+    private static final String DAY_OF_YEAR = "Day Of Year";
+
+    private static final Image RUNNING = new Image("nl/bos/icons/running.png");
+    private static final Image ACTIVE = new Image("nl/bos/icons/active.png");
+    private static final Image INACTIVE = new Image("nl/bos/icons/inactive.png");
+    private static final Image RUNNING_ANIM = new Image("nl/bos/icons/running.gif");
+    private static final Image ACTIVE_ANIM = new Image("nl/bos/icons/active.gif");
+    private static final Image INACTIVE_ANIM = new Image("nl/bos/icons/inactive.gif");
+
     private Repository repository = Repository.getInstance();
-    private Image running = new Image("nl/bos/icons/running.png");
-    private Image active = new Image("nl/bos/icons/active.png");
-    private Image inactive = new Image("nl/bos/icons/inactive.png");
 
     @FXML
     private ListView lvJobs;
@@ -124,11 +140,12 @@ public class JobEditorPane implements Initializable, ChangeListener {
             ObservableList categories = FXCollections.observableArrayList();
             IDfCollection collection = repository.query("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job order by title, object_name");
             while (collection.next()) {
-                String type = collection.getString("title");
-                jobIds.add(new MyJobObject(collection.getString("r_object_id"), collection.getString("object_name"), type, !collection.getBoolean("is_inactive"), collection.getString("a_current_status")));
+                String type = collection.getString(ATTR_TITLE);
+                jobIds.add(new MyJobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), type, !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
                 if (!categories.contains(type))
                     categories.add(type);
             }
+            collection.close();
             lvJobs.setItems(jobIds);
             txtNrOfJobsListed.setText(String.valueOf(jobIds.size()));
             lvJobs.setCellFactory(param -> new ListCell<MyJobObject>() {
@@ -142,11 +159,11 @@ public class JobEditorPane implements Initializable, ChangeListener {
                         setGraphic(null);
                     } else {
                         if (item.isRunning())
-                            imageView.setImage(running);
+                            imageView.setImage(RUNNING);
                         else if (item.isActive())
-                            imageView.setImage(active);
+                            imageView.setImage(ACTIVE);
                         else
-                            imageView.setImage(inactive);
+                            imageView.setImage(INACTIVE);
                         setText(item.getObjectName());
                         setGraphic(imageView);
                     }
@@ -165,20 +182,21 @@ public class JobEditorPane implements Initializable, ChangeListener {
             servers.add("Any Running Server");
             IDfCollection serverInfo = repository.query("select object_name, r_host_name from dm_server_config order by object_name");
             while (serverInfo.next()) {
-                servers.add(String.format("%s.%s@%s", repository.getRepositoryName(), serverInfo.getString("object_name"), serverInfo.getString("r_host_name")));
+                servers.add(String.format("%s.%s@%s", repository.getRepositoryName(), serverInfo.getString(ATTR_OBJECT_NAME), serverInfo.getString(ATTR_R_HOST_NAME)));
             }
+            serverInfo.close();
             cbDesignatedServer.setItems(servers);
 
             ObservableList repeats = FXCollections.observableArrayList();
-            repeats.add("Minutes");
-            repeats.add("Hours");
-            repeats.add("Days");
-            repeats.add("Weeks");
-            repeats.add("Months");
-            repeats.add("Years");
-            repeats.add("Day Of Week");
-            repeats.add("Day Of Month");
-            repeats.add("Day Of Year");
+            repeats.add(MINUTES);
+            repeats.add(HOURS);
+            repeats.add(DAYS);
+            repeats.add(WEEKS);
+            repeats.add(MONTHS);
+            repeats.add(YEARS);
+            repeats.add(DAY_OF_WEEK);
+            repeats.add(DAY_OF_MONTH);
+            repeats.add(DAY_OF_YEAR);
             cbRepeat.setItems(repeats);
         } catch (DfException e) {
             log.finest(e.getMessage());
@@ -194,52 +212,52 @@ public class JobEditorPane implements Initializable, ChangeListener {
         if (observable.getValue().getClass().equals(MyJobObject.class)) {
             try {
                 IDfPersistentObject job = repository.getSession().getObject(new DfId(((MyJobObject) observable.getValue()).getObjectId()));
-                txtObjectId.setText(job.getString("r_object_id"));
-                txtLastCompletionDate.setText(job.getString("a_last_completion"));
-                txtNextInvocationDate.setText(job.getString("a_next_invocation"));
-                txtRunCompleted.setText(String.valueOf(job.getInt("a_iterations")));
-                txtLastReturnCode.setText(job.getString("a_last_return_code"));
-                chkIsContinued.setDisable(job.getBoolean("a_is_continued"));
-                txtName.setText(job.getString("object_name"));
-                txtType.setText(job.getString("title"));
-                txtDescription.setText(job.getString("subject"));
-                rbStateActive.setSelected(!job.getBoolean("is_inactive"));
-                rbStateInactive.setSelected(job.getBoolean("is_inactive"));
-                cbTraceLevel.setValue(job.getInt("method_trace_level"));
-                chkDeactivateOnFailure.setSelected(job.getBoolean("inactivate_after_failure"));
-                cbDesignatedServer.setValue(job.getString("target_server"));
+                txtObjectId.setText(job.getString(ATTR_R_OBJECT_ID));
+                txtLastCompletionDate.setText(job.getString(ATTR_A_LAST_COMPLETION));
+                txtNextInvocationDate.setText(job.getString(ATTR_A_NEXT_INVOCATION));
+                txtRunCompleted.setText(String.valueOf(job.getInt(ATTR_A_ITERATIONS)));
+                txtLastReturnCode.setText(job.getString(ATTR_A_LAST_RETURN_CODE));
+                chkIsContinued.setDisable(job.getBoolean(ATTR_A_IS_CONTINUED));
+                txtName.setText(job.getString(ATTR_OBJECT_NAME));
+                txtType.setText(job.getString(ATTR_TITLE));
+                txtDescription.setText(job.getString(ATTR_SUBJECT));
+                rbStateActive.setSelected(!job.getBoolean(ATTR_IS_INACTIVE));
+                rbStateInactive.setSelected(job.getBoolean(ATTR_IS_INACTIVE));
+                cbTraceLevel.setValue(job.getInt(ATTR_METHOD_TRACE_LEVEL));
+                chkDeactivateOnFailure.setSelected(job.getBoolean(ATTR_INACTIVATE_AFTER_FAILURE));
+                cbDesignatedServer.setValue(job.getString(ATTR_TARGET_SERVER));
 
-                IDfTime startDate = job.getTime("start_date");
+                IDfTime startDate = job.getTime(ATTR_START_DATE);
                 if (!startDate.isNullDate()) {
                     LocalDate localDate = LocalDate.of(startDate.getYear(), startDate.getMonth(), startDate.getDay());
                     dpStartDate.setValue(localDate);
                 } else
                     dpStartDate.setValue(LocalDate.now());
 
-                cbRepeat.setValue(getDisplayValue(job.getInt("run_mode")));
-                txtFrequency.setText(String.valueOf(job.getInt("run_interval")));
-                txtContinuousInterval.setText(String.valueOf(job.getInt("a_continuation_interval")));
-                cbPassStandardArguments.setSelected(job.getBoolean("pass_standard_arguments"));
-                txtMethod.setText(job.getString("method_name"));
+                cbRepeat.setValue(getDisplayValue(job.getInt(ATTR_RUN_MODE)));
+                txtFrequency.setText(String.valueOf(job.getInt(ATTR_RUN_INTERVAL)));
+                txtContinuousInterval.setText(String.valueOf(job.getInt(ATTR_A_CONTINUATION_INTERVAL)));
+                cbPassStandardArguments.setSelected(job.getBoolean(ATTR_PASS_STANDARD_ARGUMENTS));
+                txtMethod.setText(job.getString(ATTR_METHOD_NAME));
 
                 ObservableList arguments = FXCollections.observableArrayList();
-                int methodArguments = job.getValueCount("method_arguments");
+                int methodArguments = job.getValueCount(ATTR_METHOD_ARGUMENTS);
                 for (int i = 0; i < methodArguments; i++) {
-                    arguments.add(job.getRepeatingString("method_arguments", i));
+                    arguments.add(job.getRepeatingString(ATTR_METHOD_ARGUMENTS, i));
                 }
                 lvArguments.setItems(arguments);
 
                 txtNrOfArguments.setText(String.valueOf(methodArguments));
 
-                if (job.getString("a_current_status").equals("STARTED")) {
-                    ivState.setImage(running);
-                    txtRunning.setText("running");
-                } else if (!job.getBoolean("is_inactive"))
-                    ivState.setImage(active);
+                if (job.getString(ATTR_A_CURRENT_STATUS).equals("STARTED")) {
+                    ivState.setImage(RUNNING_ANIM);
+                    txtRunning.setText("RUNNING");
+                } else if (!job.getBoolean(ATTR_IS_INACTIVE))
+                    ivState.setImage(ACTIVE_ANIM);
                 else
-                    ivState.setImage(inactive);
+                    ivState.setImage(INACTIVE_ANIM);
 
-                lblStatus.setText(job.getString("a_current_status"));
+                lblStatus.setText(job.getString(ATTR_A_CURRENT_STATUS));
 
                 IDfTime endDate = job.getTime("expiration_date");
                 if (!endDate.isNullDate()) {
@@ -248,7 +266,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
                 } else
                     dpEndDate.setValue(LocalDate.now());
 
-                txtMaxIterations.setText(String.valueOf(job.getInt("max_iterations")));
+                txtMaxIterations.setText(String.valueOf(job.getInt(ATTR_MAX_ITERATIONS)));
                 txtMaxIterations.setDisable(!hasEndIterationValue(job));
 
                 rbEndDate.setSelected(!hasEndIterationValue(job));
@@ -256,40 +274,58 @@ public class JobEditorPane implements Initializable, ChangeListener {
             } catch (DfException e) {
                 log.finest(e.getMessage());
             }
-        } else
+        } else {
             log.info(String.format("Category is %s", observable));
+            ObservableList jobIds = FXCollections.observableArrayList();
+            try {
+                IDfCollection collection;
+                if (!observable.getValue().equals(""))
+                    collection = repository.query(String.format("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job where title = '%s' order by title, object_name", observable.getValue()));
+                else
+                    collection = repository.query("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job order by title, object_name");
+                while (collection.next()) {
+                    jobIds.add(new MyJobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), collection.getString(ATTR_TITLE), !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
+                }
+                collection.close();
+            } catch (DfException e) {
+                log.finest(e.getMessage());
+            }
+            lvJobs.setItems(jobIds);
+            txtNrOfJobsListed.setText(String.valueOf(jobIds.size()));
+        }
     }
 
     private boolean hasEndIterationValue(IDfPersistentObject job) throws DfException {
-        return job.getInt("max_iterations") != 0;
+        return job.getInt(ATTR_MAX_ITERATIONS) != 0;
     }
 
     private String getDisplayValue(int runMode) {
         switch (runMode) {
             case 1:
-                return "Minutes";
+                return MINUTES;
             case 2:
-                return "Hours";
+                return HOURS;
             case 3:
-                return "Days";
+                return DAYS;
             case 4:
-                return "Weeks";
+                return WEEKS;
             case 5:
-                return "Months";
+                return MONTHS;
             case 6:
-                return "Years";
+                return YEARS;
             case 7:
-                return "Day Of Week";
+                return DAY_OF_WEEK;
             case 8:
-                return "Day Of Month";
+                return DAY_OF_MONTH;
             case 9:
-                return "Day Of Year";
+                return DAY_OF_YEAR;
             default:
                 return "Unknown";
         }
     }
 
-    public void handleExit(ActionEvent actionEvent) {
+    @FXML
+    private void handleExit(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
         Stage stage = (Stage) btnExit.getScene().getWindow();
         stage.close();
