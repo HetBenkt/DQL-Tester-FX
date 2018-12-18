@@ -36,6 +36,7 @@ public final class Constants {
     public static final String ATTR_METHOD_NAME = "method_name";
     public static final String ATTR_METHOD_ARGUMENTS = "method_arguments";
     public static final String ATTR_MAX_ITERATIONS = "max_iterations";
+    public static final String ATTR_EXPIRATION_DATE = "expiration_date";
 
     public static final String PATH_FORMAT = "%s/%s";
 

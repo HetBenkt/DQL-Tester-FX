@@ -19,14 +19,14 @@
                 </VBox.margin>
             </TextField>
         </VBox>
-        <VBox prefWidth="320.0" spacing="5.0">
+        <VBox fx:id="vbJobList" prefWidth="320.0" spacing="5.0">
             <HBox.margin>
                 <Insets right="5.0" top="5.0"/>
             </HBox.margin>
             <ChoiceBox fx:id="cbJobsFilter"/>
             <ListView fx:id="lvJobs" prefHeight="700.0"/>
         </VBox>
-        <VBox prefWidth="210.0" spacing="13.0">
+        <VBox fx:id="vbFieldLabels" disable="true" prefWidth="210.0" spacing="13.0">
             <padding>
                 <Insets top="4.0"/>
             </padding>
@@ -48,7 +48,7 @@
                 </VBox.margin>
             </Label>
             <Label text="Designated Server"/>
-            <CheckBox fx:id="cbWatchJob" mnemonicParsing="false" text="Watch Job"/>
+            <CheckBox fx:id="cbWatchJob" mnemonicParsing="false" onAction="#handleWatchJob" text="Watch Job"/>
             <Label text="Start Date"/>
             <Label text="Repeat"/>
             <Label text="Frequency"/>
@@ -66,12 +66,12 @@
                 </VBox.margin>
                 <Button fx:id="btnViewLog" mnemonicParsing="false" text="View Log"/>
                 <VBox spacing="5.0">
-                    <TextField editable="false" maxWidth="30.0" text="0"/>
-                    <TextField fx:id="txtNrOfArguments" editable="false" maxWidth="30.0" text="0"/>
+                    <TextField disable="true" editable="false" maxWidth="30.0" text="0"/>
+                    <TextField fx:id="txtNrOfArguments" disable="true" editable="false" maxWidth="30.0" text="0"/>
                 </VBox>
             </HBox>
         </VBox>
-        <VBox prefWidth="400.0" spacing="5.0">
+        <VBox fx:id="vbFields" disable="true" prefWidth="400.0" spacing="5.0">
             <HBox.margin>
                 <Insets top="5.0"/>
             </HBox.margin>
@@ -167,12 +167,18 @@
             <TextField fx:id="txtMethod" editable="false"/>
             <ListView fx:id="lvArguments" prefHeight="100.0"/>
         </VBox>
-        <VBox spacing="5.0">
+        <VBox fx:id="vbFieldButtons" disable="true" spacing="5.0">
             <HBox.margin>
                 <Insets left="5.0" top="5.0"/>
             </HBox.margin>
             <ImageView fitHeight="64.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true">
                 <Image url="@../icons/calendar.png"/>
+            </ImageView>
+            <ImageView fx:id="ivLock" fitHeight="64.0" fitWidth="64.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true"
+                       preserveRatio="true" visible="false">
+                <image>
+                    <Image url="@../icons/shield.png"/>
+                </image>
             </ImageView>
             <Button fx:id="btnEditServer" mnemonicParsing="false" text="Edit">
                 <VBox.margin>
@@ -187,14 +193,14 @@
             <Button fx:id="btnEditArguments" mnemonicParsing="false" text="Edit list"/>
         </VBox>
     </HBox>
-    <HBox spacing="15.0">
+    <HBox fx:id="hbButtons" spacing="15.0">
         <VBox.margin>
             <Insets left="5.0" top="10.0"/>
         </VBox.margin>
-        <Button mnemonicParsing="false" text="Refresh"/>
-        <Button fx:id="btnCopyJob" mnemonicParsing="false" text="Copy Job"/>
-        <Button fx:id="btnDeleteJob" mnemonicParsing="false" text="Delete Job"/>
-        <Button fx:id="btnExportJob" mnemonicParsing="false" text="Export Job"/>
+        <Button fx:id="btnRefresh" mnemonicParsing="false" onAction="#handleRefresh" text="Refresh"/>
+        <Button fx:id="btnCopyJob" disable="true" mnemonicParsing="false" text="Copy Job"/>
+        <Button fx:id="btnDeleteJob" disable="true" mnemonicParsing="false" text="Delete Job"/>
+        <Button fx:id="btnExportJob" disable="true" mnemonicParsing="false" text="Export Job"/>
         <Button fx:id="btnNewJob" mnemonicParsing="false" text="New Job"/>
         <Button fx:id="btnUpdate" disable="true" mnemonicParsing="false" text="Update"/>
         <Button fx:id="btnExit" mnemonicParsing="false" onAction="#handleExit" text="Exit"/>
