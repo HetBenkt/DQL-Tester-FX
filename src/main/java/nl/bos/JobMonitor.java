@@ -3,6 +3,7 @@ package nl.bos;
 import com.documentum.fc.client.IDfPersistentObject;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
+import javafx.application.Platform;
 import lombok.extern.java.Log;
 import nl.bos.controllers.JobEditorPane;
 
@@ -24,12 +25,14 @@ public class JobMonitor implements Runnable {
         while (running) {
             log.info("Monitor...");
 
-            try {
-                IDfPersistentObject job = repository.getSession().getObject(new DfId(currentJob.getObjectId()));
-                jobEditorPane.updateFields(job);
-            } catch (DfException e) {
-                log.finest(e.getMessage());
-            }
+            Platform.runLater(() -> {
+                try {
+                    IDfPersistentObject job = repository.getSession().getObject(new DfId(currentJob.getObjectId()));
+                    jobEditorPane.updateFields(job);
+                } catch (DfException e) {
+                    log.finest(e.getMessage());
+                }
+            });
 
             try {
                 Thread.sleep(2000);
