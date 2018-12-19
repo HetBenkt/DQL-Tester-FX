@@ -4,11 +4,12 @@ import com.documentum.fc.client.IDfPersistentObject;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import lombok.extern.java.Log;
 import nl.bos.controllers.JobEditorPane;
 
 @Log
-public class JobMonitor implements Runnable {
+public class JobMonitor extends Task<Void> {
     private final JobEditorPane jobEditorPane;
     private final MyJobObject currentJob;
     private Repository repository = Repository.getInstance();
@@ -20,10 +21,14 @@ public class JobMonitor implements Runnable {
         this.jobEditorPane = jobEditorPane;
     }
 
+    public synchronized void stop() {
+        running = false;
+    }
+
     @Override
-    public void run() {
+    protected Void call() throws Exception {
         while (running) {
-            log.info("Monitor...");
+            log.finest("Monitor...");
 
             Platform.runLater(() -> {
                 try {
@@ -34,15 +39,8 @@ public class JobMonitor implements Runnable {
                 }
             });
 
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                log.finest(e.getMessage());
-            }
+            Thread.sleep(2000);
         }
-    }
-
-    public synchronized void stop() {
-        running = false;
+        return null;
     }
 }

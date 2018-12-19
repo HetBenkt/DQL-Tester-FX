@@ -152,7 +152,6 @@ public class JobEditorPane implements Initializable, ChangeListener {
     @FXML
     private ImageView ivLock;
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
@@ -278,7 +277,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
 
                     txtNrOfArguments.setText(String.valueOf(methodArguments));
 
-                    updateStatus(job.getString(ATTR_A_CURRENT_STATUS), job.getBoolean(ATTR_IS_INACTIVE));
+                    updateStatus(job.getString(ATTR_R_LOCK_OWNER), job.getBoolean(ATTR_IS_INACTIVE));
 
                     IDfTime endDate = job.getTime(ATTR_EXPIRATION_DATE);
                     if (!endDate.isNullDate()) {
@@ -385,8 +384,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
             Stage stage = (Stage) vbJobList.getScene().getWindow();
             stage.setTitle(String.format("Job Editor - %s [Watch Mode]", repository.getRepositoryName()));
             jobMonitor = new JobMonitor(currentJob, this);
-            Thread t = new Thread(jobMonitor, "JobMonitor");
-            t.start();
+            new Thread(jobMonitor).start();
         } else {
             btnViewLog.setDisable(false);
             vbFields.setDisable(false);
@@ -399,17 +397,19 @@ public class JobEditorPane implements Initializable, ChangeListener {
         }
     }
 
-    public void updateStatus(String status, boolean isInactive) {
-        if (status.equals("STARTED")) {
+    public void updateStatus(String lockOwner, boolean isInactive) {
+        if (!lockOwner.isEmpty()) {
             ivState.setImage(RUNNING_ANIM);
             txtRunning.setText("RUNNING");
         } else if (!isInactive) {
             ivState.setImage(ACTIVE_ANIM);
             txtRunning.setText("");
-        } else
+        } else {
             ivState.setImage(INACTIVE_ANIM);
+            txtRunning.setText("");
+        }
 
-        lblStatus.setText(status);
+        lblStatus.setText(lockOwner);
     }
 
     public void updateFields(IDfPersistentObject job) throws DfException {
@@ -420,6 +420,6 @@ public class JobEditorPane implements Initializable, ChangeListener {
         else
             ivLock.setVisible(true);
 
-        updateStatus(job.getString(ATTR_A_CURRENT_STATUS), job.getBoolean(ATTR_IS_INACTIVE));
+        updateStatus(job.getString(ATTR_R_LOCK_OWNER), job.getBoolean(ATTR_IS_INACTIVE));
     }
 }
