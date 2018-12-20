@@ -20,18 +20,19 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import lombok.extern.java.Log;
 import nl.bos.MyTreeItem;
 import nl.bos.Repository;
 
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
 
-@Log
 public class RepositoryBrowserPane implements Initializable, ChangeListener<TreeItem<MyTreeItem>>, EventHandler<ActionEvent> {
+    private static final Logger log = Logger.getLogger(RepositoryBrowserPane.class.getName());
+
     @FXML
     private TreeView<MyTreeItem> treeView;
     @FXML

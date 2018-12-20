@@ -19,8 +19,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-import lombok.Getter;
-import lombok.extern.java.Log;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -34,22 +32,36 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
-@Log
 public class BodyPane implements Initializable, ChangeListener {
+    private static final Logger log = Logger.getLogger(BodyPane.class.getName());
+
+    public TextArea getTaStatement() {
+        return taStatement;
+    }
+
+    public ChoiceBox<String> getCmbHistory() {
+        return cmbHistory;
+    }
+
+    public JSONObject getJsonObject() {
+        return jsonObject;
+    }
+
+    public FXMLLoader getFxmlLoader() {
+        return fxmlLoader;
+    }
+
     @FXML
     private VBox vboxBody;
     @FXML
-    @Getter
     private TextArea taStatement;
     @FXML
-    @Getter
     private ChoiceBox<String> cmbHistory;
     @FXML
     private TableView tbResult;
-    @Getter
     private JSONObject jsonObject;
-    @Getter
     private FXMLLoader fxmlLoader;
 
     public void initialize(URL location, ResourceBundle resources) {

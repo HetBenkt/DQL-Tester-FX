@@ -8,16 +8,17 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
-import lombok.extern.java.Log;
 import nl.bos.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Log
 public class GetAttributesPane {
+    private static final Logger log = Logger.getLogger(GetAttributesPane.class.getName());
+
     @FXML
     private TextField txtObjectId;
     @FXML

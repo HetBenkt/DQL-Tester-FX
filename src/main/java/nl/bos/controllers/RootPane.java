@@ -8,16 +8,19 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import lombok.Getter;
-import lombok.extern.java.Log;
 import nl.bos.Repository;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
-@Log
 public class RootPane {
+    private static final Logger log = Logger.getLogger(RootPane.class.getName());
+
+    public MenuBar getMenubar() {
+        return menubar;
+    }
+
     @FXML
-    @Getter
     private MenuBar menubar;
 
     @FXML

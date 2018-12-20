@@ -15,8 +15,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import lombok.Getter;
-import lombok.extern.java.Log;
 import nl.bos.Repository;
 
 import java.io.IOException;
@@ -24,28 +22,39 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
-@Log
 public class LoginPane implements Initializable {
+    private static final Logger log = Logger.getLogger(LoginPane.class.getName());
+
+    public ChoiceBox<String> getChbRepository() {
+        return chbRepository;
+    }
+
+    public TextField getTxtUsername() {
+        return txtUsername;
+    }
+
+    public String getHostName() {
+        return hostName;
+    }
+
     @FXML
     private Label lblVersion;
     @FXML
     private Label lblServer;
     @FXML
-    @Getter
     private ChoiceBox<String> chbRepository;
     @FXML
     private Button btnLogin;
     @FXML
     private Button btnLogout;
     @FXML
-    @Getter
     private TextField txtUsername;
     @FXML
     private PasswordField txtPassword;
     @FXML
     private TextField txtDomain;
-    @Getter
     private String hostName;
     @FXML
     private CheckBox chkSaveLoginData;

@@ -7,7 +7,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import lombok.extern.java.Log;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,12 +15,13 @@ import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 
 import static org.junit.matchers.JUnitMatchers.containsString;
 
 
-@Log
 public class MainTest extends ApplicationTest {
+    private static final Logger log = Logger.getLogger(MainTest.class.getName());
 
     @Before
     public void setup() {

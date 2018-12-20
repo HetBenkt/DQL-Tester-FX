@@ -5,27 +5,42 @@ import com.documentum.com.IDfClientX;
 import com.documentum.fc.client.*;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfLoginInfo;
-import lombok.Getter;
-import lombok.extern.java.Log;
 
-@Log
+import java.util.logging.Logger;
+
 public class Repository {
+    private static final Logger log = Logger.getLogger(Repository.class.getName());
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public IDfSession getSession() {
+        return session;
+    }
+
+    public String getRepositoryName() {
+        return repositoryName;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public IDfClient getClient() {
+        return client;
+    }
+
     private static Repository repository;
-    @Getter
     private String errorMessage = "";
     private IDfSessionManager sessionManager;
-    @Getter
     private IDfSession session;
-    @Getter
     private String repositoryName;
-    @Getter
     private String userName;
     private String passkey;
     private String domain;
     private IDfClientX clientX = new DfClientX();
-    @Getter
     private IDfClient client = null;
-
 
     private Repository() {
     }

@@ -5,11 +5,13 @@ import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import lombok.extern.java.Log;
 import nl.bos.controllers.JobEditorPane;
 
-@Log
+import java.util.logging.Logger;
+
 public class JobMonitor extends Task<Void> {
+    private static final Logger log = Logger.getLogger(JobMonitor.class.getName());
+
     private final JobEditorPane jobEditorPane;
     private final MyJobObject currentJob;
     private Repository repository = Repository.getInstance();

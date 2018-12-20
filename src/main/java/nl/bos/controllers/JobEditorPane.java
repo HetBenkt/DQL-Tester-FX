@@ -18,7 +18,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import lombok.extern.java.Log;
 import nl.bos.JobMonitor;
 import nl.bos.MyJobObject;
 import nl.bos.Repository;
@@ -26,11 +25,13 @@ import nl.bos.Repository;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
 
-@Log
 public class JobEditorPane implements Initializable, ChangeListener {
+    private static final Logger log = Logger.getLogger(JobEditorPane.class.getName());
+
     private static final String MINUTES = "Minutes";
     private static final String HOURS = "Hours";
     private static final String DAYS = "Days";

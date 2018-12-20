@@ -14,8 +14,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import lombok.Getter;
-import lombok.extern.java.Log;
 import nl.bos.Main;
 import nl.bos.Repository;
 import org.json.simple.JSONArray;
@@ -26,10 +24,31 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
-@Log
 public class InputPane implements Initializable, EventHandler<WindowEvent> {
-    @Getter
+    private static final Logger log = Logger.getLogger(InputPane.class.getName());
+
+    public static Stage getLoginStage() {
+        return loginStage;
+    }
+
+    public Button getBtnFlushCache() {
+        return btnFlushCache;
+    }
+
+    public Button getBtnReadQuery() {
+        return btnReadQuery;
+    }
+
+    public Button getBtnConnect() {
+        return btnConnect;
+    }
+
+    public Button getBtnDisconnect() {
+        return btnDisconnect;
+    }
+
     private static Stage loginStage = new Stage();
     @FXML
     private Label lblStatus;
@@ -44,16 +63,12 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
     @FXML
     private Label lblServerVersion;
     @FXML
-    @Getter
     private Button btnFlushCache;
     @FXML
-    @Getter
     private Button btnReadQuery;
     @FXML
-    @Getter
     private Button btnConnect;
     @FXML
-    @Getter
     private Button btnDisconnect;
 
     private FXMLLoader fxmlLoader;

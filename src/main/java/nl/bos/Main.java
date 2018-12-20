@@ -8,19 +8,26 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import lombok.Getter;
-import lombok.extern.java.Log;
 import nl.bos.controllers.BodyPane;
 import nl.bos.controllers.InputPane;
 import nl.bos.controllers.RootPane;
 
-@Log
+import java.util.logging.Logger;
+
 public class Main extends Application {
+    private static final Logger log = Logger.getLogger(Main.class.getName());
+
+    public FXMLLoader getBodyPaneLoader() {
+        return bodyPaneLoader;
+    }
+
+    public FXMLLoader getRootPaneLoader() {
+        return rootPaneLoader;
+    }
+
     private static Main mainClass;
     private static boolean devModeEnabled = false;
-    @Getter
     private FXMLLoader bodyPaneLoader;
-    @Getter
     private FXMLLoader rootPaneLoader;
 
     public Main() {

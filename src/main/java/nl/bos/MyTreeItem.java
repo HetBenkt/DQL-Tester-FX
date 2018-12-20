@@ -5,17 +5,15 @@ import com.documentum.fc.client.IDfPersistentObject;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import javafx.scene.control.TreeItem;
-import lombok.Data;
-import lombok.extern.java.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
 
-@Data
-@Log
 public class MyTreeItem extends TreeItem<String> {
+    private static final Logger log = Logger.getLogger(MyTreeItem.class.getName());
 
     private String type;
     private String name;
@@ -67,6 +65,14 @@ public class MyTreeItem extends TreeItem<String> {
         return children;
     }
 
+    private String getPath() {
+        return path;
+    }
+
+    public String getType() {
+        return type;
+    }
+
     private void addNodesToParent(MyTreeItem parent, List<MyTreeItem> children, String function, boolean showAllVersions) throws DfException {
         IDfCollection folders = repositoryCon.query(String.format("select r_object_id, object_name from dm_folder where %s('%s') order by object_name", function, parent.getPath()));
         while (folders.next()) {
@@ -90,5 +96,13 @@ public class MyTreeItem extends TreeItem<String> {
             children.add(child);
         }
         documents.close();
+    }
+
+    public IDfPersistentObject getObject() {
+        return object;
+    }
+
+    public String getName() {
+        return name;
     }
 }

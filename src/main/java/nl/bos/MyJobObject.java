@@ -1,9 +1,10 @@
 package nl.bos;
 
-import lombok.Data;
+import java.util.logging.Logger;
 
-@Data
 public class MyJobObject {
+    private static final Logger log = Logger.getLogger(MyJobObject.class.getName());
+
     private final String objectId;
     private final String objectName;
     private final String category;
@@ -17,5 +18,21 @@ public class MyJobObject {
         this.isActive = isActive;
 
         this.isRunning = isRunning.equals("STARTED");
+    }
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public String getObjectName() {
+        return objectName;
     }
 }
