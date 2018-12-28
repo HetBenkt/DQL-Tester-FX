@@ -51,6 +51,13 @@
             <artifactId>javafx-fxml</artifactId>
             <version>11</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.testfx/openjfx-monocle -->
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>openjfx-monocle</artifactId>
+            <version>jdk-11+23</version>
+            <scope>test</scope>
+        </dependency>
         <!--<dependency>-->
         <!--<groupId>org.projectlombok</groupId>-->
         <!--<artifactId>lombok</artifactId>-->
