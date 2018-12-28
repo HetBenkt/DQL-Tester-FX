@@ -18,14 +18,15 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
      
 
 ### Requirements for this application
-* A Java Runtime Environment (JRE) (e.g. jre1.8.0_161)
+* A Java Runtime Environment (JRE) (e.g. [OpenJDK Runtime Environment 18.9 (build 11.0.1+13)](https://jdk.java.net/))
+* JavaFX libraries (as they are not included in OpenJDK!). Downloadable fom [JavaFX SDK](https://gluonhq.com/products/javafx/)
 * A runnable OpenText Documentum environment that can be pinged by hostname or IP-address from the machine where this application will be executed
 * DFC libraries. These can be downloaded from [OpenText My Support](https://mysupport.opentext.com)
 
 ### How to run the application:
 1. Download the latest [release](https://github.com/HetBenkt/DQL-Tester-FX/releases) to the local drive from
 2. In the download directory create a sub directory named: `lib`
-3. Copy the following downloaded DFC jar files in this `lib` directory
+3. Copy the following DFC jar files in this `lib` directory
     * aspectjrt.jar
     * certj.jar
     * commons-lang-2.4.jar
@@ -34,7 +35,6 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
     * log4j.jar
 4. Copy the following jar files in this `lib` directory from the download locations
     * [json-simple-1.1.1.jar](https://code.google.com/archive/p/json-simple/)
-    * [lombok-1.16.0.jar](https://projectlombok.org/all-versions)
 5. In the download directory create a sub directory named: `config`
 6. Create a new file called `dfc.properties` in the `config` directory with this content
     ```
@@ -64,9 +64,11 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
     log4j.appender.F1.layout=org.apache.log4j.PatternLayout
     log4j.appender.F1.layout.ConversionPattern=%d{ABSOLUTE} %5p [%t] %c - %m%n
     ```
-4. Start a CMD prompt and give these commands (point to your own path as these are samples)
+9. Start a CMD prompt and give these commands (point to your own path as these are samples)
 * `cd "c:\DQL Tester FX"`
 >It's the location of the downloaded `DQLTesterFX-xxx.jar` and just created `lib` and `config` directory
-* `"c:\jre1.8.0_161\bin\java.exe" -cp DQLTesterFX-xxx.jar;lib/*;config nl.bos.Main`
+* `set PATH_TO_FX="c:\javafx-sdk-11.0.1\lib"`
+>Sets the path to the extracted JavaFX runtime libraries
+* `"c:\jdk-11.0.1\bin\java.exe" --module-path %PATH_TO_FX% --add-modules=javafx.controls,javafx.fxml -cp DQLTesterFX-xxx.jar;lib\*;config nl.bos.Main`
 >For a direct login, pass 3 parameters: 
-* `"c:\jre1.8.0_161\bin\java.exe" -cp DQLTesterFX-xxx.jar;lib/*;config nl.bos.Main <REPOSITORY_NAME> <USERNAME> <PASSWORD>`
+* `"c:\jdk-11.0.1\bin\java.exe" --module-path %PATH_TO_FX% --add-modules=javafx.controls,javafx.fxml -cp DQLTesterFX-xxx.jar;lib\*;config nl.bos.Main <REPOSITORY_NAME> <USERNAME> <PASSWORD>`

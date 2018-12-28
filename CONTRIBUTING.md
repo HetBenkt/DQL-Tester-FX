@@ -1,4 +1,11 @@
 # How to participate in this repository
+### Java SDK version
+```
+openjdk 11.0.1 2018-10-16
+OpenJDK Runtime Environment 18.9 (build 11.0.1+13)
+OpenJDK 64-Bit Server VM 18.9 (build 11.0.1+13, mixed mode)
+```
+[JDK 11.0.1 General-Availability Release](https://jdk.java.net/11/)
 ### Cloning the project
 * Start IntelliJ
 * On the 'Welcome' screen: Check out from Version Control -> Git
@@ -16,7 +23,6 @@
 * Open 'File' > 'Settings'
 * Go to the 'Plugins' section
 * Download/install and enable these extra plugins
-    * Lombok Plugin (and enable annotation processing for the project)
     * Coverage
     * Emma
     * SonarLint
@@ -36,7 +42,7 @@ Run configuration 'Main (dev-mode)':
 > * Hit the '+' sign to add a new 'Application'
 > * Give it a name: Main (dev-mode)
 > * Give it a main class: nl.bos.Main
-> * Give it a program arguments: <REPOSITORY_NAME> <USERNAME> <PASSWORD>
+> * Give it the program arguments: REPOSITORY_NAME USERNAME PASSWORD
 
 Create 2 new propery files
 * A file called `dfc.properties` in the `src\main\resources` directory with this content
