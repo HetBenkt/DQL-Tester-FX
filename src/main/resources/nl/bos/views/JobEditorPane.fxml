@@ -64,7 +64,7 @@
                 <VBox.margin>
                     <Insets/>
                 </VBox.margin>
-                <Button fx:id="btnViewLog" mnemonicParsing="false" text="View Log"/>
+                <Button fx:id="btnViewLog" mnemonicParsing="false" onAction="#handleViewLog" text="View Log"/>
                 <VBox spacing="5.0">
                     <TextField disable="true" editable="false" maxWidth="30.0" text="0"/>
                     <TextField fx:id="txtNrOfArguments" disable="true" editable="false" maxWidth="30.0" text="0"/>
@@ -183,7 +183,7 @@
             </ImageView>
             <Button fx:id="btnEditServer" mnemonicParsing="false" text="Edit">
                 <VBox.margin>
-                    <Insets top="230.0"/>
+                    <Insets top="161.0"/>
                 </VBox.margin>
             </Button>
             <Button fx:id="btnBrowseMethod" mnemonicParsing="false" text="Browse">

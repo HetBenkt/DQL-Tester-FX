@@ -49,6 +49,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
     private static final Image RUNNING_ANIM = new Image("nl/bos/icons/running.gif");
     private static final Image ACTIVE_ANIM = new Image("nl/bos/icons/active.gif");
     private static final Image INACTIVE_ANIM = new Image("nl/bos/icons/inactive.gif");
+    private static final String ANY_RUNNING_SERVER = "Any Running Server";
 
     private Repository repository = Repository.getInstance();
     private String currentCategory;
@@ -202,7 +203,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
             cbTraceLevel.setItems(levels);
 
             ObservableList servers = FXCollections.observableArrayList();
-            servers.add("Any Running Server");
+            servers.add(ANY_RUNNING_SERVER);
             IDfCollection serverInfo = repository.query("select object_name, r_host_name from dm_server_config order by object_name");
             while (serverInfo.next()) {
                 servers.add(String.format("%s.%s@%s", repository.getRepositoryName(), serverInfo.getString(ATTR_OBJECT_NAME), serverInfo.getString(ATTR_R_HOST_NAME)));
@@ -257,7 +258,12 @@ public class JobEditorPane implements Initializable, ChangeListener {
                     rbStateInactive.setSelected(job.getBoolean(ATTR_IS_INACTIVE));
                     cbTraceLevel.setValue(job.getInt(ATTR_METHOD_TRACE_LEVEL));
                     chkDeactivateOnFailure.setSelected(job.getBoolean(ATTR_INACTIVATE_AFTER_FAILURE));
-                    cbDesignatedServer.setValue(job.getString(ATTR_TARGET_SERVER));
+                    String targetServer = job.getString(ATTR_TARGET_SERVER);
+                    if (targetServer.isEmpty())
+                        cbDesignatedServer.setValue(ANY_RUNNING_SERVER);
+                    else
+                        cbDesignatedServer.setValue(targetServer);
+                    cbRunAfterUpdate.setSelected(job.getBoolean(ATTR_RUN_NOW));
 
                     IDfTime startDate = job.getTime(ATTR_START_DATE);
                     if (!startDate.isNullDate()) {
@@ -281,6 +287,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
 
                     txtNrOfArguments.setText(String.valueOf(methodArguments));
 
+                    lblStatus.setText(job.getString(ATTR_A_CURRENT_STATUS));
                     updateStatus(job.getString(ATTR_R_LOCK_OWNER), job.getBoolean(ATTR_IS_INACTIVE));
 
                     IDfTime endDate = job.getTime(ATTR_EXPIRATION_DATE);
@@ -401,7 +408,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
         }
     }
 
-    public void updateStatus(String lockOwner, boolean isInactive) {
+    private void updateStatus(String lockOwner, boolean isInactive) {
         if (!lockOwner.isEmpty()) {
             ivState.setImage(RUNNING_ANIM);
             txtRunning.setText("RUNNING");
@@ -412,12 +419,13 @@ public class JobEditorPane implements Initializable, ChangeListener {
             ivState.setImage(INACTIVE_ANIM);
             txtRunning.setText("");
         }
-
-        lblStatus.setText(lockOwner);
     }
 
     public void updateFields(IDfPersistentObject job) throws DfException {
         txtLastCompletionDate.setText(job.getString(ATTR_A_LAST_COMPLETION));
+        cbRunAfterUpdate.setSelected(job.getBoolean(ATTR_RUN_NOW));
+        txtRunCompleted.setText(String.valueOf(job.getInt(ATTR_A_ITERATIONS)));
+        lblStatus.setText(job.getString(ATTR_A_CURRENT_STATUS));
 
         if (job.getString(ATTR_R_LOCK_OWNER).isEmpty())
             ivLock.setVisible(false);
@@ -431,6 +439,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
     private void handleRunAfterUpdate(ActionEvent actionEvent) {
         currentJob.updateChanges(ATTR_RUN_NOW, String.format("set %s = %s", ATTR_RUN_NOW, cbRunAfterUpdate.isSelected()));
         btnUpdate.setDisable(false);
+        cbWatchJob.setDisable(true);
     }
 
     @FXML
@@ -438,10 +447,21 @@ public class JobEditorPane implements Initializable, ChangeListener {
         String updateList = currentJob.getUpdateList();
         repository.query(String.format("update dm_job object %s where r_object_id = '%s'", updateList, currentJob.getObjectId()));
         btnUpdate.setDisable(true);
+        cbWatchJob.setDisable(false);
     }
 
-    public void handleDescription(KeyEvent keyEvent) {
+    @FXML
+    private void handleDescription(KeyEvent keyEvent) {
         currentJob.updateChanges(ATTR_SUBJECT, String.format("set %s = '%s'", ATTR_SUBJECT, txtDescription.getText()));
         btnUpdate.setDisable(false);
+        cbWatchJob.setDisable(true);
+    }
+
+    @FXML
+    private void handleViewLog(ActionEvent actionEvent) throws DfException {
+        IDfCollection query = repository.query(String.format("select * from dm_document where folder('/Temp/Jobs/%s') order by r_creation_date desc enable(return_top 1)", currentJob.getObjectName()));
+        while (query.next()) {
+            log.info(query.getObjectId().getId());
+        }
     }
 }
