@@ -36,12 +36,14 @@ Run configuration 'Main':
 > * Hit the '+' sign to add a new 'Application'
 > * Give it a name: Main
 > * Give it a main class: nl.bos.Main
+> * VM Options: --module-path "c:\javafx-sdk-11.0.1\lib" --add-modules=javafx.controls,javafx.fxml
 
 Run configuration 'Main (dev-mode)':
 
 > * Hit the '+' sign to add a new 'Application'
 > * Give it a name: Main (dev-mode)
 > * Give it a main class: nl.bos.Main
+> * VM Options: --module-path "c:\javafx-sdk-11.0.1\lib" --add-modules=javafx.controls,javafx.fxml
 > * Give it the program arguments: REPOSITORY_NAME USERNAME PASSWORD
 
 Create 2 new propery files
