@@ -15,6 +15,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -152,6 +153,8 @@ public class JobEditorPane implements Initializable, ChangeListener {
     private CheckBox cbWatchJob;
     @FXML
     private ImageView ivLock;
+    @FXML
+    private CheckBox cbRunAfterUpdate;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -422,5 +425,23 @@ public class JobEditorPane implements Initializable, ChangeListener {
             ivLock.setVisible(true);
 
         updateStatus(job.getString(ATTR_R_LOCK_OWNER), job.getBoolean(ATTR_IS_INACTIVE));
+    }
+
+    @FXML
+    private void handleRunAfterUpdate(ActionEvent actionEvent) {
+        currentJob.updateChanges(ATTR_RUN_NOW, String.format("set %s = %s", ATTR_RUN_NOW, cbRunAfterUpdate.isSelected()));
+        btnUpdate.setDisable(false);
+    }
+
+    @FXML
+    private void handleUpdate(ActionEvent actionEvent) throws DfException {
+        String updateList = currentJob.getUpdateList();
+        repository.query(String.format("update dm_job object %s where r_object_id = '%s'", updateList, currentJob.getObjectId()));
+        btnUpdate.setDisable(true);
+    }
+
+    public void handleDescription(KeyEvent keyEvent) {
+        currentJob.updateChanges(ATTR_SUBJECT, String.format("set %s = '%s'", ATTR_SUBJECT, txtDescription.getText()));
+        btnUpdate.setDisable(false);
     }
 }

@@ -31,6 +31,7 @@ public final class Constants {
     public static final String ATTR_TARGET_SERVER = "target_server";
     public static final String ATTR_START_DATE = "start_date";
     public static final String ATTR_RUN_MODE = "run_mode";
+    public static final String ATTR_RUN_NOW = "run_now";
     public static final String ATTR_RUN_INTERVAL = "run_interval";
     public static final String ATTR_PASS_STANDARD_ARGUMENTS = "pass_standard_arguments";
     public static final String ATTR_METHOD_NAME = "method_name";

@@ -89,7 +89,7 @@
             </HBox>
             <TextField fx:id="txtName"/>
             <TextField fx:id="txtType"/>
-            <TextField fx:id="txtDescription"/>
+            <TextField fx:id="txtDescription" onKeyTyped="#handleDescription"/>
             <HBox spacing="5.0">
                 <ImageView fx:id="ivState" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                     <HBox.margin>
@@ -120,7 +120,8 @@
                 </CheckBox>
             </HBox>
             <ChoiceBox fx:id="cbDesignatedServer"/>
-            <CheckBox fx:id="cbRunAfterUpdate" mnemonicParsing="false" text="Run After Update">
+            <CheckBox fx:id="cbRunAfterUpdate" mnemonicParsing="false" onAction="#handleRunAfterUpdate"
+                      text="Run After Update">
                 <VBox.margin>
                     <Insets top="4.0"/>
                 </VBox.margin>
@@ -202,7 +203,7 @@
         <Button fx:id="btnDeleteJob" disable="true" mnemonicParsing="false" text="Delete Job"/>
         <Button fx:id="btnExportJob" disable="true" mnemonicParsing="false" text="Export Job"/>
         <Button fx:id="btnNewJob" mnemonicParsing="false" text="New Job"/>
-        <Button fx:id="btnUpdate" disable="true" mnemonicParsing="false" text="Update"/>
+        <Button fx:id="btnUpdate" disable="true" mnemonicParsing="false" onAction="#handleUpdate" text="Update"/>
         <Button fx:id="btnExit" mnemonicParsing="false" onAction="#handleExit" text="Exit"/>
     </HBox>
     <HBox spacing="5.0">
