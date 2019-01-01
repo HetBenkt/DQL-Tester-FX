@@ -1,6 +1,7 @@
 package nl.bos.controllers;
 
 import com.documentum.fc.client.IDfCollection;
+import com.documentum.fc.client.IDfDocument;
 import com.documentum.fc.client.IDfPersistentObject;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
@@ -12,7 +13,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -23,7 +27,15 @@ import nl.bos.JobMonitor;
 import nl.bos.MyJobObject;
 import nl.bos.Repository;
 
+import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
@@ -451,17 +463,44 @@ public class JobEditorPane implements Initializable, ChangeListener {
     }
 
     @FXML
-    private void handleDescription(KeyEvent keyEvent) {
-        currentJob.updateChanges(ATTR_SUBJECT, String.format("set %s = '%s'", ATTR_SUBJECT, txtDescription.getText()));
+    private void handleTextField(KeyEvent keyEvent) {
+        if (((TextField) keyEvent.getSource()).getId().equals("txtDescription"))
+            currentJob.updateChanges(ATTR_SUBJECT, String.format("set %s = '%s'", ATTR_SUBJECT, txtDescription.getText()));
+        else if (((TextField) keyEvent.getSource()).getId().equals("txtName"))
+            currentJob.updateChanges(ATTR_OBJECT_NAME, String.format("set %s = '%s'", ATTR_OBJECT_NAME, txtName.getText()));
+        else if (((TextField) keyEvent.getSource()).getId().equals("txtType"))
+            currentJob.updateChanges(ATTR_TITLE, String.format("set %s = '%s'", ATTR_TITLE, txtType.getText()));
         btnUpdate.setDisable(false);
         cbWatchJob.setDisable(true);
     }
 
     @FXML
-    private void handleViewLog(ActionEvent actionEvent) throws DfException {
-        IDfCollection query = repository.query(String.format("select * from dm_document where folder('/Temp/Jobs/%s') order by r_creation_date desc enable(return_top 1)", currentJob.getObjectName()));
+    private void handleViewLog(ActionEvent actionEvent) throws DfException, IOException {
+        IDfCollection query = repository.query(String.format("select r_object_id, object_name from dm_document where folder('/Temp/Jobs/%s') order by r_creation_date desc enable(return_top 1)", currentJob.getObjectName()));
         while (query.next()) {
-            log.info(query.getObjectId().getId());
+            log.info(query.getString(ATTR_R_OBJECT_ID));
+            IDfDocument jobLog = (IDfDocument) repository.getSession().getObject(new DfId(query.getString(ATTR_R_OBJECT_ID)));
+            ByteArrayInputStream jobLogContent = jobLog.getContent();
+
+            File tempFile = File.createTempFile("tmp_", ".txt");
+            log.info(tempFile.getPath());
+            ReadableByteChannel readableByteChannel = Channels.newChannel(jobLogContent);
+            FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
+            FileChannel fileChannel = fileOutputStream.getChannel();
+            fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+
+            jobLogContent.close();
+            readableByteChannel.close();
+            fileChannel.close();
+
+            if (!Desktop.isDesktopSupported()) {
+                log.info("Desktop is not supported");
+                return;
+            }
+
+            Desktop desktop = Desktop.getDesktop();
+            if (tempFile.exists())
+                desktop.open(tempFile);
         }
     }
 }
