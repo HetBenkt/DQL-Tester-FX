@@ -107,15 +107,15 @@ public class JobEditorPane implements Initializable, ChangeListener {
     @FXML
     private RadioButton rbStateInactive;
     @FXML
-    private ChoiceBox cbTraceLevel;
+    private ComboBox cbTraceLevel;
     @FXML
     private CheckBox chkDeactivateOnFailure;
     @FXML
-    private ChoiceBox cbDesignatedServer;
+    private ComboBox cbDesignatedServer;
     @FXML
     private DatePicker dpStartDate;
     @FXML
-    private ChoiceBox cbRepeat;
+    private ComboBox cbRepeat;
     @FXML
     private TextField txtFrequency;
     @FXML
@@ -369,6 +369,31 @@ public class JobEditorPane implements Initializable, ChangeListener {
         }
     }
 
+    private int getRunValue(String runMode) {
+        switch (runMode) {
+            case MINUTES:
+                return 1;
+            case HOURS:
+                return 2;
+            case DAYS:
+                return 3;
+            case WEEKS:
+                return 4;
+            case MONTHS:
+                return 5;
+            case YEARS:
+                return 6;
+            case DAY_OF_WEEK:
+                return 7;
+            case DAY_OF_MONTH:
+                return 8;
+            case DAY_OF_YEAR:
+                return 9;
+            default:
+                return -1;
+        }
+    }
+
     @FXML
     private void handleExit(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
@@ -381,7 +406,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
         ObservableList jobIds = FXCollections.observableArrayList();
         try {
             IDfCollection collection;
-            if (!currentCategory.equals(""))
+            if (currentCategory != null && !currentCategory.isEmpty())
                 collection = repository.query(String.format("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job where title = '%s' order by title, object_name", currentCategory));
             else
                 collection = repository.query("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job order by title, object_name");
@@ -466,9 +491,9 @@ public class JobEditorPane implements Initializable, ChangeListener {
     private void handleTextField(KeyEvent keyEvent) {
         if (((TextField) keyEvent.getSource()).getId().equals("txtDescription"))
             currentJob.updateChanges(ATTR_SUBJECT, String.format("set %s = '%s'", ATTR_SUBJECT, txtDescription.getText()));
-        else if (((TextField) keyEvent.getSource()).getId().equals("txtName"))
+        if (((TextField) keyEvent.getSource()).getId().equals("txtName"))
             currentJob.updateChanges(ATTR_OBJECT_NAME, String.format("set %s = '%s'", ATTR_OBJECT_NAME, txtName.getText()));
-        else if (((TextField) keyEvent.getSource()).getId().equals("txtType"))
+        if (((TextField) keyEvent.getSource()).getId().equals("txtType"))
             currentJob.updateChanges(ATTR_TITLE, String.format("set %s = '%s'", ATTR_TITLE, txtType.getText()));
         btnUpdate.setDisable(false);
         cbWatchJob.setDisable(true);
@@ -503,4 +528,35 @@ public class JobEditorPane implements Initializable, ChangeListener {
                 desktop.open(tempFile);
         }
     }
+
+    @FXML
+    private void handleToggleState(ActionEvent actionEvent) {
+        if (((RadioButton) actionEvent.getSource()).getId().equals("rbStateActive")) {
+            currentJob.updateChanges(ATTR_IS_INACTIVE, String.format("set %s = %s", ATTR_IS_INACTIVE, rbStateActive.isSelected()));
+        }
+        if (((RadioButton) actionEvent.getSource()).getId().equals("rbStateInactive")) {
+            currentJob.updateChanges(ATTR_IS_INACTIVE, String.format("set %s = %s", ATTR_IS_INACTIVE, !rbStateInactive.isSelected()));
+        }
+        btnUpdate.setDisable(false);
+        cbWatchJob.setDisable(true);
+    }
+
+    @FXML
+    private void handleComboBox(ActionEvent actionEvent) {
+        if (((ComboBox) actionEvent.getSource()).getId().equals("cbTraceLevel")) {
+            currentJob.updateChanges(ATTR_METHOD_TRACE_LEVEL, String.format("set %s = %s", ATTR_METHOD_TRACE_LEVEL, cbTraceLevel.getValue()));
+        }
+        if (((ComboBox) actionEvent.getSource()).getId().equals("cbDesignatedServer")) {
+            String serverValue = cbDesignatedServer.getValue().toString();
+            if (serverValue.equals(ANY_RUNNING_SERVER))
+                serverValue = "";
+            currentJob.updateChanges(ATTR_TARGET_SERVER, String.format("set %s = '%s'", ATTR_TARGET_SERVER, serverValue));
+        }
+        if (((ComboBox) actionEvent.getSource()).getId().equals("cbRepeat")) {
+            currentJob.updateChanges(ATTR_RUN_MODE, String.format("set %s = %s", ATTR_RUN_MODE, getRunValue(cbRepeat.getValue().toString())));
+        }
+        btnUpdate.setDisable(false);
+        cbWatchJob.setDisable(true);
+    }
+
 }

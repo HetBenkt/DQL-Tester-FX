@@ -41,6 +41,7 @@ public class MyJobObject {
     }
 
     public void updateChanges(String key, String value) {
+        log.info(String.format("key: %s; value: %s", key, value));
         updates.put(key, value);
     }
 

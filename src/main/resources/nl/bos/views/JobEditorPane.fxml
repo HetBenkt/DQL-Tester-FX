@@ -96,7 +96,7 @@
                         <Insets top="4.0"/>
                     </HBox.margin>
                 </ImageView>
-                <RadioButton fx:id="rbStateActive" mnemonicParsing="false" text="Active">
+                <RadioButton fx:id="rbStateActive" mnemonicParsing="false" onAction="#handleToggleState" text="Active">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
@@ -104,7 +104,8 @@
                         <ToggleGroup fx:id="jobState"/>
                     </toggleGroup>
                 </RadioButton>
-                <RadioButton fx:id="rbStateInactive" mnemonicParsing="false" text="Inactive" toggleGroup="$jobState">
+                <RadioButton fx:id="rbStateInactive" mnemonicParsing="false" onAction="#handleToggleState"
+                             text="Inactive" toggleGroup="$jobState">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
@@ -112,14 +113,14 @@
                 <TextField fx:id="txtRunning" disable="true"/>
             </HBox>
             <HBox spacing="5.0">
-                <ChoiceBox fx:id="cbTraceLevel"/>
+                <ComboBox fx:id="cbTraceLevel" onAction="#handleComboBox"/>
                 <CheckBox fx:id="chkDeactivateOnFailure" mnemonicParsing="false" text="Deactivate on Failure">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
                 </CheckBox>
             </HBox>
-            <ChoiceBox fx:id="cbDesignatedServer"/>
+            <ComboBox fx:id="cbDesignatedServer" onAction="#handleComboBox"/>
             <CheckBox fx:id="cbRunAfterUpdate" mnemonicParsing="false" onAction="#handleRunAfterUpdate"
                       text="Run After Update">
                 <VBox.margin>
@@ -131,7 +132,7 @@
                     <Insets top="5.0"/>
                 </VBox.margin>
             </DatePicker>
-            <ChoiceBox fx:id="cbRepeat"/>
+            <ComboBox fx:id="cbRepeat" onAction="#handleComboBox"/>
             <TextField fx:id="txtFrequency"/>
             <HBox spacing="5.0">
                 <RadioButton fx:id="rbEndDate" mnemonicParsing="false">
