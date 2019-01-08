@@ -23,6 +23,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import nl.bos.DateTimePicker;
 import nl.bos.JobMonitor;
 import nl.bos.MyJobObject;
 import nl.bos.Repository;
@@ -36,7 +37,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -113,7 +114,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
     @FXML
     private ComboBox cbDesignatedServer;
     @FXML
-    private DatePicker dpStartDate;
+    private DateTimePicker dpStartDate;
     @FXML
     private ComboBox cbRepeat;
     @FXML
@@ -135,7 +136,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
     @FXML
     private Label lblStatus;
     @FXML
-    private DatePicker dpEndDate;
+    private DateTimePicker dpEndDate;
     @FXML
     private TextField txtMaxIterations;
     @FXML
@@ -279,10 +280,10 @@ public class JobEditorPane implements Initializable, ChangeListener {
 
                     IDfTime startDate = job.getTime(ATTR_START_DATE);
                     if (!startDate.isNullDate()) {
-                        LocalDate localDate = LocalDate.of(startDate.getYear(), startDate.getMonth(), startDate.getDay());
-                        dpStartDate.setValue(localDate);
+                        LocalDateTime localDate = LocalDateTime.of(startDate.getYear(), startDate.getMonth(), startDate.getDay(), startDate.getHour(), startDate.getMinutes(), startDate.getSeconds());
+                        dpStartDate.setDateTimeValue(localDate);
                     } else
-                        dpStartDate.setValue(LocalDate.now());
+                        dpStartDate.setDateTimeValue(LocalDateTime.now());
 
                     cbRepeat.setValue(getDisplayValue(job.getInt(ATTR_RUN_MODE)));
                     txtFrequency.setText(String.valueOf(job.getInt(ATTR_RUN_INTERVAL)));
@@ -304,10 +305,10 @@ public class JobEditorPane implements Initializable, ChangeListener {
 
                     IDfTime endDate = job.getTime(ATTR_EXPIRATION_DATE);
                     if (!endDate.isNullDate()) {
-                        LocalDate localEndDate = LocalDate.of(endDate.getYear(), endDate.getMonth(), endDate.getDay());
-                        dpEndDate.setValue(localEndDate);
+                        LocalDateTime localEndDate = LocalDateTime.of(endDate.getYear(), endDate.getMonth(), endDate.getDay(), endDate.getHour(), endDate.getMinutes(), endDate.getSeconds());
+                        dpEndDate.setDateTimeValue(localEndDate);
                     } else
-                        dpEndDate.setValue(LocalDate.now());
+                        dpEndDate.setDateTimeValue(LocalDateTime.now());
 
                     txtMaxIterations.setText(String.valueOf(job.getInt(ATTR_MAX_ITERATIONS)));
                     txtMaxIterations.setDisable(!hasEndIterationValue(job));
@@ -338,6 +339,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
                 txtNrOfJobsListed.setText(String.valueOf(jobIds.size()));
             }
         }
+        btnUpdate.setDisable(true);
     }
 
     private boolean hasEndIterationValue(IDfPersistentObject job) throws DfException {

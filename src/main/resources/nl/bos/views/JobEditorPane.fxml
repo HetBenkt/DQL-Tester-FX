@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import nl.bos.DateTimePicker?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
       minWidth="-Infinity" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121"
       fx:controller="nl.bos.controllers.JobEditorPane">
@@ -127,11 +128,11 @@
                     <Insets top="4.0"/>
                 </VBox.margin>
             </CheckBox>
-            <DatePicker fx:id="dpStartDate">
+            <DateTimePicker fx:id="dpStartDate">
                 <VBox.margin>
                     <Insets top="5.0"/>
                 </VBox.margin>
-            </DatePicker>
+            </DateTimePicker>
             <ComboBox fx:id="cbRepeat" onAction="#handleComboBox"/>
             <TextField fx:id="txtFrequency"/>
             <HBox spacing="5.0">
@@ -143,7 +144,7 @@
                         <ToggleGroup fx:id="jobEndDate"/>
                     </toggleGroup>
                 </RadioButton>
-                <DatePicker fx:id="dpEndDate"/>
+                <DateTimePicker fx:id="dpEndDate"/>
             </HBox>
             <HBox spacing="5.0">
                 <RadioButton fx:id="rbEndMaxIterations" mnemonicParsing="false" text=" after" toggleGroup="$jobEndDate">
