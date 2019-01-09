@@ -38,6 +38,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -168,7 +169,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
     @FXML
     private ImageView ivLock;
     @FXML
-    private CheckBox cbRunAfterUpdate;
+    private CheckBox chkRunAfterUpdate;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -276,7 +277,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
                         cbDesignatedServer.setValue(ANY_RUNNING_SERVER);
                     else
                         cbDesignatedServer.setValue(targetServer);
-                    cbRunAfterUpdate.setSelected(job.getBoolean(ATTR_RUN_NOW));
+                    chkRunAfterUpdate.setSelected(job.getBoolean(ATTR_RUN_NOW));
 
                     IDfTime startDate = job.getTime(ATTR_START_DATE);
                     if (!startDate.isNullDate()) {
@@ -462,7 +463,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
 
     public void updateFields(IDfPersistentObject job) throws DfException {
         txtLastCompletionDate.setText(job.getString(ATTR_A_LAST_COMPLETION));
-        cbRunAfterUpdate.setSelected(job.getBoolean(ATTR_RUN_NOW));
+        chkRunAfterUpdate.setSelected(job.getBoolean(ATTR_RUN_NOW));
         txtRunCompleted.setText(String.valueOf(job.getInt(ATTR_A_ITERATIONS)));
         lblStatus.setText(job.getString(ATTR_A_CURRENT_STATUS));
 
@@ -475,8 +476,11 @@ public class JobEditorPane implements Initializable, ChangeListener {
     }
 
     @FXML
-    private void handleRunAfterUpdate(ActionEvent actionEvent) {
-        currentJob.updateChanges(ATTR_RUN_NOW, String.format("set %s = %s", ATTR_RUN_NOW, cbRunAfterUpdate.isSelected()));
+    private void handleCheckBox(ActionEvent actionEvent) {
+        if (((CheckBox) actionEvent.getSource()).getId().equals("chkRunAfterUpdate"))
+            currentJob.updateChanges(ATTR_RUN_NOW, String.format("set %s = %s", ATTR_RUN_NOW, chkRunAfterUpdate.isSelected()));
+        if (((CheckBox) actionEvent.getSource()).getId().equals("chkDeactivateOnFailure"))
+            currentJob.updateChanges(ATTR_INACTIVATE_AFTER_FAILURE, String.format("set %s = %s", ATTR_INACTIVATE_AFTER_FAILURE, chkDeactivateOnFailure.isSelected()));
         btnUpdate.setDisable(false);
         cbWatchJob.setDisable(true);
     }
@@ -561,4 +565,14 @@ public class JobEditorPane implements Initializable, ChangeListener {
         cbWatchJob.setDisable(true);
     }
 
+    @FXML
+    private void handleDatePicker(ActionEvent actionEvent) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/mm/yyyy hh:mm:ss");
+        if (((DateTimePicker) actionEvent.getSource()).getId().equals("dpStartDate")) {
+            currentJob.updateChanges(ATTR_START_DATE, String.format("set %s = date('%s', 'dd/mm/yyyy hh:mi:ss')", ATTR_START_DATE, dpStartDate.getDateTimeValue().format(dateTimeFormatter)));
+        }
+        if (((DateTimePicker) actionEvent.getSource()).getId().equals("dpEndDate")) {
+            currentJob.updateChanges(ATTR_EXPIRATION_DATE, String.format("set %s = ('%s', 'dd/mm/yyyy hh:mi:ss')", ATTR_EXPIRATION_DATE, dpEndDate.getDateTimeValue().format(dateTimeFormatter)));
+        }
+    }
 }

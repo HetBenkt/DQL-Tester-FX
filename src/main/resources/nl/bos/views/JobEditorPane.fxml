@@ -82,11 +82,13 @@
             <TextField fx:id="txtRunCompleted" editable="false"/>
             <HBox spacing="5.0">
                 <TextField fx:id="txtLastReturnCode" editable="false"/>
-                <CheckBox fx:id="chkIsContinued" disable="true" mnemonicParsing="false" text="Is Continued">
-                    <HBox.margin>
-                        <Insets top="3.0"/>
-                    </HBox.margin>
-                </CheckBox>
+                <HBox disable="true">
+                    <CheckBox fx:id="chkIsContinued" style="-fx-opacity: 1" mnemonicParsing="false" text="Is Continued">
+                        <HBox.margin>
+                            <Insets top="3.0"/>
+                        </HBox.margin>
+                    </CheckBox>
+                </HBox>
             </HBox>
             <TextField fx:id="txtName" onKeyTyped="#handleTextField"/>
             <TextField fx:id="txtType" onKeyTyped="#handleTextField"/>
@@ -115,20 +117,21 @@
             </HBox>
             <HBox spacing="5.0">
                 <ComboBox fx:id="cbTraceLevel" onAction="#handleComboBox"/>
-                <CheckBox fx:id="chkDeactivateOnFailure" mnemonicParsing="false" text="Deactivate on Failure">
+                <CheckBox fx:id="chkDeactivateOnFailure" mnemonicParsing="false" onAction="#handleCheckBox"
+                          text="Deactivate on Failure">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
                 </CheckBox>
             </HBox>
             <ComboBox fx:id="cbDesignatedServer" onAction="#handleComboBox"/>
-            <CheckBox fx:id="cbRunAfterUpdate" mnemonicParsing="false" onAction="#handleRunAfterUpdate"
+            <CheckBox fx:id="chkRunAfterUpdate" mnemonicParsing="false" onAction="#handleCheckBox"
                       text="Run After Update">
                 <VBox.margin>
                     <Insets top="4.0"/>
                 </VBox.margin>
             </CheckBox>
-            <DateTimePicker fx:id="dpStartDate">
+            <DateTimePicker fx:id="dpStartDate" onAction="#handleDatePicker">
                 <VBox.margin>
                     <Insets top="5.0"/>
                 </VBox.margin>
@@ -144,7 +147,7 @@
                         <ToggleGroup fx:id="jobEndDate"/>
                     </toggleGroup>
                 </RadioButton>
-                <DateTimePicker fx:id="dpEndDate"/>
+                <DateTimePicker fx:id="dpEndDate" onAction="#handleDatePicker"/>
             </HBox>
             <HBox spacing="5.0">
                 <RadioButton fx:id="rbEndMaxIterations" mnemonicParsing="false" text=" after" toggleGroup="$jobEndDate">
