@@ -40,7 +40,6 @@ public class RootPane {
     private void manageJobs(ActionEvent actionEvent) throws IOException {
         Repository repositoryCon = Repository.getInstance();
         Stage jobEditorStage = new Stage();
-        jobEditorStage.initModality(Modality.APPLICATION_MODAL);
         jobEditorStage.setTitle(String.format("Job Editor - %s", repositoryCon.getRepositoryName()));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/JobEditorPane.fxml"));
         VBox jobEditor = fxmlLoader.load();
