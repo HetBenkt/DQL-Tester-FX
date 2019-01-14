@@ -123,7 +123,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
     @FXML
     private TextField txtContinuousInterval;
     @FXML
-    private CheckBox cbPassStandardArguments;
+    private CheckBox chkPassStandardArguments;
     @FXML
     private TextField txtMethod;
     @FXML
@@ -287,9 +287,28 @@ public class JobEditorPane implements Initializable, ChangeListener {
                         dpStartDate.setDateTimeValue(LocalDateTime.now());
 
                     cbRepeat.setValue(getDisplayValue(job.getInt(ATTR_RUN_MODE)));
+
                     txtFrequency.setText(String.valueOf(job.getInt(ATTR_RUN_INTERVAL)));
+                    txtFrequency.textProperty().addListener((observableFrequency, oldValueFrequency, newValueFrequency) -> {
+                        if (!newValueFrequency.matches("\\d*")) {
+                            txtFrequency.setText(newValueFrequency.replaceAll("[^\\d]", ""));
+                        }
+                        currentJob.updateChanges(ATTR_RUN_INTERVAL, String.format("set %s = %s", ATTR_RUN_INTERVAL, txtFrequency.getText()));
+                        btnUpdate.setDisable(false);
+                        cbWatchJob.setDisable(true);
+                    });
+
                     txtContinuousInterval.setText(String.valueOf(job.getInt(ATTR_A_CONTINUATION_INTERVAL)));
-                    cbPassStandardArguments.setSelected(job.getBoolean(ATTR_PASS_STANDARD_ARGUMENTS));
+                    txtContinuousInterval.textProperty().addListener((observableContinuousInterval, oldValueContinuousInterval, newValueContinuousInterval) -> {
+                        if (!newValueContinuousInterval.matches("\\d*")) {
+                            txtContinuousInterval.setText(newValueContinuousInterval.replaceAll("[^\\d]", ""));
+                        }
+                        currentJob.updateChanges(ATTR_A_CONTINUATION_INTERVAL, String.format("set %s = %s", ATTR_A_CONTINUATION_INTERVAL, txtContinuousInterval.getText()));
+                        btnUpdate.setDisable(false);
+                        cbWatchJob.setDisable(true);
+                    });
+
+                    chkPassStandardArguments.setSelected(job.getBoolean(ATTR_PASS_STANDARD_ARGUMENTS));
                     txtMethod.setText(job.getString(ATTR_METHOD_NAME));
 
                     ObservableList arguments = FXCollections.observableArrayList();
@@ -481,6 +500,8 @@ public class JobEditorPane implements Initializable, ChangeListener {
             currentJob.updateChanges(ATTR_RUN_NOW, String.format("set %s = %s", ATTR_RUN_NOW, chkRunAfterUpdate.isSelected()));
         if (((CheckBox) actionEvent.getSource()).getId().equals("chkDeactivateOnFailure"))
             currentJob.updateChanges(ATTR_INACTIVATE_AFTER_FAILURE, String.format("set %s = %s", ATTR_INACTIVATE_AFTER_FAILURE, chkDeactivateOnFailure.isSelected()));
+        if (((CheckBox) actionEvent.getSource()).getId().equals("chkPassStandardArguments"))
+            currentJob.updateChanges(ATTR_PASS_STANDARD_ARGUMENTS, String.format("set %s = %s", ATTR_PASS_STANDARD_ARGUMENTS, chkPassStandardArguments.isSelected()));
         btnUpdate.setDisable(false);
         cbWatchJob.setDisable(true);
     }
@@ -538,10 +559,10 @@ public class JobEditorPane implements Initializable, ChangeListener {
     @FXML
     private void handleToggleState(ActionEvent actionEvent) {
         if (((RadioButton) actionEvent.getSource()).getId().equals("rbStateActive")) {
-            currentJob.updateChanges(ATTR_IS_INACTIVE, String.format("set %s = %s", ATTR_IS_INACTIVE, rbStateActive.isSelected()));
+            currentJob.updateChanges(ATTR_IS_INACTIVE, String.format("set %s = %s", ATTR_IS_INACTIVE, !rbStateActive.isSelected()));
         }
         if (((RadioButton) actionEvent.getSource()).getId().equals("rbStateInactive")) {
-            currentJob.updateChanges(ATTR_IS_INACTIVE, String.format("set %s = %s", ATTR_IS_INACTIVE, !rbStateInactive.isSelected()));
+            currentJob.updateChanges(ATTR_IS_INACTIVE, String.format("set %s = %s", ATTR_IS_INACTIVE, rbStateInactive.isSelected()));
         }
         btnUpdate.setDisable(false);
         cbWatchJob.setDisable(true);
@@ -567,12 +588,12 @@ public class JobEditorPane implements Initializable, ChangeListener {
 
     @FXML
     private void handleDatePicker(ActionEvent actionEvent) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/mm/yyyy hh:mm:ss");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss");
         if (((DateTimePicker) actionEvent.getSource()).getId().equals("dpStartDate")) {
             currentJob.updateChanges(ATTR_START_DATE, String.format("set %s = date('%s', 'dd/mm/yyyy hh:mi:ss')", ATTR_START_DATE, dpStartDate.getDateTimeValue().format(dateTimeFormatter)));
         }
         if (((DateTimePicker) actionEvent.getSource()).getId().equals("dpEndDate")) {
-            currentJob.updateChanges(ATTR_EXPIRATION_DATE, String.format("set %s = ('%s', 'dd/mm/yyyy hh:mi:ss')", ATTR_EXPIRATION_DATE, dpEndDate.getDateTimeValue().format(dateTimeFormatter)));
+            currentJob.updateChanges(ATTR_EXPIRATION_DATE, String.format("set %s = date('%s', 'dd/mm/yyyy hh:mi:ss')", ATTR_EXPIRATION_DATE, dpEndDate.getDateTimeValue().format(dateTimeFormatter)));
         }
     }
 }

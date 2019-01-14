@@ -164,7 +164,8 @@
             </HBox>
             <HBox spacing="5.0">
                 <TextField fx:id="txtContinuousInterval"/>
-                <CheckBox fx:id="cbPassStandardArguments" mnemonicParsing="false" text="Pass standard arguments">
+                <CheckBox fx:id="chkPassStandardArguments" mnemonicParsing="false" text="Pass standard arguments"
+                          onAction="#handleCheckBox">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
