@@ -14,7 +14,7 @@ public class JobMonitor extends Task<Void> {
 
     private final JobEditorPane jobEditorPane;
     private final MyJobObject currentJob;
-    private Repository repository = Repository.getInstance();
+    private final Repository repository = Repository.getInstance();
     private volatile boolean running;
 
     public JobMonitor(MyJobObject currentJob, JobEditorPane jobEditorPane) {

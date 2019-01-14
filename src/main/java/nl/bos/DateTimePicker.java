@@ -21,16 +21,9 @@ public class DateTimePicker extends DatePicker {
             FormatStyle.SHORT, FormatStyle.MEDIUM, IsoChronology.INSTANCE,
             Locale.ENGLISH);
 
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DefaultFormat);
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DefaultFormat);
 
-    private ObjectProperty<LocalDateTime> dateTimeValue = new SimpleObjectProperty<>(LocalDateTime.now());
-
-    private ObjectProperty<String> format = new SimpleObjectProperty<String>() {
-        public void set(String newValue) {
-            super.set(newValue);
-            formatter = DateTimeFormatter.ofPattern(newValue);
-        }
-    };
+    private final ObjectProperty<LocalDateTime> dateTimeValue = new SimpleObjectProperty<>(LocalDateTime.now());
 
     public DateTimePicker() {
         getStyleClass().add("datetime-picker");
@@ -52,9 +45,7 @@ public class DateTimePicker extends DatePicker {
         });
 
         // Syncronize changes to dateTimeValue back to the underlying date value
-        dateTimeValue.addListener((observable, oldValue, newValue) -> {
-            setValue(newValue == null ? null : newValue.toLocalDate());
-        });
+        dateTimeValue.addListener((observable, oldValue, newValue) -> setValue(newValue == null ? null : newValue.toLocalDate()));
 
         // Persist changes onblur
         getEditor().focusedProperty().addListener((observable, oldValue, newValue) -> {
@@ -74,26 +65,10 @@ public class DateTimePicker extends DatePicker {
     }
 
     public void setDateTimeValue(LocalDateTime dateTimeValue) {
-        if (dateTimeValue.isAfter(LocalDateTime.of(1971, 6, 30, 12, 00)))
+        if (dateTimeValue.isAfter(LocalDateTime.of(1971, 6, 30, 12, 0)))
             this.dateTimeValue.set(dateTimeValue);
         else
             this.dateTimeValue.set(null);
-    }
-
-    public ObjectProperty<LocalDateTime> dateTimeValueProperty() {
-        return dateTimeValue;
-    }
-
-    public String getFormat() {
-        return format.get();
-    }
-
-    public void setFormat(String format) {
-        this.format.set(format);
-    }
-
-    public ObjectProperty<String> formatProperty() {
-        return format;
     }
 
     class InternalConverter extends StringConverter<LocalDate> {

@@ -15,11 +15,11 @@ import static nl.bos.Constants.*;
 public class MyTreeItem extends TreeItem<String> {
     private static final Logger log = Logger.getLogger(MyTreeItem.class.getName());
 
-    private String type;
-    private String name;
-    private String path;
-    private IDfPersistentObject object;
-    private Repository repositoryCon = Repository.getInstance();
+    private final String type;
+    private final String name;
+    private final String path;
+    private final IDfPersistentObject object;
+    private final Repository repositoryCon = Repository.getInstance();
 
     public MyTreeItem(IDfPersistentObject object, String name, String type, String path) {
         this.object = object;

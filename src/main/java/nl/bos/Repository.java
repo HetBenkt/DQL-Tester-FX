@@ -6,6 +6,7 @@ import com.documentum.fc.client.*;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfLoginInfo;
 
+import java.text.MessageFormat;
 import java.util.logging.Logger;
 
 public class Repository {
@@ -39,7 +40,7 @@ public class Repository {
     private String userName;
     private String passkey;
     private String domain;
-    private IDfClientX clientX = new DfClientX();
+    private final IDfClientX clientX = new DfClientX();
     private IDfClient client = null;
 
     private Repository() {
@@ -116,7 +117,8 @@ public class Repository {
         q.setDQL(query);
 
         IDfCollection collection = q.execute(session, IDfQuery.DF_READ_QUERY);
-        log.finest(String.format("Query executed: %s", query));
+        String message = MessageFormat.format("Query executed: {0}", query);
+        log.finest(message);
 
         return collection;
     }

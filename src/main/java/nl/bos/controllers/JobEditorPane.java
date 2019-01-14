@@ -6,8 +6,6 @@ import com.documentum.fc.client.IDfPersistentObject;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfTime;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -44,7 +42,7 @@ import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
 
-public class JobEditorPane implements Initializable, ChangeListener {
+public class JobEditorPane implements Initializable {
     private static final Logger log = Logger.getLogger(JobEditorPane.class.getName());
 
     private static final String MINUTES = "Minutes";
@@ -65,7 +63,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
     private static final Image INACTIVE_ANIM = new Image("nl/bos/icons/inactive.gif");
     private static final String ANY_RUNNING_SERVER = "Any Running Server";
 
-    private Repository repository = Repository.getInstance();
+    private final Repository repository = Repository.getInstance();
     private String currentCategory;
     private JobMonitor jobMonitor;
     private MyJobObject currentJob;
@@ -83,9 +81,9 @@ public class JobEditorPane implements Initializable, ChangeListener {
     @FXML
     private Button btnViewLog;
     @FXML
-    private ListView lvJobs;
+    private ListView<MyJobObject> lvJobs;
     @FXML
-    private ChoiceBox cbJobsFilter;
+    private ChoiceBox<String> cbJobsFilter;
     @FXML
     private TextField txtObjectId;
     @FXML
@@ -109,15 +107,15 @@ public class JobEditorPane implements Initializable, ChangeListener {
     @FXML
     private RadioButton rbStateInactive;
     @FXML
-    private ComboBox cbTraceLevel;
+    private ComboBox<Integer> cbTraceLevel;
     @FXML
     private CheckBox chkDeactivateOnFailure;
     @FXML
-    private ComboBox cbDesignatedServer;
+    private ComboBox<String> cbDesignatedServer;
     @FXML
     private DateTimePicker dpStartDate;
     @FXML
-    private ComboBox cbRepeat;
+    private ComboBox<String> cbRepeat;
     @FXML
     private TextField txtFrequency;
     @FXML
@@ -127,7 +125,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
     @FXML
     private TextField txtMethod;
     @FXML
-    private ListView lvArguments;
+    private ListView<String> lvArguments;
     @FXML
     private TextField txtRunning;
     @FXML
@@ -174,20 +172,20 @@ public class JobEditorPane implements Initializable, ChangeListener {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            ObservableList jobIds = FXCollections.observableArrayList();
-            ObservableList categories = FXCollections.observableArrayList();
+            ObservableList<MyJobObject> jobIds = FXCollections.observableArrayList();
+            ObservableList<String> categories = FXCollections.observableArrayList();
             IDfCollection collection = repository.query("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job order by title, object_name");
             while (collection.next()) {
+                jobIds.add(new MyJobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
                 String type = collection.getString(ATTR_TITLE);
-                jobIds.add(new MyJobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), type, !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
                 if (!categories.contains(type))
                     categories.add(type);
             }
             collection.close();
             lvJobs.setItems(jobIds);
             txtNrOfJobsListed.setText(String.valueOf(jobIds.size()));
-            lvJobs.setCellFactory(param -> new ListCell<MyJobObject>() {
-                private ImageView imageView = new ImageView();
+            lvJobs.setCellFactory(param -> new ListCell<>() {
+                private final ImageView imageView = new ImageView();
 
                 @Override
                 protected void updateItem(MyJobObject item, boolean empty) {
@@ -210,13 +208,13 @@ public class JobEditorPane implements Initializable, ChangeListener {
 
             cbJobsFilter.setItems(categories);
 
-            ObservableList levels = FXCollections.observableArrayList();
+            ObservableList<Integer> levels = FXCollections.observableArrayList();
             for (int i = 0; i <= 10; i++) {
                 levels.add(i);
             }
             cbTraceLevel.setItems(levels);
 
-            ObservableList servers = FXCollections.observableArrayList();
+            ObservableList<String> servers = FXCollections.observableArrayList();
             servers.add(ANY_RUNNING_SERVER);
             IDfCollection serverInfo = repository.query("select object_name, r_host_name from dm_server_config order by object_name");
             while (serverInfo.next()) {
@@ -225,7 +223,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
             serverInfo.close();
             cbDesignatedServer.setItems(servers);
 
-            ObservableList repeats = FXCollections.observableArrayList();
+            ObservableList<String> repeats = FXCollections.observableArrayList();
             repeats.add(MINUTES);
             repeats.add(HOURS);
             repeats.add(DAYS);
@@ -240,16 +238,9 @@ public class JobEditorPane implements Initializable, ChangeListener {
             log.finest(e.getMessage());
         }
 
-        lvJobs.getSelectionModel().selectedItemProperty().addListener(this);
-        cbJobsFilter.getSelectionModel().selectedItemProperty().addListener(this);
-    }
-
-    @Override
-    public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-        log.info(String.format("ListView selection changed from old value %s to the new value %s", oldValue, newValue));
-        if (observable.getValue() != null) {
-            if (observable.getValue().getClass().equals(MyJobObject.class)) {
-                currentJob = (MyJobObject) observable.getValue();
+        lvJobs.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                currentJob = observable.getValue();
                 btnCopyJob.setDisable(false);
                 btnDeleteJob.setDisable(false);
                 btnExportJob.setDisable(false);
@@ -258,7 +249,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
                 vbFieldButtons.setDisable(false);
 
                 try {
-                    IDfPersistentObject job = repository.getSession().getObject(new DfId(((MyJobObject) observable.getValue()).getObjectId()));
+                    IDfPersistentObject job = repository.getSession().getObject(new DfId(observable.getValue().getObjectId()));
                     txtObjectId.setText(job.getString(ATTR_R_OBJECT_ID));
                     txtLastCompletionDate.setText(job.getString(ATTR_A_LAST_COMPLETION));
                     txtNextInvocationDate.setText(job.getString(ATTR_A_NEXT_INVOCATION));
@@ -289,29 +280,15 @@ public class JobEditorPane implements Initializable, ChangeListener {
                     cbRepeat.setValue(getDisplayValue(job.getInt(ATTR_RUN_MODE)));
 
                     txtFrequency.setText(String.valueOf(job.getInt(ATTR_RUN_INTERVAL)));
-                    txtFrequency.textProperty().addListener((observableFrequency, oldValueFrequency, newValueFrequency) -> {
-                        if (!newValueFrequency.matches("\\d*")) {
-                            txtFrequency.setText(newValueFrequency.replaceAll("[^\\d]", ""));
-                        }
-                        currentJob.updateChanges(ATTR_RUN_INTERVAL, String.format("set %s = %s", ATTR_RUN_INTERVAL, txtFrequency.getText()));
-                        btnUpdate.setDisable(false);
-                        cbWatchJob.setDisable(true);
-                    });
+                    textFieldUpdate(txtFrequency, ATTR_RUN_INTERVAL);
 
                     txtContinuousInterval.setText(String.valueOf(job.getInt(ATTR_A_CONTINUATION_INTERVAL)));
-                    txtContinuousInterval.textProperty().addListener((observableContinuousInterval, oldValueContinuousInterval, newValueContinuousInterval) -> {
-                        if (!newValueContinuousInterval.matches("\\d*")) {
-                            txtContinuousInterval.setText(newValueContinuousInterval.replaceAll("[^\\d]", ""));
-                        }
-                        currentJob.updateChanges(ATTR_A_CONTINUATION_INTERVAL, String.format("set %s = %s", ATTR_A_CONTINUATION_INTERVAL, txtContinuousInterval.getText()));
-                        btnUpdate.setDisable(false);
-                        cbWatchJob.setDisable(true);
-                    });
+                    textFieldUpdate(txtContinuousInterval, ATTR_A_CONTINUATION_INTERVAL);
 
                     chkPassStandardArguments.setSelected(job.getBoolean(ATTR_PASS_STANDARD_ARGUMENTS));
                     txtMethod.setText(job.getString(ATTR_METHOD_NAME));
 
-                    ObservableList arguments = FXCollections.observableArrayList();
+                    ObservableList<String> arguments = FXCollections.observableArrayList();
                     int methodArguments = job.getValueCount(ATTR_METHOD_ARGUMENTS);
                     for (int i = 0; i < methodArguments; i++) {
                         arguments.add(job.getRepeatingString(ATTR_METHOD_ARGUMENTS, i));
@@ -338,28 +315,42 @@ public class JobEditorPane implements Initializable, ChangeListener {
                 } catch (DfException e) {
                     log.finest(e.getMessage());
                 }
-            } else {
-                log.info(String.format("Category is %s", observable));
-                ObservableList jobIds = FXCollections.observableArrayList();
-                try {
-                    IDfCollection collection;
-                    currentCategory = (String) observable.getValue();
-                    if (!currentCategory.equals(""))
-                        collection = repository.query(String.format("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job where title = '%s' order by title, object_name", currentCategory));
-                    else
-                        collection = repository.query("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job order by title, object_name");
-                    while (collection.next()) {
-                        jobIds.add(new MyJobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), collection.getString(ATTR_TITLE), !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
-                    }
-                    collection.close();
-                } catch (DfException e) {
-                    log.finest(e.getMessage());
-                }
-                lvJobs.setItems(jobIds);
-                txtNrOfJobsListed.setText(String.valueOf(jobIds.size()));
+                btnUpdate.setDisable(true);
             }
-        }
-        btnUpdate.setDisable(true);
+        });
+
+        cbJobsFilter.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            log.info(String.format("Category is %s", observable));
+            ObservableList<MyJobObject> jobIds = FXCollections.observableArrayList();
+            try {
+                IDfCollection collection;
+                currentCategory = observable.getValue();
+                if (!currentCategory.equals(""))
+                    collection = repository.query(String.format("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job where title = '%s' order by title, object_name", currentCategory));
+                else
+                    collection = repository.query("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job order by title, object_name");
+                while (collection.next()) {
+                    jobIds.add(new MyJobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
+                }
+                collection.close();
+            } catch (DfException e) {
+                log.finest(e.getMessage());
+            }
+            lvJobs.setItems(jobIds);
+            txtNrOfJobsListed.setText(String.valueOf(jobIds.size()));
+            btnUpdate.setDisable(true);
+        });
+    }
+
+    private void textFieldUpdate(TextField textField, String attribute) {
+        textField.textProperty().addListener((observableFrequency, oldValueFrequency, newValueFrequency) -> {
+            if (!newValueFrequency.matches("\\d*")) {
+                textField.setText(newValueFrequency.replaceAll("[^\\d]", ""));
+            }
+            currentJob.updateChanges(attribute, String.format("set %s = %s", attribute, textField.getText()));
+            btnUpdate.setDisable(false);
+            cbWatchJob.setDisable(true);
+        });
     }
 
     private boolean hasEndIterationValue(IDfPersistentObject job) throws DfException {
@@ -425,7 +416,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
 
     @FXML
     private void handleRefresh(ActionEvent actionEvent) {
-        ObservableList jobIds = FXCollections.observableArrayList();
+        ObservableList<MyJobObject> jobIds = FXCollections.observableArrayList();
         try {
             IDfCollection collection;
             if (currentCategory != null && !currentCategory.isEmpty())
@@ -433,7 +424,7 @@ public class JobEditorPane implements Initializable, ChangeListener {
             else
                 collection = repository.query("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job order by title, object_name");
             while (collection.next()) {
-                jobIds.add(new MyJobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), collection.getString(ATTR_TITLE), !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
+                jobIds.add(new MyJobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
             }
             collection.close();
         } catch (DfException e) {
@@ -574,13 +565,13 @@ public class JobEditorPane implements Initializable, ChangeListener {
             currentJob.updateChanges(ATTR_METHOD_TRACE_LEVEL, String.format("set %s = %s", ATTR_METHOD_TRACE_LEVEL, cbTraceLevel.getValue()));
         }
         if (((ComboBox) actionEvent.getSource()).getId().equals("cbDesignatedServer")) {
-            String serverValue = cbDesignatedServer.getValue().toString();
+            String serverValue = cbDesignatedServer.getValue();
             if (serverValue.equals(ANY_RUNNING_SERVER))
                 serverValue = "";
             currentJob.updateChanges(ATTR_TARGET_SERVER, String.format("set %s = '%s'", ATTR_TARGET_SERVER, serverValue));
         }
         if (((ComboBox) actionEvent.getSource()).getId().equals("cbRepeat")) {
-            currentJob.updateChanges(ATTR_RUN_MODE, String.format("set %s = %s", ATTR_RUN_MODE, getRunValue(cbRepeat.getValue().toString())));
+            currentJob.updateChanges(ATTR_RUN_MODE, String.format("set %s = %s", ATTR_RUN_MODE, getRunValue(cbRepeat.getValue())));
         }
         btnUpdate.setDisable(false);
         cbWatchJob.setDisable(true);

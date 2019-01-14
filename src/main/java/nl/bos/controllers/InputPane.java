@@ -29,9 +29,7 @@ import java.util.logging.Logger;
 public class InputPane implements Initializable, EventHandler<WindowEvent> {
     private static final Logger log = Logger.getLogger(InputPane.class.getName());
 
-    public static Stage getLoginStage() {
-        return loginStage;
-    }
+    private final static Stage loginStage = new Stage();
 
     public Button getBtnFlushCache() {
         return btnFlushCache;
@@ -49,7 +47,7 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
         return btnDisconnect;
     }
 
-    private static Stage loginStage = new Stage();
+    private final FXMLLoader fxmlLoader;
     @FXML
     private Label lblStatus;
     @FXML
@@ -70,10 +68,12 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
     private Button btnConnect;
     @FXML
     private Button btnDisconnect;
+    private final Repository repositoryCon = Repository.getInstance();
+    private final Main main = Main.getInstance();
 
-    private FXMLLoader fxmlLoader;
-    private Repository repositoryCon = Repository.getInstance();
-    private Main main = Main.getInstance();
+    static Stage getLoginStage() {
+        return loginStage;
+    }
 
     public InputPane() throws IOException {
         loginStage.initModality(Modality.APPLICATION_MODAL);
@@ -166,8 +166,8 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
         }
 
         if (result != null) {
-            ChoiceBox<String> cmbHistory = bodyPaneController.getCmbHistory();
-            ObservableList<String> items = cmbHistory.getItems();
+            ChoiceBox<Object> cmbHistory = bodyPaneController.getCmbHistory();
+            ObservableList<Object> items = cmbHistory.getItems();
             if (statementNotExists(items, statement)) {
                 items.add(0, statement);
                 cmbHistory.setValue(statement);

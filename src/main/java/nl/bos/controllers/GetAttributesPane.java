@@ -19,6 +19,17 @@ import java.util.regex.Pattern;
 public class GetAttributesPane {
     private static final Logger log = Logger.getLogger(GetAttributesPane.class.getName());
 
+    private final List<IDfAttr> userAttributes = new ArrayList<>();
+    private final List<IDfAttr> systemAttributes = new ArrayList<>();
+    private final List<IDfAttr> applicationAttributes = new ArrayList<>();
+    private final List<IDfAttr> internalAttributes = new ArrayList<>();
+    private final StringBuilder text = new StringBuilder();
+    private final List<Integer> previousIndexes = new ArrayList<>();
+
+    private final Repository repositoryCon = Repository.getInstance();
+
+    private int lastIndex;
+
     @FXML
     private TextField txtObjectId;
     @FXML
@@ -30,16 +41,6 @@ public class GetAttributesPane {
     @FXML
     private CheckBox chkCaseSensitive;
 
-    private List<IDfAttr> userAttributes = new ArrayList<>();
-    private List<IDfAttr> systemAttributes = new ArrayList<>();
-    private List<IDfAttr> applicationAttributes = new ArrayList<>();
-    private List<IDfAttr> internalAttributes = new ArrayList<>();
-    private StringBuilder text = new StringBuilder();
-    private int lastIndex;
-    private List<Integer> previousIndexes = new ArrayList();
-
-    private Repository repositoryCon = Repository.getInstance();
-
     @FXML
     private void handleExit(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
@@ -47,7 +48,7 @@ public class GetAttributesPane {
         stage.close();
     }
 
-    protected void initTextArea(IDfPersistentObject object) throws DfException {
+    void initTextArea(IDfPersistentObject object) throws DfException {
         appendTextToStringBuilder(object);
 
         txaAttributes.setText(String.valueOf(text));

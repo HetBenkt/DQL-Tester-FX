@@ -4,7 +4,6 @@ import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfAttr;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,18 +33,17 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-public class BodyPane implements Initializable, ChangeListener {
+public class BodyPane implements Initializable {
     private static final Logger log = Logger.getLogger(BodyPane.class.getName());
 
-    public TextArea getTaStatement() {
+    @FXML
+    private ChoiceBox<Object> cmbHistory;
+
+    TextArea getTaStatement() {
         return taStatement;
     }
 
-    public ChoiceBox<String> getCmbHistory() {
-        return cmbHistory;
-    }
-
-    public JSONObject getJsonObject() {
+    JSONObject getJsonObject() {
         return jsonObject;
     }
 
@@ -57,8 +55,10 @@ public class BodyPane implements Initializable, ChangeListener {
     private VBox vboxBody;
     @FXML
     private TextArea taStatement;
-    @FXML
-    private ChoiceBox<String> cmbHistory;
+
+    ChoiceBox<Object> getCmbHistory() {
+        return cmbHistory;
+    }
     @FXML
     private TableView tbResult;
     private JSONObject jsonObject;
@@ -72,7 +72,11 @@ public class BodyPane implements Initializable, ChangeListener {
         } catch (IOException e) {
             log.info(e.getMessage());
         }
-        cmbHistory.getSelectionModel().selectedIndexProperty().addListener(this);
+        cmbHistory.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> {
+            String selectedHistoryItem = String.valueOf(cmbHistory.getItems().get((Integer) newValue));
+            log.info(selectedHistoryItem);
+            taStatement.setText(selectedHistoryItem);
+        });
 
         try {
             loadHistory();
@@ -105,22 +109,16 @@ public class BodyPane implements Initializable, ChangeListener {
         log.info(jsonObject.toJSONString());
 
         JSONArray msg = (JSONArray) jsonObject.get("queries");
-        Iterator<String> iterator = msg.iterator();
-        List<String> statements = new ArrayList<>();
+        Iterator iterator = msg.iterator();
+        List<Object> statements = new ArrayList<>();
         while (iterator.hasNext()) {
             statements.add(iterator.next());
         }
-        ObservableList<String> value = FXCollections.observableList(statements);
+        ObservableList<Object> value = FXCollections.observableList(statements);
         cmbHistory.setItems(value);
     }
 
-    public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-        String selectedHistoryItem = String.valueOf(cmbHistory.getItems().get((Integer) newValue));
-        log.info(selectedHistoryItem);
-        taStatement.setText(selectedHistoryItem);
-    }
-
-    protected void updateResultTable(IDfCollection collection) throws DfException {
+    void updateResultTable(IDfCollection collection) throws DfException {
         tbResult.getItems().clear();
         tbResult.getColumns().clear();
 

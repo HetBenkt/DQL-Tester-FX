@@ -27,16 +27,14 @@ import java.util.logging.Logger;
 public class LoginPane implements Initializable {
     private static final Logger log = Logger.getLogger(LoginPane.class.getName());
 
-    public ChoiceBox<String> getChbRepository() {
+    private final Repository repositoryCon = Repository.getInstance();
+
+    ChoiceBox<String> getChbRepository() {
         return chbRepository;
     }
 
-    public TextField getTxtUsername() {
+    TextField getTxtUsername() {
         return txtUsername;
-    }
-
-    public String getHostName() {
-        return hostName;
     }
 
     @FXML
@@ -61,7 +59,9 @@ public class LoginPane implements Initializable {
     @FXML
     private CheckBox chkUseWindowsLogin;
 
-    private Repository repositoryCon = Repository.getInstance();
+    String getHostName() {
+        return hostName;
+    }
 
     @FXML
     private void handleLogin(ActionEvent actionEvent) throws DfException {

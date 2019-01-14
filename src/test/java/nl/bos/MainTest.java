@@ -7,7 +7,10 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 
@@ -61,11 +64,6 @@ public class MainTest extends ApplicationTest {
         }
 
         registerPrimaryStage();
-    }
-
-    @Before
-    public void setup() {
-
     }
 
     @Test

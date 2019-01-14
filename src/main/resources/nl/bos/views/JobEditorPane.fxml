@@ -183,9 +183,7 @@
             </ImageView>
             <ImageView fx:id="ivLock" fitHeight="64.0" fitWidth="64.0" layoutX="10.0" layoutY="10.0" pickOnBounds="true"
                        preserveRatio="true" visible="false">
-                <image>
-                    <Image url="@../icons/shield.png"/>
-                </image>
+                <Image url="@../icons/shield.png"/>
             </ImageView>
             <Button fx:id="btnEditServer" mnemonicParsing="false" text="Edit">
                 <VBox.margin>
@@ -217,9 +215,7 @@
             <Insets top="5.0"/>
         </VBox.margin>
         <ImageView fx:id="ivInfo" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-                <Image url="@../icons/info.png"/>
-            </image>
+            <Image url="@../icons/info.png"/>
         </ImageView>
         <Label fx:id="lblStatus"/>
     </HBox>

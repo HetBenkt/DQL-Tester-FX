@@ -11,11 +11,8 @@ import javafx.stage.Stage;
 import nl.bos.Repository;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 public class RootPane {
-    private static final Logger log = Logger.getLogger(RootPane.class.getName());
-
     public MenuBar getMenubar() {
         return menubar;
     }

@@ -70,8 +70,8 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
 
     private MyTreeItem rootItem;
 
-    private Repository repositoryCon = Repository.getInstance();
-    private ContextMenu rootContextMenu = new ContextMenu();
+    private final Repository repositoryCon = Repository.getInstance();
+    private final ContextMenu rootContextMenu = new ContextMenu();
     private MyTreeNode selected;
 
     @FXML
@@ -249,7 +249,7 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
         private boolean isFirstTimeChildren;
         private boolean isFirstTimeLeaf;
 
-        public MyTreeNode(MyTreeItem treeItem, ImageView imageView) {
+        private MyTreeNode(MyTreeItem treeItem, ImageView imageView) {
             super(treeItem, imageView);
             isFirstTimeChildren = true;
             isFirstTimeLeaf = true;
@@ -283,13 +283,11 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
             if (parentItem != null && parentItem.isDirectory()) {
                 List<MyTreeItem> treeItems = parentItem.listObjects(parentItem, ckbShowAllCabinets.isSelected(), ckbShowAllVersions.isSelected());
                 lblNrOfItems.setText(String.format("%s items found", treeItems.size()));
-                if (treeItems != null) {
-                    ObservableList<TreeItem<MyTreeItem>> children = FXCollections.observableArrayList();
-                    for (MyTreeItem treeItem : treeItems) {
-                        children.add(createNode(treeItem));
-                    }
-                    return children;
+                ObservableList<TreeItem<MyTreeItem>> children = FXCollections.observableArrayList();
+                for (MyTreeItem treeItem : treeItems) {
+                    children.add(createNode(treeItem));
                 }
+                return children;
             }
             return FXCollections.emptyObservableList();
         }

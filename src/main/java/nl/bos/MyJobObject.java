@@ -1,5 +1,6 @@
 package nl.bos;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -10,15 +11,13 @@ public class MyJobObject {
 
     private final String objectId;
     private final String objectName;
-    private final String category;
     private final boolean isActive;
     private final boolean isRunning;
-    private Map<String, String> updates = new HashMap<>();
+    private final Map<String, String> updates = new HashMap<>();
 
-    public MyJobObject(String objectId, String objectName, String category, boolean isActive, String isRunning) {
+    public MyJobObject(String objectId, String objectName, boolean isActive, String isRunning) {
         this.objectId = objectId;
         this.objectName = objectName;
-        this.category = category;
         this.isActive = isActive;
 
         this.isRunning = isRunning.equals("STARTED");
@@ -41,7 +40,8 @@ public class MyJobObject {
     }
 
     public void updateChanges(String key, String value) {
-        log.info(String.format("key: %s; value: %s", key, value));
+        String message = MessageFormat.format("key: {0}; value: {1}", key, value);
+        log.info(message);
         updates.put(key, value);
     }
 
