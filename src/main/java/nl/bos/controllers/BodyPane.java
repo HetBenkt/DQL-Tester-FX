@@ -2,6 +2,7 @@ package nl.bos.controllers;
 
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
+import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfAttr;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -10,15 +11,18 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.Callback;
+import nl.bos.MyTableColumn;
+import nl.bos.Repository;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -37,9 +41,12 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import static nl.bos.Constants.ATTR_R_OBJECT_ID;
+
 public class BodyPane implements Initializable {
     private static final Logger log = Logger.getLogger(BodyPane.class.getName());
-    private final MenuItem miExportToCsv;
+    private final MenuItem miExportToCsv, miProperties, miGetAttributes;
+    private final Repository repositoryCon = Repository.getInstance();
 
     @FXML
     private ChoiceBox<Object> cmbHistory;
@@ -51,12 +58,57 @@ public class BodyPane implements Initializable {
     private TableView tvResult;
     private JSONObject jsonObject;
     private FXMLLoader fxmlLoader;
-    private ContextMenu contextMenu;
+    private ContextMenu contextMenu = new ContextMenu();
 
     public BodyPane() {
-        this.contextMenu = new ContextMenu();
+        miProperties = new MenuItem("Properties");
+        miProperties.setDisable(true);
+        handleMiProperties();
+
         miExportToCsv = new MenuItem("Export Results into CSV File/Clipboard");
         miExportToCsv.setDisable(true);
+        handleMiExportToCsv();
+
+        miGetAttributes = new MenuItem("Get Attributes");
+        miGetAttributes.setDisable(true);
+        handleMiGetAttributes();
+
+        contextMenu.getItems().addAll(miProperties, miExportToCsv, miGetAttributes);
+    }
+
+    private void handleMiGetAttributes() {
+        miGetAttributes.setOnAction(actionEvent -> {
+            log.info(actionEvent.getSource().toString());
+
+            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
+            String id = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
+
+            try {
+                log.info(id);
+                Stage getAttributes = new Stage();
+                getAttributes.setTitle(String.format("Attributes List - %s (%s)", id, repositoryCon.getRepositoryName()));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributesPane.fxml"));
+                VBox loginPane = fxmlLoader.load();
+                Scene scene = new Scene(loginPane);
+                getAttributes.setScene(scene);
+                GetAttributesPane controller = fxmlLoader.getController();
+                controller.initTextArea(repositoryCon.getSession().getObject(new DfId(id)));
+                getAttributes.showAndWait();
+            } catch (Exception e) {
+                log.finest(e.getMessage());
+            }
+        });
+
+    }
+
+    private void handleMiProperties() {
+        miProperties.setOnAction(actionEvent -> {
+            log.info(actionEvent.getSource().toString());
+
+        });
+    }
+
+    private void handleMiExportToCsv() {
         miExportToCsv.setOnAction(actionEvent -> {
             log.info(actionEvent.getSource().toString());
             try {
@@ -84,7 +136,6 @@ public class BodyPane implements Initializable {
                 log.finest(e.getMessage());
             }
         });
-        contextMenu.getItems().add(miExportToCsv);
     }
 
     ChoiceBox<Object> getCmbHistory() {
@@ -108,7 +159,7 @@ public class BodyPane implements Initializable {
 
         ObservableList columns = tvResult.getColumns();
         for (int i = 0; i < columns.size(); i++) {
-            TableColumn column = (TableColumn) columns.get(i);
+            MyTableColumn column = (MyTableColumn) columns.get(i);
             if (i < columns.size() - 1) {
                 String appendText = column.getText() + ";";
                 result.append(appendText);
@@ -134,6 +185,8 @@ public class BodyPane implements Initializable {
     }
 
     public void initialize(URL location, ResourceBundle resources) {
+        tvResult.getSelectionModel().setCellSelectionEnabled(true);
+
         try {
             fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/InputPane.fxml"));
             BorderPane inputPane = fxmlLoader.load();
@@ -158,8 +211,16 @@ public class BodyPane implements Initializable {
 
         tvResult.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
             if (t.getButton() == MouseButton.SECONDARY) {
+                TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
+                MyTableColumn tableColumn = (MyTableColumn) focusedCell.getTableColumn();
+                IDfAttr attr = tableColumn.getAttr();
+                if (attr.getDataType() == IDfAttr.DM_STRING && attr.getLength() == 16 && attr.getName().equals(ATTR_R_OBJECT_ID))
+                    miGetAttributes.setDisable(false);
+                else
+                    miGetAttributes.setDisable(true);
                 contextMenu.show(tvResult, t.getScreenX(), t.getScreenY());
-            }
+            } else if (t.getButton() == MouseButton.PRIMARY)
+                contextMenu.hide();
         });
     }
 
@@ -197,7 +258,7 @@ public class BodyPane implements Initializable {
         tvResult.getItems().clear();
         tvResult.getColumns().clear();
 
-        List<TableColumn> columns = new ArrayList<>();
+        List<MyTableColumn> columns = new ArrayList<>();
         ObservableList<ObservableList> rows = FXCollections.observableArrayList();
 
         int rowCount = 0;
@@ -209,9 +270,9 @@ public class BodyPane implements Initializable {
 
                 if (rowCount == 1) {
                     final int j = i;
-                    TableColumn column = new TableColumn(attr.getName());
-                    column.setCellValueFactory(new PropertyValueFactory<>(attr.getName()));
-                    column.setCellValueFactory((Callback<TableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>) param -> new SimpleStringProperty(param.getValue().get(j).toString()));
+                    MyTableColumn column = new MyTableColumn(attr.getName());
+                    column.setAttr(attr);
+                    column.setCellValueFactory((Callback<MyTableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>) param -> new SimpleStringProperty(param.getValue().get(j).toString()));
                     columns.add(column);
                 }
 
@@ -244,6 +305,9 @@ public class BodyPane implements Initializable {
         }
         tvResult.getColumns().addAll(columns);
         tvResult.setItems(rows);
-        miExportToCsv.setDisable(false);
+        if (rows.size() > 0)
+            miExportToCsv.setDisable(false);
+        else
+            miExportToCsv.setDisable(true);
     }
 }

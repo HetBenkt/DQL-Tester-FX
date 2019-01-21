@@ -213,7 +213,7 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
         try {
             log.info(selected.getValue().getObject().getObjectId().getId());
             Stage dumpAttributes = new Stage();
-            dumpAttributes.setTitle(String.format("Attributes List - %s", selected.getValue().getObject().getObjectId().getId()));
+            dumpAttributes.setTitle(String.format("Attributes List - %s (%s)", selected.getValue().getObject().getObjectId().getId(), repositoryCon.getRepositoryName()));
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributesPane.fxml"));
             VBox loginPane = fxmlLoader.load();
             Scene scene = new Scene(loginPane);
