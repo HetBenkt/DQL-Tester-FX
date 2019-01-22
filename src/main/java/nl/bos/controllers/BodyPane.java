@@ -15,6 +15,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -35,6 +37,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +48,7 @@ import static nl.bos.Constants.ATTR_R_OBJECT_ID;
 
 public class BodyPane implements Initializable {
     private static final Logger log = Logger.getLogger(BodyPane.class.getName());
-    private final MenuItem miExportToCsv, miProperties, miGetAttributes;
+    private final MenuItem miExportToCsv, miProperties, miGetAttributes, miCopyCellToClipBoard, miCopyRowToClipBoard, miDescribeObject, miFindCellText;
     private final Repository repositoryCon = Repository.getInstance();
 
     @FXML
@@ -65,15 +68,82 @@ public class BodyPane implements Initializable {
         miProperties.setDisable(true);
         handleMiProperties();
 
+        miCopyCellToClipBoard = new MenuItem("Copy Cell Text into Clipboard");
+        miCopyCellToClipBoard.setDisable(true);
+        handleMiCopyCellToClipBoard();
+
+        miCopyRowToClipBoard = new MenuItem("Copy Row into Clipboard");
+        miCopyRowToClipBoard.setDisable(true);
+        handleMiCopyRowToClipBoard();
+
         miExportToCsv = new MenuItem("Export Results into CSV File/Clipboard");
         miExportToCsv.setDisable(true);
         handleMiExportToCsv();
+
+        miDescribeObject = new MenuItem("Describe Object");
+        miDescribeObject.setDisable(true);
+        handleMiDescribeObject();
 
         miGetAttributes = new MenuItem("Get Attributes");
         miGetAttributes.setDisable(true);
         handleMiGetAttributes();
 
-        contextMenu.getItems().addAll(miProperties, miExportToCsv, miGetAttributes);
+        miFindCellText = new MenuItem("Find Cell Text");
+        miFindCellText.setDisable(true);
+        handleMiFindCellText();
+
+        contextMenu.getItems().addAll(
+                miProperties,
+                new SeparatorMenuItem(),
+                miCopyCellToClipBoard,
+                miCopyRowToClipBoard,
+                miExportToCsv,
+                new SeparatorMenuItem(),
+                miDescribeObject,
+                new SeparatorMenuItem(),
+                miGetAttributes,
+                new SeparatorMenuItem(),
+                miFindCellText
+        );
+    }
+
+    private void handleMiFindCellText() {
+        //todo
+    }
+
+    private void handleMiDescribeObject() {
+        //todo
+    }
+
+    private void handleMiCopyRowToClipBoard() {
+        miCopyRowToClipBoard.setOnAction(actionEvent -> {
+            TablePosition focusedCell = tvResult.getFocusModel().getFocusedCell();
+            ObservableList<String> row = (ObservableList<String>) tvResult.getItems().get(focusedCell.getRow());
+
+            StringBuilder value = new StringBuilder();
+
+            for (String cellValue : row) {
+                String appendText = cellValue + "\n";
+                value.append(appendText);
+            }
+
+            final Clipboard clipboard = Clipboard.getSystemClipboard();
+            final ClipboardContent content = new ClipboardContent();
+            content.putString(value.toString());
+            clipboard.setContent(content);
+        });
+    }
+
+    private void handleMiCopyCellToClipBoard() {
+        miCopyCellToClipBoard.setOnAction(actionEvent -> {
+            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
+            String value = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
+
+            final Clipboard clipboard = Clipboard.getSystemClipboard();
+            final ClipboardContent content = new ClipboardContent();
+            content.putString(value);
+            clipboard.setContent(content);
+        });
     }
 
     private void handleMiGetAttributes() {
@@ -98,13 +168,21 @@ public class BodyPane implements Initializable {
                 log.finest(e.getMessage());
             }
         });
-
     }
 
     private void handleMiProperties() {
         miProperties.setOnAction(actionEvent -> {
             log.info(actionEvent.getSource().toString());
+            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
+            MyTableColumn tableColumn = (MyTableColumn) focusedCell.getTableColumn();
+            IDfAttr attr = tableColumn.getAttr();
 
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Properties");
+            alert.setHeaderText(null);
+            String message = MessageFormat.format("Attribute Name: {0}\nData Type: {1,number,integer}\nSize: {2,number,integer}\nRepeating: {3}", attr.getName(), attr.getDataType(), attr.getLength(), String.valueOf(attr.isRepeating()));
+            alert.setContentText(message);
+            alert.showAndWait();
         });
     }
 
@@ -305,9 +383,16 @@ public class BodyPane implements Initializable {
         }
         tvResult.getColumns().addAll(columns);
         tvResult.setItems(rows);
-        if (rows.size() > 0)
+        if (rows.size() > 0) {
             miExportToCsv.setDisable(false);
-        else
+            miProperties.setDisable(false);
+            miCopyCellToClipBoard.setDisable(false);
+            miCopyRowToClipBoard.setDisable(false);
+        } else {
             miExportToCsv.setDisable(true);
+            miProperties.setDisable(true);
+            miCopyCellToClipBoard.setDisable(true);
+            miCopyRowToClipBoard.setDisable(true);
+        }
     }
 }
