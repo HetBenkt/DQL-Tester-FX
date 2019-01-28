@@ -77,7 +77,6 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
     @FXML
     private void handleExit(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
-        log.info(String.valueOf(actionEvent.getSource()));
         Stage stage = (Stage) btnExit.getScene().getWindow();
         stage.close();
     }

@@ -8,10 +8,11 @@
     <top>
         <MenuBar fx:id="menubar" disable="true" BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="Tools">
-                <MenuItem mnemonicParsing="false" text="Browse Repository" onAction="#browseRepository"/>
+                <MenuItem mnemonicParsing="false" onAction="#browseRepository" text="Browse Repository"/>
+                <MenuItem mnemonicParsing="false" onAction="#describeObject" text="Describe Object"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Administration">
-                <MenuItem mnemonicParsing="false" text="Manage Jobs" onAction="#manageJobs"/>
+                <MenuItem mnemonicParsing="false" onAction="#manageJobs" text="Manage Jobs"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Info">
                 <MenuItem mnemonicParsing="false" text="Get Last SQL"/>

@@ -1,6 +1,7 @@
 package nl.bos.controllers;
 
 import com.documentum.fc.client.IDfCollection;
+import com.documentum.fc.client.IDfPersistentObject;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfAttr;
@@ -48,7 +49,7 @@ import static nl.bos.Constants.ATTR_R_OBJECT_ID;
 
 public class BodyPane implements Initializable {
     private static final Logger log = Logger.getLogger(BodyPane.class.getName());
-    private final MenuItem miExportToCsv, miProperties, miGetAttributes, miCopyCellToClipBoard, miCopyRowToClipBoard, miDescribeObject, miFindCellText;
+    private final MenuItem miExportToCsv, miProperties, miGetAttributes, miCopyCellToClipBoard, miCopyRowToClipBoard, miDescribeObject, miDestroyObject;
     private final Repository repositoryCon = Repository.getInstance();
 
     @FXML
@@ -88,9 +89,9 @@ public class BodyPane implements Initializable {
         miGetAttributes.setDisable(true);
         handleMiGetAttributes();
 
-        miFindCellText = new MenuItem("Find Cell Text");
-        miFindCellText.setDisable(true);
-        handleMiFindCellText();
+        miDestroyObject = new MenuItem("Destroy Object");
+        miDestroyObject.setDisable(true);
+        handleMiDestroyObject();
 
         contextMenu.getItems().addAll(
                 miProperties,
@@ -102,13 +103,53 @@ public class BodyPane implements Initializable {
                 miDescribeObject,
                 new SeparatorMenuItem(),
                 miGetAttributes,
-                new SeparatorMenuItem(),
-                miFindCellText
+                miDestroyObject
         );
     }
 
-    private void handleMiFindCellText() {
-        //todo
+    private void handleMiDestroyObject() {
+        miDestroyObject.setOnAction(actionEvent -> {
+            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
+            String id = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
+
+            try {
+                log.info(id);
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Delete Object");
+                alert.setHeaderText(null);
+                String message = MessageFormat.format("Are you sure you want to destroy the selected object id ''{0}''?", id);
+                alert.setContentText(message);
+                ButtonType btnYes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
+                ButtonType btnNo = new ButtonType("No", ButtonBar.ButtonData.NO);
+                alert.getButtonTypes().setAll(btnYes, btnNo);
+                alert.showAndWait().ifPresent(type -> {
+                    if (type == btnYes) {
+                        log.info("Deleting the object!");
+                        try {
+                            IDfPersistentObject object = repositoryCon.getSession().getObject(new DfId(id));
+                            object.destroy();
+                            Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
+                            confirmation.setTitle("Confirmation delete object");
+                            confirmation.setHeaderText(null);
+                            String messageConfirmation = MessageFormat.format("Succesfully destroyed the object id ''{0}''?", id);
+                            confirmation.setContentText(messageConfirmation);
+                            confirmation.showAndWait();
+                        } catch (DfException e) {
+                            log.finest(e.getMessage());
+                            Alert confirmation = new Alert(Alert.AlertType.ERROR);
+                            confirmation.setTitle("Error on delete object");
+                            confirmation.setHeaderText(null);
+                            confirmation.setContentText(e.getMessage());
+                            confirmation.showAndWait();
+                        }
+                    } else {
+                        log.info("Object deletion cancelled!");
+                    }
+                });
+            } catch (Exception e) {
+                log.finest(e.getMessage());
+            }
+        });
     }
 
     private void handleMiDescribeObject() {
@@ -289,13 +330,25 @@ public class BodyPane implements Initializable {
 
         tvResult.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
             if (t.getButton() == MouseButton.SECONDARY) {
-                TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
-                MyTableColumn tableColumn = (MyTableColumn) focusedCell.getTableColumn();
-                IDfAttr attr = tableColumn.getAttr();
-                if (attr.getDataType() == IDfAttr.DM_STRING && attr.getLength() == 16 && attr.getName().equals(ATTR_R_OBJECT_ID))
-                    miGetAttributes.setDisable(false);
-                else
-                    miGetAttributes.setDisable(true);
+                if (tvResult.getSelectionModel().getSelectedCells().size() != 0) {
+                    TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
+                    MyTableColumn tableColumn = (MyTableColumn) focusedCell.getTableColumn();
+                    IDfAttr attr = tableColumn.getAttr();
+                    if (attr.getDataType() == IDfAttr.DM_STRING && attr.getLength() == 16 && attr.getName().equals(ATTR_R_OBJECT_ID)) {
+                        miGetAttributes.setDisable(false);
+                        miDestroyObject.setDisable(false);
+                    } else {
+                        miGetAttributes.setDisable(true);
+                        miDestroyObject.setDisable(true);
+                    }
+                    miProperties.setDisable(false);
+                    miCopyCellToClipBoard.setDisable(false);
+                    miCopyRowToClipBoard.setDisable(false);
+                } else {
+                    miProperties.setDisable(true);
+                    miCopyCellToClipBoard.setDisable(true);
+                    miCopyRowToClipBoard.setDisable(true);
+                }
                 contextMenu.show(tvResult, t.getScreenX(), t.getScreenY());
             } else if (t.getButton() == MouseButton.PRIMARY)
                 contextMenu.hide();
@@ -385,14 +438,8 @@ public class BodyPane implements Initializable {
         tvResult.setItems(rows);
         if (rows.size() > 0) {
             miExportToCsv.setDisable(false);
-            miProperties.setDisable(false);
-            miCopyCellToClipBoard.setDisable(false);
-            miCopyRowToClipBoard.setDisable(false);
         } else {
             miExportToCsv.setDisable(true);
-            miProperties.setDisable(true);
-            miCopyCellToClipBoard.setDisable(true);
-            miCopyRowToClipBoard.setDisable(true);
         }
     }
 }

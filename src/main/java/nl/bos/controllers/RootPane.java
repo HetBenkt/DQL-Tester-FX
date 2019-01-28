@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -17,12 +18,13 @@ public class RootPane {
         return menubar;
     }
 
+    private final Repository repositoryCon = Repository.getInstance();
+
     @FXML
     private MenuBar menubar;
 
     @FXML
     private void browseRepository(ActionEvent actionEvent) throws IOException {
-        Repository repositoryCon = Repository.getInstance();
         Stage browseRepositoryStage = new Stage();
         browseRepositoryStage.initModality(Modality.APPLICATION_MODAL);
         browseRepositoryStage.setTitle(String.format("Repository Browser - %s (%s)", repositoryCon.getRepositoryName(), repositoryCon.getUserName()));
@@ -35,7 +37,6 @@ public class RootPane {
 
     @FXML
     private void manageJobs(ActionEvent actionEvent) throws IOException {
-        Repository repositoryCon = Repository.getInstance();
         Stage jobEditorStage = new Stage();
         jobEditorStage.setTitle(String.format("Job Editor - %s", repositoryCon.getRepositoryName()));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/JobEditorPane.fxml"));
@@ -43,5 +44,16 @@ public class RootPane {
         jobEditorStage.setScene(new Scene(jobEditor));
 
         jobEditorStage.showAndWait();
+    }
+
+    @FXML
+    private void describeObject(ActionEvent actionEvent) throws IOException {
+        Stage describeObjectStage = new Stage();
+        describeObjectStage.setTitle("Describe object");
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/DescribeObjectPane.fxml"));
+        HBox describeObject = fxmlLoader.load();
+        describeObjectStage.setScene(new Scene(describeObject));
+
+        describeObjectStage.showAndWait();
     }
 }
