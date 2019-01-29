@@ -3,9 +3,9 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="300.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121"
+<HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="250.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121"
       fx:controller="nl.bos.controllers.DescribeObjectPane">
-    <VBox spacing="8.0">
+    <VBox prefWidth="300.0" spacing="10.0">
         <HBox.margin>
             <Insets left="5.0" top="5.0"/>
         </HBox.margin>
@@ -20,11 +20,25 @@
         </HBox>
         <ComboBox fx:id="cbTypesTables" onAction="#handleTypesTables" prefWidth="150.0"/>
         <HBox spacing="5.0">
-            <Button fx:id="btnOk" mnemonicParsing="false" onAction="#handleOK" text="Ok"/>
-            <Button fx:id="btnCancel" mnemonicParsing="false" onAction="#handleCancel" text="Cancel"/>
+            <RadioButton fx:id="rbTypeTable" mnemonicParsing="false" onAction="#handleTypeTable" selected="true"
+                         text="Type &amp; Table">
+                <toggleGroup>
+                    <ToggleGroup fx:id="tgTypeTable"/>
+                </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="rbType" mnemonicParsing="false" onAction="#handleType" text="Type"
+                         toggleGroup="$tgTypeTable"/>
+            <RadioButton fx:id="rbTable" mnemonicParsing="false" onAction="#handleTable" text="Table"
+                         toggleGroup="$tgTypeTable"/>
+        </HBox>
+        <HBox spacing="5.0">
+            <Button fx:id="btnOk" defaultButton="true" disable="true" mnemonicParsing="false" onAction="#handleOK"
+                    text="Ok"/>
+            <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#handleCancel"
+                    text="Cancel"/>
         </HBox>
     </VBox>
-    <TreeView fx:id="tvTypesTables" prefWidth="430.0">
+    <TreeView fx:id="tvTypesTables" prefWidth="285.0">
         <HBox.margin>
             <Insets bottom="5.0" left="5.0" top="5.0"/>
         </HBox.margin>
