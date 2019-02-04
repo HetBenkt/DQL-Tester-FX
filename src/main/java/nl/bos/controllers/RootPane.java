@@ -1,6 +1,9 @@
 package nl.bos.controllers;
 
+import com.documentum.fc.client.IDfCollection;
+import com.documentum.fc.common.DfException;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -9,19 +12,44 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import nl.bos.Main;
 import nl.bos.Repository;
 
 import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.logging.Logger;
 
-public class RootPane {
+import static nl.bos.Constants.TABLE;
+import static nl.bos.Constants.TYPE;
+
+public class RootPane implements EventHandler<WindowEvent> {
+    private static final Logger log = Logger.getLogger(RootPane.class.getName());
+
     public MenuBar getMenubar() {
         return menubar;
     }
 
+    private final static Stage describeObjectStage = new Stage();
     private final Repository repositoryCon = Repository.getInstance();
+    private final Main main = Main.getInstance();
 
     @FXML
     private MenuBar menubar;
+
+    private FXMLLoader fxmlLoader;
+
+    public RootPane() throws IOException {
+        describeObjectStage.setTitle("Describe object");
+        fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/DescribeObjectPane.fxml"));
+        HBox describeObject = fxmlLoader.load();
+        describeObjectStage.setScene(new Scene(describeObject));
+        describeObjectStage.setOnCloseRequest(this);
+    }
+
+    static Stage getDescribeObjectStage() {
+        return describeObjectStage;
+    }
 
     @FXML
     private void browseRepository(ActionEvent actionEvent) throws IOException {
@@ -47,13 +75,45 @@ public class RootPane {
     }
 
     @FXML
-    private void describeObject(ActionEvent actionEvent) throws IOException {
-        Stage describeObjectStage = new Stage();
-        describeObjectStage.setTitle("Describe object");
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/DescribeObjectPane.fxml"));
-        HBox describeObject = fxmlLoader.load();
-        describeObjectStage.setScene(new Scene(describeObject));
-
+    private void describeObject(ActionEvent actionEvent) {
+        DescribeObjectPane describeObjectPaneController = fxmlLoader.getController();
+        describeObjectPaneController.initialize(null, null);
         describeObjectStage.showAndWait();
+    }
+
+    @Override
+    public void handle(WindowEvent windowEvent) {
+        DescribeObjectPane describeObjectPaneController = fxmlLoader.getController();
+        String currentSelected = (String) describeObjectPaneController.getCurrentSelected().getValue();
+        String type = describeObjectPaneController.getCurrentSelected().getType();
+        String message = MessageFormat.format("Selected item ''{0}'' of type ''{1}''", currentSelected, type);
+        log.info(message);
+        try {
+            switch (type) {
+                case TYPE:
+                    updateTableWithTypeInfo(currentSelected);
+                    break;
+                case TABLE:
+                    updateTableWithTableInfo(currentSelected);
+                    break;
+                default:
+                    log.info("Do nothing");
+                    break;
+            }
+        } catch (DfException e) {
+            log.finest(e.getMessage());
+        }
+    }
+
+    private void updateTableWithTableInfo(String currentSelected) throws DfException {
+        BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
+        IDfCollection result = repositoryCon.query(String.format("select column_name, column_datatype, column_length, is_key from dm_registered where table_name = '%s' order by 1", currentSelected));
+        bodyPaneController.updateResultTable(result);
+    }
+
+    private void updateTableWithTypeInfo(String currentSelected) throws DfException {
+        BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
+        IDfCollection result = repositoryCon.query(String.format("select attr_name, attr_type, attr_length, attr_repeating from dm_type where name = '%s' order by 1", currentSelected));
+        bodyPaneController.updateResultTable(result);
     }
 }
