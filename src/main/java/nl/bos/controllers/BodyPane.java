@@ -26,6 +26,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import nl.bos.MyTableColumn;
 import nl.bos.Repository;
+import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -39,10 +40,8 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.ATTR_R_OBJECT_ID;
@@ -63,6 +62,8 @@ public class BodyPane implements Initializable {
     private JSONObject jsonObject;
     private FXMLLoader fxmlLoader;
     private ContextMenu contextMenu = new ContextMenu();
+    private String description;
+    private String[] parsedDescription;
 
     public BodyPane() {
         miProperties = new MenuItem("Properties");
@@ -218,10 +219,17 @@ public class BodyPane implements Initializable {
             MyTableColumn tableColumn = (MyTableColumn) focusedCell.getTableColumn();
             IDfAttr attr = tableColumn.getAttr();
 
+            String message;
+            if (attr != null) {
+                message = MessageFormat.format("Attribute Name: {0}\nData Type: {1,number,integer}\nSize: {2,number,integer}\nRepeating: {3}", attr.getName(), attr.getDataType(), attr.getLength(), String.valueOf(attr.isRepeating()));
+            } else {
+                int index = StringUtils.ordinalIndexOf(description, "\r\n\r\n", 2);
+                message = description.substring(0, index);
+            }
+
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Properties");
             alert.setHeaderText(null);
-            String message = MessageFormat.format("Attribute Name: {0}\nData Type: {1,number,integer}\nSize: {2,number,integer}\nRepeating: {3}", attr.getName(), attr.getDataType(), attr.getLength(), String.valueOf(attr.isRepeating()));
             alert.setContentText(message);
             alert.showAndWait();
         });
@@ -334,12 +342,14 @@ public class BodyPane implements Initializable {
                     TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
                     MyTableColumn tableColumn = (MyTableColumn) focusedCell.getTableColumn();
                     IDfAttr attr = tableColumn.getAttr();
-                    if (attr.getDataType() == IDfAttr.DM_STRING && attr.getLength() == 16 && attr.getName().equals(ATTR_R_OBJECT_ID)) {
-                        miGetAttributes.setDisable(false);
-                        miDestroyObject.setDisable(false);
-                    } else {
-                        miGetAttributes.setDisable(true);
-                        miDestroyObject.setDisable(true);
+                    if (attr != null) {
+                        if (attr.getDataType() == IDfAttr.DM_STRING && attr.getLength() == 16 && attr.getName().equals(ATTR_R_OBJECT_ID)) {
+                            miGetAttributes.setDisable(false);
+                            miDestroyObject.setDisable(false);
+                        } else {
+                            miGetAttributes.setDisable(true);
+                            miDestroyObject.setDisable(true);
+                        }
                     }
                     miProperties.setDisable(false);
                     miCopyCellToClipBoard.setDisable(false);
@@ -441,5 +451,85 @@ public class BodyPane implements Initializable {
         } else {
             miExportToCsv.setDisable(true);
         }
+    }
+
+    void updateResultTableWithStringInput(String description, List<String> columnNames) {
+        this.description = description;
+        tvResult.getItems().clear();
+        tvResult.getColumns().clear();
+
+        List<MyTableColumn> columns = new ArrayList<>();
+        ObservableList<ObservableList> rows = FXCollections.observableArrayList();
+
+        int rowCount = 0;
+
+        while (rowCount < getRowSize(description)) {
+            rowCount++;
+            ObservableList<String> row = FXCollections.observableArrayList();
+            for (int i = 0; i < columnNames.size(); i++) {
+
+                if (rowCount == 1) {
+                    final int j = i;
+                    MyTableColumn column = new MyTableColumn(columnNames.get(j));
+                    column.setCellValueFactory((Callback<MyTableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>) param -> new SimpleStringProperty(param.getValue().get(j).toString()));
+                    columns.add(column);
+                }
+
+                row.add(getRowValue(description, rowCount - 1, i));
+            }
+            rows.add(row);
+        }
+        tvResult.getColumns().addAll(columns);
+        tvResult.setItems(rows);
+        if (rows.size() > 0) {
+            miExportToCsv.setDisable(false);
+        } else {
+            miExportToCsv.setDisable(true);
+        }
+    }
+
+    private String getRowValue(String description, int rowIndex, int columnIndex) {
+        String result = "";
+        try {
+            result = parsedDescription[(rowIndex * 3) + columnIndex];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            log.finest(e.getMessage());
+        }
+        return result;
+    }
+
+    private void parseDescription(String descriptionInput) {
+        String[] split;
+        String type = descriptionInput.substring(0, descriptionInput.indexOf("\t"));
+
+        if (type.contains("Table")) {
+            split = descriptionInput.substring(descriptionInput.indexOf("\r\n", descriptionInput.indexOf("Columns:"))).replace("KEYED\r\n", " KEYED ").replace("\r\n", " NOT_KEYED ").replace(" NOT_KEYED", " FALSE").replace("KEYED", " TRUE").split(" ");
+        } else {
+            split = descriptionInput.substring(descriptionInput.indexOf("\r\n", descriptionInput.indexOf("Attributes:"))).replace("REPEATING\r\n", " REPEATING ").replace("\r\n", " NOT_REPEATING ").replace(" NOT_REPEATING", " FALSE").replace("REPEATING", " TRUE").split(" ");
+        }
+
+        split[0] = "";
+        split[1] = "";
+        split[2] = "";
+        split[3] = "";
+        parsedDescription = Arrays.stream(split).filter(value -> !value.equals("")).toArray(size -> new String[size]);
+    }
+
+    private int getRowSize(String description) {
+        String fromColumns;
+        String type = description.substring(0, description.indexOf("\t"));
+
+        if (type.contains("Table")) {
+            fromColumns = description.substring(description.indexOf("Columns:"));
+        } else {
+            fromColumns = description.substring(description.indexOf("Attributes:"));
+        }
+
+        String columnsInfo = fromColumns.substring(0, fromColumns.indexOf("\r\n"));
+        String value = columnsInfo.substring(columnsInfo.indexOf(":") + 1, columnsInfo.length()).trim();
+
+        parseDescription(description);
+
+        return Integer.parseInt(value);
     }
 }

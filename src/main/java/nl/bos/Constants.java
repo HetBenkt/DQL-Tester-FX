@@ -40,8 +40,8 @@ public final class Constants {
     public static final String ATTR_EXPIRATION_DATE = "expiration_date";
 
     public static final String PATH_FORMAT = "%s/%s";
-    public static final String TYPE = "type";
-    public static final String TABLE = "table";
+    public static final String TYPE = "TYPE";
+    public static final String TABLE = "TABLE";
 
 
     private Constants() {

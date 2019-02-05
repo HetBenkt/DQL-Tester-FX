@@ -1,6 +1,5 @@
 package nl.bos.controllers;
 
-import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -18,6 +17,7 @@ import nl.bos.Repository;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.TABLE;
@@ -107,13 +107,13 @@ public class RootPane implements EventHandler<WindowEvent> {
 
     private void updateTableWithTableInfo(String currentSelected) throws DfException {
         BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
-        IDfCollection result = repositoryCon.query(String.format("select column_name, column_datatype, column_length, is_key from dm_registered where table_name = '%s' order by 1", currentSelected));
-        bodyPaneController.updateResultTable(result);
+        String tableDesciption = repositoryCon.getSession().describe(TABLE, "dm_dbo." + currentSelected);
+        bodyPaneController.updateResultTableWithStringInput(tableDesciption, Arrays.asList("Column", "Data Type", "Primary Key"));
     }
 
     private void updateTableWithTypeInfo(String currentSelected) throws DfException {
         BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
-        IDfCollection result = repositoryCon.query(String.format("select attr_name, attr_type, attr_length, attr_repeating from dm_type where name = '%s' order by 1", currentSelected));
-        bodyPaneController.updateResultTable(result);
+        String typeDesciption = repositoryCon.getSession().describe(TYPE, currentSelected);
+        bodyPaneController.updateResultTableWithStringInput(typeDesciption, Arrays.asList("Attribute", "Data Type", "Repeating"));
     }
 }
