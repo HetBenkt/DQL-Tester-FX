@@ -1,6 +1,5 @@
 package nl.bos.controllers;
 
-import com.documentum.fc.common.DfException;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -12,16 +11,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import nl.bos.Main;
 import nl.bos.Repository;
+import nl.bos.utils.TableResultUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.logging.Logger;
-
-import static nl.bos.Constants.TABLE;
-import static nl.bos.Constants.TYPE;
 
 public class RootPane implements EventHandler<WindowEvent> {
     private static final Logger log = Logger.getLogger(RootPane.class.getName());
@@ -32,7 +27,6 @@ public class RootPane implements EventHandler<WindowEvent> {
 
     private final static Stage describeObjectStage = new Stage();
     private final Repository repositoryCon = Repository.getInstance();
-    private final Main main = Main.getInstance();
 
     @FXML
     private MenuBar menubar;
@@ -88,32 +82,6 @@ public class RootPane implements EventHandler<WindowEvent> {
         String type = describeObjectPaneController.getCurrentSelected().getType();
         String message = MessageFormat.format("Selected item ''{0}'' of type ''{1}''", currentSelected, type);
         log.info(message);
-        try {
-            switch (type) {
-                case TYPE:
-                    updateTableWithTypeInfo(currentSelected);
-                    break;
-                case TABLE:
-                    updateTableWithTableInfo(currentSelected);
-                    break;
-                default:
-                    log.info("Do nothing");
-                    break;
-            }
-        } catch (DfException e) {
-            log.finest(e.getMessage());
-        }
-    }
-
-    private void updateTableWithTableInfo(String currentSelected) throws DfException {
-        BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
-        String tableDesciption = repositoryCon.getSession().describe(TABLE, "dm_dbo." + currentSelected);
-        bodyPaneController.updateResultTableWithStringInput(tableDesciption, Arrays.asList("Column", "Data Type", "Primary Key"));
-    }
-
-    private void updateTableWithTypeInfo(String currentSelected) throws DfException {
-        BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
-        String typeDesciption = repositoryCon.getSession().describe(TYPE, currentSelected);
-        bodyPaneController.updateResultTableWithStringInput(typeDesciption, Arrays.asList("Attribute", "Data Type", "Repeating"));
+        new TableResultUtils().updateTable(type, currentSelected);
     }
 }

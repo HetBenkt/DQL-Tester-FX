@@ -26,6 +26,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import nl.bos.MyTableColumn;
 import nl.bos.Repository;
+import nl.bos.utils.TableResultUtils;
 import org.apache.commons.lang.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -43,8 +44,11 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static nl.bos.Constants.ATTR_R_OBJECT_ID;
+import static nl.bos.Constants.TABLE;
+import static nl.bos.Constants.TYPE;
 
 public class BodyPane implements Initializable {
     private static final Logger log = Logger.getLogger(BodyPane.class.getName());
@@ -64,6 +68,7 @@ public class BodyPane implements Initializable {
     private ContextMenu contextMenu = new ContextMenu();
     private String description;
     private String[] parsedDescription;
+    private String describeObjectType;
 
     public BodyPane() {
         miProperties = new MenuItem("Properties");
@@ -154,7 +159,13 @@ public class BodyPane implements Initializable {
     }
 
     private void handleMiDescribeObject() {
-        //todo
+        miDescribeObject.setOnAction(actionEvent -> {
+            log.info(actionEvent.getSource().toString());
+            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
+            String name = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
+            log.info(name);
+            new TableResultUtils().updateTable(describeObjectType, name);
+        });
     }
 
     private void handleMiCopyRowToClipBoard() {
@@ -343,13 +354,27 @@ public class BodyPane implements Initializable {
                     MyTableColumn tableColumn = (MyTableColumn) focusedCell.getTableColumn();
                     IDfAttr attr = tableColumn.getAttr();
                     if (attr != null) {
-                        if (attr.getDataType() == IDfAttr.DM_STRING && attr.getLength() == 16 && attr.getName().equals(ATTR_R_OBJECT_ID)) {
+                        Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
+                        if (isObjectId(String.valueOf(cellData))) {
                             miGetAttributes.setDisable(false);
                             miDestroyObject.setDisable(false);
                         } else {
                             miGetAttributes.setDisable(true);
                             miDestroyObject.setDisable(true);
                         }
+                        if (isTypeName(String.valueOf(cellData))) {
+                            describeObjectType = TYPE;
+                            miDescribeObject.setDisable(false);
+                        } else if (isTableName(String.valueOf(cellData))) {
+                            describeObjectType = TABLE;
+                            miDescribeObject.setDisable(false);
+                        } else {
+                            miDescribeObject.setDisable(true);
+                        }
+                    } else {
+                        miGetAttributes.setDisable(true);
+                        miDestroyObject.setDisable(true);
+                        miDescribeObject.setDisable(true);
                     }
                     miProperties.setDisable(false);
                     miCopyCellToClipBoard.setDisable(false);
@@ -363,6 +388,41 @@ public class BodyPane implements Initializable {
             } else if (t.getButton() == MouseButton.PRIMARY)
                 contextMenu.hide();
         });
+    }
+
+    private boolean isObjectId(String id) {
+        String regex = "^[0-9a-f]{16}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(id);
+        return matcher.find();
+    }
+
+    private boolean isTableName(String name) {
+        boolean result = false;
+        try {
+            IDfCollection nrOfTypes = repositoryCon.query(String.format("select count(r_object_id) as nroftables from dm_registered where object_name = '%s'", name));
+            nrOfTypes.next();
+            if (Integer.parseInt(nrOfTypes.getString("nroftables")) > 0)
+                result = true;
+            nrOfTypes.close();
+        } catch (DfException e) {
+            log.finest(e.getMessage());
+        }
+        return result;
+    }
+
+    private boolean isTypeName(String name) {
+        boolean result = false;
+        try {
+            IDfCollection nrOfTypes = repositoryCon.query(String.format("select count(r_object_id) as nroftypes from dm_type where name = '%s'", name));
+            nrOfTypes.next();
+            if (Integer.parseInt(nrOfTypes.getString("nroftypes")) > 0)
+                result = true;
+            nrOfTypes.close();
+        } catch (DfException e) {
+            log.finest(e.getMessage());
+        }
+        return result;
     }
 
     private void createHistoryFile() {
@@ -453,7 +513,7 @@ public class BodyPane implements Initializable {
         }
     }
 
-    void updateResultTableWithStringInput(String description, List<String> columnNames) {
+    public void updateResultTableWithStringInput(String description, List<String> columnNames) {
         this.description = description;
         tvResult.getItems().clear();
         tvResult.getColumns().clear();
@@ -475,7 +535,7 @@ public class BodyPane implements Initializable {
                     columns.add(column);
                 }
 
-                row.add(getRowValue(description, rowCount - 1, i));
+                row.add(getRowValue(rowCount - 1, i));
             }
             rows.add(row);
         }
@@ -488,7 +548,7 @@ public class BodyPane implements Initializable {
         }
     }
 
-    private String getRowValue(String description, int rowIndex, int columnIndex) {
+    private String getRowValue(int rowIndex, int columnIndex) {
         String result = "";
         try {
             result = parsedDescription[(rowIndex * 3) + columnIndex];
