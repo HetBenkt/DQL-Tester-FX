@@ -40,6 +40,8 @@ public class DescribeObjectPane implements Initializable {
         return currentSelected;
     }
 
+    private ObservableList<DescribeObjectTreeItem> items;
+
     @FXML
     private void handleTypesTables(ActionEvent actionEvent) {
         DescribeObjectTreeItem selectedItem = cbTypesTables.getSelectionModel().getSelectedItem();
@@ -66,64 +68,89 @@ public class DescribeObjectPane implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         if (repositoryCon.getClient() != null) {
-            ObservableList<DescribeObjectTreeItem> items = FXCollections.observableArrayList();
-            DescribeObjectTreeItem tiTypes = new DescribeObjectTreeItem("Types", null);
-            DescribeObjectTreeItem tiTables = new DescribeObjectTreeItem("Tables", null);
-
-            try {
-                IDfCollection types = repositoryCon.query("select name from dm_type order by 1");
-                while (types.next()) {
-                    DescribeObjectTreeItem item = new DescribeObjectTreeItem(types.getString("name"), TYPE);
-                    items.add(item);
-                    tiTypes.getChildren().add(item);
-                }
-                types.close();
-
-                IDfCollection tables = repositoryCon.query("select object_name from dm_registered order by 1");
-                while (tables.next()) {
-                    DescribeObjectTreeItem item = new DescribeObjectTreeItem(tables.getString("object_name"), TABLE);
-                    items.add(item);
-                    tiTables.getChildren().add(item);
-                }
-                tables.close();
-
-            } catch (DfException e) {
-                log.info(e.getMessage());
-            }
-
-            SortedList<DescribeObjectTreeItem> sorted = items.sorted();
-            cbTypesTables.setItems(sorted);
-            txtNrOfItems.setText(String.valueOf(items.size()));
-
-            TreeItem rootItem = new TreeItem();
-            rootItem.setExpanded(true);
-
-            rootItem.getChildren().add(tiTypes);
-            rootItem.getChildren().add(tiTables);
-
-            tvTypesTables.setRoot(rootItem);
-            tvTypesTables.setShowRoot(false);
-
-            tvTypesTables.getSelectionModel().selectedItemProperty().addListener((observableValue, oldItem, newItem) -> {
-                cbTypesTables.getSelectionModel().select((DescribeObjectTreeItem) newItem);
-                currentSelected = (DescribeObjectTreeItem) newItem;
-                btnOk.setDisable(false);
-            });
+            items = FXCollections.observableArrayList();
+            DescribeObjectTreeItem tiTypes = initTypeParentWithChildren();
+            DescribeObjectTreeItem tiTables = initTableParentWithChildren();
+            initTreeView(tiTypes, tiTables);
         }
+    }
+
+    private void initTreeView(DescribeObjectTreeItem... treeItems) {
+        SortedList<DescribeObjectTreeItem> sorted = items.sorted();
+        cbTypesTables.setItems(sorted);
+        txtNrOfItems.setText(String.valueOf(items.size()));
+
+        TreeItem rootItem = new TreeItem();
+        rootItem.setExpanded(true);
+
+        rootItem.getChildren().addAll(treeItems);
+
+        tvTypesTables.setRoot(rootItem);
+        tvTypesTables.setShowRoot(false);
+
+        tvTypesTables.getSelectionModel().selectedItemProperty().addListener((observableValue, oldItem, newItem) -> {
+            cbTypesTables.getSelectionModel().select((DescribeObjectTreeItem) newItem);
+            currentSelected = (DescribeObjectTreeItem) newItem;
+            btnOk.setDisable(false);
+        });
+    }
+
+    private DescribeObjectTreeItem initTableParentWithChildren() {
+        DescribeObjectTreeItem parent = new DescribeObjectTreeItem("Tables");
+
+        try {
+            IDfCollection tables = repositoryCon.query("select object_name from dm_registered order by 1");
+            while (tables.next()) {
+                DescribeObjectTreeItem item = new DescribeObjectTreeItem(tables.getString("object_name"), TABLE);
+                items.add(item);
+                parent.getChildren().add(item);
+            }
+            tables.close();
+        } catch (DfException e) {
+            log.finest(e.getMessage());
+        }
+
+        return parent;
+    }
+
+    private DescribeObjectTreeItem initTypeParentWithChildren() {
+        DescribeObjectTreeItem parent = new DescribeObjectTreeItem("Types");
+
+        try {
+            IDfCollection types = repositoryCon.query("select name from dm_type order by 1");
+            while (types.next()) {
+                DescribeObjectTreeItem item = new DescribeObjectTreeItem(types.getString("name"), TYPE);
+                items.add(item);
+                parent.getChildren().add(item);
+            }
+            types.close();
+        } catch (DfException e) {
+            log.finest(e.getMessage());
+        }
+
+        return parent;
     }
 
     @FXML
     private void handleTypeTable(ActionEvent actionEvent) {
-
+        items = FXCollections.observableArrayList();
+        DescribeObjectTreeItem tiTypes = initTypeParentWithChildren();
+        DescribeObjectTreeItem tiTables = initTableParentWithChildren();
+        initTreeView(tiTypes, tiTables);
     }
 
     @FXML
     private void handleType(ActionEvent actionEvent) {
+        items = FXCollections.observableArrayList();
+        DescribeObjectTreeItem tiTypes = initTypeParentWithChildren();
+        initTreeView(tiTypes);
 
     }
 
     @FXML
     private void handleTable(ActionEvent actionEvent) {
-
+        items = FXCollections.observableArrayList();
+        DescribeObjectTreeItem tiTables = initTableParentWithChildren();
+        initTreeView(tiTables);
     }
 }

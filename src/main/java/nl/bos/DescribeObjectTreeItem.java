@@ -12,6 +12,11 @@ public class DescribeObjectTreeItem extends TreeItem {
         this.setValue(value);
     }
 
+    public DescribeObjectTreeItem(String value) {
+        this.value = value;
+        this.setValue(value);
+    }
+
     public String getType() {
         return type;
     }
