@@ -9,16 +9,20 @@
         <MenuBar fx:id="menubar" disable="true" BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="Tools">
                 <MenuItem mnemonicParsing="false" onAction="#browseRepository" text="Browse Repository"/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
                 <MenuItem mnemonicParsing="false" onAction="#describeObject" text="Describe Object"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Administration">
                 <MenuItem mnemonicParsing="false" onAction="#manageJobs" text="Manage Jobs"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Info">
-                <MenuItem mnemonicParsing="false" text="Get Last SQL"/>
+                <MenuItem mnemonicParsing="false" onAction="#showCurrentSessions" text="Show Current Sessions..."/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem mnemonicParsing="false" onAction="#getLastSQL" text="Get Last SQL"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Special">
-                <MenuItem mnemonicParsing="false" text="Enable SQL Trace"/>
+                <MenuItem mnemonicParsing="false" onAction="#enableSQLTrace" text="Enable SQL Trace"/>
+                <MenuItem mnemonicParsing="false" onAction="#disbleSQLTrace" text="Disble SQL Trace"/>
             </Menu>
         </MenuBar>
     </top>
