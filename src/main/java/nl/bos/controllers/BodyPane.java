@@ -134,10 +134,10 @@ public class BodyPane implements Initializable {
                         try {
                             IDfPersistentObject object = repositoryCon.getSession().getObject(new DfId(id));
                             object.destroy();
-                            Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
+                            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
                             confirmation.setTitle("Confirmation delete object");
                             confirmation.setHeaderText(null);
-                            String messageConfirmation = MessageFormat.format("Succesfully destroyed the object id ''{0}''?", id);
+                            String messageConfirmation = MessageFormat.format("Succesfully destroyed the object id ''{0}''!", id);
                             confirmation.setContentText(messageConfirmation);
                             confirmation.showAndWait();
                         } catch (DfException e) {

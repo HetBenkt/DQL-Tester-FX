@@ -5,7 +5,6 @@ import com.documentum.fc.commands.admin.IDfAdminCommand;
 import com.documentum.fc.commands.admin.impl.AdminApplyCommand;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfList;
-import com.documentum.fc.common.IDfAttr;
 import com.documentum.fc.common.IDfList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,6 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import nl.bos.Main;
 import nl.bos.Repository;
 import nl.bos.utils.TableResultUtils;
 
@@ -157,12 +157,8 @@ public class RootPane implements EventHandler<WindowEvent> {
 
     public void showCurrentSessions(ActionEvent actionEvent) throws DfException {
         IDfCollection showSessions = repositoryCon.query("EXECUTE show_sessions");
-        while (showSessions.next()) {
-            for (int i = 0; i < showSessions.getAttrCount(); i++) {
-                IDfAttr attr = showSessions.getAttr(i);
-                log.info(attr.getName());
-            }
-        }
+        BodyPane bodyPaneController = Main.getInstance().getBodyPaneLoader().getController();
+        bodyPaneController.updateResultTable(showSessions);
         showSessions.close();
     }
 }
