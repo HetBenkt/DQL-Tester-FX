@@ -76,10 +76,10 @@
                 <Insets left="5.0" right="5.0" top="5.0"/>
             </BorderPane.margin>
             <TextField/>
-            <Button fx:id="btnConnect" defaultButton="true" maxWidth="1.7976931348623157E308"
-                    mnemonicParsing="false" onAction="#handleConnect" text="Connect"/>
-            <Button fx:id="btnDisconnect" defaultButton="true" maxWidth="1.7976931348623157E308"
-                    mnemonicParsing="false" onAction="#handleDisconnect" text="Disconnect" visible="false"/>
+            <Button fx:id="btnConnect" defaultButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#handleConnect" text="Connect"/>
+            <Button fx:id="btnDisconnect" defaultButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#handleDisconnect" text="Disconnect" visible="false"/>
             <Button fx:id="btnExit" cancelButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
                     onAction="#handleExit" text="Exit"/>
         </VBox>
@@ -89,12 +89,36 @@
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
             </padding>
-            <Label fx:id="lblStatus" text="Offline"/>
-            <Label fx:id="lblUsernameOS" text="OS Username"/>
-            <Label fx:id="lblUsernameDC" text="DC Username"/>
-            <Label fx:id="lblDomainOS" text="OS Domain"/>
-            <Label fx:id="lblPrivileges" text="Privileges"/>
-            <Label fx:id="lblServerVersion" text="Server Version"/>
+            <Label fx:id="lblStatus" style="-fx-background-color: #a8a8a8" text="Offline">
+                <padding>
+                    <Insets left="5.0" right="5.0"/>
+                </padding>
+            </Label>
+            <Label fx:id="lblUsernameOS" style="-fx-background-color: #d3d3d3" text="OS Username">
+                <padding>
+                    <Insets left="5.0" right="5.0"/>
+                </padding>
+            </Label>
+            <Label fx:id="lblUsernameDC" style="-fx-background-color: #a8a8a8" text="DC Username">
+                <padding>
+                    <Insets left="5.0" right="5.0"/>
+                </padding>
+            </Label>
+            <Label fx:id="lblDomainOS" style="-fx-background-color: #d3d3d3" text="OS Domain">
+                <padding>
+                    <Insets left="5.0" right="5.0"/>
+                </padding>
+            </Label>
+            <Label fx:id="lblPrivileges" style="-fx-background-color: #a8a8a8" text="Privileges">
+                <padding>
+                    <Insets left="5.0" right="5.0"/>
+                </padding>
+            </Label>
+            <Label fx:id="lblServerVersion" style="-fx-background-color: #d3d3d3" text="Server Version">
+                <padding>
+                    <Insets left="5.0" right="5.0"/>
+                </padding>
+            </Label>
         </HBox>
     </bottom>
 </BorderPane>

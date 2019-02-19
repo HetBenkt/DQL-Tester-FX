@@ -1,6 +1,8 @@
 package nl.bos.controllers;
 
 import com.documentum.fc.client.IDfCollection;
+import com.documentum.fc.client.IDfSession;
+import com.documentum.fc.client.IDfUser;
 import com.documentum.fc.common.DfException;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -112,12 +114,65 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
     }
 
     public void handle(WindowEvent event) {
-        LoginPane loginPaneController = fxmlLoader.getController();
-        if (repositoryCon.getSession() != null && repositoryCon.getSession().isConnected()) {
-            updateNodes(String.valueOf(loginPaneController.getChbRepository().getValue()), "dummyUserNameOS", loginPaneController.getTxtUsername().getText(), loginPaneController.getHostName(), "dummyPrivileges", "dummyServerVersion", true);
+        IDfSession session = repositoryCon.getSession();
+        if (session != null && session.isConnected()) {
+            try {
+                updateNodes(session);
+            } catch (DfException e) {
+                log.finest(e.getMessage());
+            }
         } else {
             updateNodes("Offline", "OS Username", "DC Username", "OS Domain", "Privileges", "Server Version", false);
         }
+    }
+
+    private void updateNodes(IDfSession session) throws DfException {
+        IDfUser user = session.getUser(session.getLoginUserName());
+        lblStatus.setText(session.getDocbaseName());
+        lblUsernameOS.setText(user.getUserOSName());
+        lblUsernameDC.setText(session.getLoginUserName());
+        lblDomainOS.setText(user.getUserOSDomain());
+        lblPrivileges.setText(String.format("%s (%d)", getUserPrivilegesLabel(user.getUserPrivileges()), user.getUserPrivileges()));
+        lblServerVersion.setText(session.getServerVersion());
+
+        btnReadQuery.setDisable(!session.isConnected());
+        btnFlushCache.setDisable(!session.isConnected());
+
+        btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
+        btnDisconnect.setManaged(session.isConnected());
+
+        btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
+        btnConnect.setManaged(!session.isConnected());
+
+        RootPane rootPaneLoaderController = main.getRootPaneLoader().getController();
+        rootPaneLoaderController.getMenubar().setDisable(!session.isConnected());
+    }
+
+    private String getUserPrivilegesLabel(int userPrivileges) {
+        String userPrivilegesLabel = "";
+
+        switch (userPrivileges) {
+            case 0:
+                userPrivilegesLabel = "None";
+                break;
+            case 1:
+                userPrivilegesLabel = "Create Type";
+                break;
+            case 2:
+                userPrivilegesLabel = "Create Cabinet";
+                break;
+            case 4:
+                userPrivilegesLabel = "Create Group";
+                break;
+            case 8:
+                userPrivilegesLabel = "Sysadmin";
+                break;
+            case 16:
+                userPrivilegesLabel = "Superuser";
+                break;
+        }
+
+        return userPrivilegesLabel;
     }
 
     private void updateNodes(String status, String usernameOS, String usernameDC, String domainOS, String privileges, String serverVersion, boolean isConnected) {
