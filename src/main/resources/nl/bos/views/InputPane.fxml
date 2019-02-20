@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="200.0" prefWidth="200.0"
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.InputPane">
@@ -89,31 +90,61 @@
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
             </padding>
+            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@../icons/type/t_dm_docbase_config_16.gif"/>
+                </image>
+            </ImageView>
             <Label fx:id="lblStatus" style="-fx-background-color: #a8a8a8" text="Offline">
                 <padding>
                     <Insets left="5.0" right="5.0"/>
                 </padding>
             </Label>
+            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@../icons/type/t_dm_user_16.gif"/>
+                </image>
+            </ImageView>
             <Label fx:id="lblUsernameOS" style="-fx-background-color: #d3d3d3" text="OS Username">
                 <padding>
                     <Insets left="5.0" right="5.0"/>
                 </padding>
             </Label>
+            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@../icons/type/t_dm_user_16.gif"/>
+                </image>
+            </ImageView>
             <Label fx:id="lblUsernameDC" style="-fx-background-color: #a8a8a8" text="DC Username">
                 <padding>
                     <Insets left="5.0" right="5.0"/>
                 </padding>
             </Label>
+            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@../icons/federations.gif"/>
+                </image>
+            </ImageView>
             <Label fx:id="lblDomainOS" style="-fx-background-color: #d3d3d3" text="OS Domain">
                 <padding>
                     <Insets left="5.0" right="5.0"/>
                 </padding>
             </Label>
+            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@../icons/sortByLock.gif"/>
+                </image>
+            </ImageView>
             <Label fx:id="lblPrivileges" style="-fx-background-color: #a8a8a8" text="Privileges">
                 <padding>
                     <Insets left="5.0" right="5.0"/>
                 </padding>
             </Label>
+            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@../icons/type/t_dm_server_config_16.gif"/>
+                </image>
+            </ImageView>
             <Label fx:id="lblServerVersion" style="-fx-background-color: #d3d3d3" text="Server Version">
                 <padding>
                     <Insets left="5.0" right="5.0"/>

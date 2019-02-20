@@ -126,7 +126,7 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
         }
     }
 
-    private void updateNodes(IDfSession session) throws DfException {
+    public void updateNodes(IDfSession session) throws DfException {
         IDfUser user = session.getUser(session.getLoginUserName());
         lblStatus.setText(session.getDocbaseName());
         lblUsernameOS.setText(user.getUserOSName());

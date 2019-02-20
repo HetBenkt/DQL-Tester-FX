@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -86,10 +87,14 @@ public class Main extends Application {
             btnConnect.setManaged(false);
 
             rootPaneLoaderController.getMenubar().setDisable(false);
+
+            inputPaneController.updateNodes(Repository.getInstance().getSession());
         }
 
         rootPane.setCenter(bodyLayout);
 
+        Image image = new Image(getClass().getClassLoader().getResourceAsStream("nl/bos/icons/logo_16.gif"));
+        primaryStage.getIcons().add(image);
         primaryStage.setTitle("DQL Tester FX");
         primaryStage.setScene(new Scene(rootPane));
 
