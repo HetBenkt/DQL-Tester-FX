@@ -44,6 +44,7 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
     dfc.globalregistry.password=<dm_bof_registry (encrypted) password>
     dfc.globalregistry.username=dm_bof_registry
     dfc.session.secure_connect_default=native
+    dfc.date_format=dd/mm/yyyy hh:mi:ss
     ```
 7. Create a new file called `log4j.properties` with this content in the `config` directory
     ```

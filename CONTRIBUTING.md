@@ -55,6 +55,7 @@ Create 2 new propery files
     dfc.globalregistry.password=<dm_bof_registry (encrypted) password>
     dfc.globalregistry.username=dm_bof_registry
     dfc.session.secure_connect_default=native
+    dfc.date_format=dd/mm/yyyy hh:mi:ss
     ```
 * A new file called `log4j.properties` with this content in the `src\main\resources` directory
     ```
