@@ -70,6 +70,20 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
     private Button btnConnect;
     @FXML
     private Button btnDisconnect;
+    @FXML
+    private Tooltip ttStatus;
+    @FXML
+    private Tooltip ttOSUsername;
+    @FXML
+    private Tooltip ttDCUsername;
+    @FXML
+    private Tooltip ttDomain;
+    @FXML
+    private Tooltip ttPrivileges;
+    @FXML
+    private Tooltip ttServerVersion;
+
+
     private final Repository repositoryCon = Repository.getInstance();
     private final Main main = Main.getInstance();
 
@@ -128,12 +142,24 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
 
     public void updateNodes(IDfSession session) throws DfException {
         IDfUser user = session.getUser(session.getLoginUserName());
+
         lblStatus.setText(session.getDocbaseName());
+        ttStatus.setText(String.format("Connected repository: %s\nRepository hostname: %s\nRepository ID: %s\nConnection Broker hostname: %s\nConnection Broker port: %s", session.getDocbaseName(), repositoryCon.obtainServerMap(session.getDocbaseName()).getString("i_host_name"), session.getDocbaseId(), repositoryCon.obtainRepositoryMap().getRepeatingString("i_host_name", 0), repositoryCon.obtainRepositoryMap().getRepeatingString("i_port_number", 0)));
+
         lblUsernameOS.setText(user.getUserOSName());
+        ttOSUsername.setText(String.format("Operating System Username: %s\nDefault Folder: %s", user.getUserOSName(), user.getDefaultFolder()));
+
         lblUsernameDC.setText(session.getLoginUserName());
+        ttDCUsername.setText(String.format("Documentum Username %s\nDefault Group: %s\nSession ID: %s\nAddress: %s", session.getLoginUserName(), user.getUserGroupName(), user.getObjectSession().getSessionId(), user.getUserAddress()));
+
         lblDomainOS.setText(user.getUserOSDomain());
+        ttDomain.setText(String.format("Operation System Domain: %s", user.getUserOSDomain()));
+
         lblPrivileges.setText(String.format("%s (%d)", getUserPrivilegesLabel(user.getUserPrivileges()), user.getUserPrivileges()));
+        ttPrivileges.setText(String.format("Documentum User Privileges: %s (%d)\nClient Capability: %s (%d)", getUserPrivilegesLabel(user.getUserPrivileges()), user.getUserPrivileges(), getClientCapabilityLabel(user.getClientCapability()), user.getClientCapability()));
+
         lblServerVersion.setText(session.getServerVersion());
+        ttServerVersion.setText(String.format("Documentum Server Version: %s \nConnection Broker Version: %s", session.getServerVersion(), repositoryCon.obtainServerMap(session.getDocbaseName()).getString("i_docbroker_version")));
 
         btnReadQuery.setDisable(!session.isConnected());
         btnFlushCache.setDisable(!session.isConnected());
@@ -146,6 +172,30 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
 
         RootPane rootPaneLoaderController = main.getRootPaneLoader().getController();
         rootPaneLoaderController.getMenubar().setDisable(!session.isConnected());
+    }
+
+    private String getClientCapabilityLabel(int clientCapability) {
+        String clientCapabilityLabel = "";
+
+        switch (clientCapability) {
+            case 0:
+                clientCapabilityLabel = "Consumer";
+                break;
+            case 1:
+                clientCapabilityLabel = "Consumer";
+                break;
+            case 2:
+                clientCapabilityLabel = "Contributor";
+                break;
+            case 4:
+                clientCapabilityLabel = "Coordinator";
+                break;
+            case 8:
+                clientCapabilityLabel = "System Administrator";
+                break;
+        }
+
+        return clientCapabilityLabel;
     }
 
     private String getUserPrivilegesLabel(int userPrivileges) {
