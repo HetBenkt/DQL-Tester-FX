@@ -440,9 +440,8 @@ public class BodyPane implements Initializable {
 
     private void loadHistory() throws IOException, ParseException {
         JSONParser parser = new JSONParser();
-        Object obj = parser.parse(new FileReader("history.json"));
+        JSONObject jsonObject = (JSONObject) parser.parse(new FileReader("history.json"));
 
-        jsonObject = (JSONObject) obj;
         log.info(jsonObject.toJSONString());
 
         JSONArray msg = (JSONArray) jsonObject.get("queries");
@@ -591,5 +590,28 @@ public class BodyPane implements Initializable {
         parseDescription(description);
 
         return Integer.parseInt(value);
+    }
+
+    public void handleDeleteHistoryItem(MouseEvent mouseEvent) throws IOException, ParseException {
+        Object selectedItem = cmbHistory.getSelectionModel().getSelectedItem();
+        int selectedIndex = cmbHistory.getSelectionModel().getSelectedIndex();
+
+        if (cmbHistory.getItems().remove(selectedItem)) {
+            ObservableList<Object> items = cmbHistory.getItems();
+
+            JSONParser parser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) parser.parse(new FileReader("history.json"));
+            JSONArray queries = (JSONArray) jsonObject.get("queries");
+
+            queries.remove(selectedIndex);
+            cmbHistory.setValue(cmbHistory.getItems().get(0));
+            try (FileWriter file = new FileWriter("history.json")) {
+                file.write(jsonObject.toJSONString());
+                file.flush();
+            } catch (IOException e) {
+                log.finest(e.getMessage());
+            }
+            cmbHistory.setItems(items);
+        }
     }
 }
