@@ -8,7 +8,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -18,13 +17,11 @@ import javafx.stage.WindowEvent;
 import nl.bos.Repository;
 
 import java.io.IOException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Properties;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-public class LoginPane implements Initializable {
+public class LoginPane {
     private static final Logger log = Logger.getLogger(LoginPane.class.getName());
 
     private final Repository repositoryCon = Repository.getInstance();
@@ -156,7 +153,8 @@ public class LoginPane implements Initializable {
         alert.showAndWait();
     }
 
-    public void initialize(URL location, ResourceBundle resources) {
+    @FXML
+    void initialize() {
         try {
             if (repositoryCon.getSession() != null && repositoryCon.getSession().isConnected()) {
                 setFieldsConnect(true);

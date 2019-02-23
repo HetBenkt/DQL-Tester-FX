@@ -7,21 +7,18 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import nl.bos.DescribeObjectTreeItem;
 import nl.bos.Repository;
 
-import java.net.URL;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.TABLE;
 import static nl.bos.Constants.TYPE;
 
-public class DescribeObjectPane implements Initializable {
+public class DescribeObjectPane {
     private static final Logger log = Logger.getLogger(DescribeObjectPane.class.getName());
     private final Repository repositoryCon = Repository.getInstance();
 
@@ -65,8 +62,8 @@ public class DescribeObjectPane implements Initializable {
         stage.close();
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    @FXML
+    void initialize() {
         if (repositoryCon.getClient() != null) {
             items = FXCollections.observableArrayList();
             DescribeObjectTreeItem tiTypes = initTypeParentWithChildren();

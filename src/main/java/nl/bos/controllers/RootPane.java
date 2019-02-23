@@ -56,6 +56,11 @@ public class RootPane implements EventHandler<WindowEvent> {
     }
 
     @FXML
+    private void initialize() {
+        //No implementation needed
+    }
+
+    @FXML
     private void browseRepository(ActionEvent actionEvent) throws IOException {
         Stage browseRepositoryStage = new Stage();
         browseRepositoryStage.initModality(Modality.APPLICATION_MODAL);
@@ -81,7 +86,7 @@ public class RootPane implements EventHandler<WindowEvent> {
     @FXML
     private void describeObject(ActionEvent actionEvent) {
         DescribeObjectPane describeObjectPaneController = fxmlLoader.getController();
-        describeObjectPaneController.initialize(null, null);
+        describeObjectPaneController.initialize();
         describeObjectStage.showAndWait();
     }
 

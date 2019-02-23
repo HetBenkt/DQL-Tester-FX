@@ -42,6 +42,11 @@ public class GetAttributesPane {
     private CheckBox chkCaseSensitive;
 
     @FXML
+    private void initialize() {
+        //No implementation needed
+    }
+
+    @FXML
     private void handleExit(ActionEvent actionEvent) {
         log.info(String.valueOf(actionEvent.getSource()));
         Stage stage = (Stage) btnExit.getScene().getWindow();

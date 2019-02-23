@@ -11,7 +11,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuItem;
@@ -35,13 +34,14 @@ import org.json.simple.parser.ParseException;
 
 import java.awt.*;
 import java.io.*;
-import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
 import static nl.bos.Constants.TABLE;
 import static nl.bos.Constants.TYPE;
 
-public class BodyPane implements Initializable {
+public class BodyPane {
     private static final Logger log = Logger.getLogger(BodyPane.class.getName());
     private final MenuItem miExportToCsv, miProperties, miGetAttributes, miCopyCellToClipBoard, miCopyRowToClipBoard, miDescribeObject, miDestroyObject;
     private final Repository repositoryCon = Repository.getInstance();
@@ -322,7 +322,8 @@ public class BodyPane implements Initializable {
         return result.toString();
     }
 
-    public void initialize(URL location, ResourceBundle resources) {
+    @FXML
+    private void initialize() {
         tvResult.getSelectionModel().setCellSelectionEnabled(true);
 
         try {
@@ -592,7 +593,8 @@ public class BodyPane implements Initializable {
         return Integer.parseInt(value);
     }
 
-    public void handleDeleteHistoryItem(MouseEvent mouseEvent) throws IOException, ParseException {
+    @FXML
+    private void handleDeleteHistoryItem(MouseEvent mouseEvent) throws IOException, ParseException {
         Object selectedItem = cmbHistory.getSelectionModel().getSelectedItem();
         int selectedIndex = cmbHistory.getSelectionModel().getSelectedIndex();
 

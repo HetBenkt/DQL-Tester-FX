@@ -10,7 +10,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
@@ -31,18 +30,16 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
 
-public class JobEditorPane implements Initializable {
+public class JobEditorPane {
     private static final Logger log = Logger.getLogger(JobEditorPane.class.getName());
 
     private static final String MINUTES = "Minutes";
@@ -169,8 +166,8 @@ public class JobEditorPane implements Initializable {
     @FXML
     private CheckBox chkRunAfterUpdate;
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    @FXML
+    private void initialize() {
         try {
             ObservableList<MyJobObject> jobIds = FXCollections.observableArrayList();
             ObservableList<String> categories = FXCollections.observableArrayList();

@@ -9,7 +9,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -23,12 +22,10 @@ import org.json.simple.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-public class InputPane implements Initializable, EventHandler<WindowEvent> {
+public class InputPane implements EventHandler<WindowEvent> {
     private static final Logger log = Logger.getLogger(InputPane.class.getName());
 
     private final static Stage loginStage = new Stage();
@@ -105,7 +102,7 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
         log.info(String.valueOf(actionEvent.getSource()));
         repositoryCon.setClient();
         LoginPane loginPaneController = fxmlLoader.getController();
-        loginPaneController.initialize(null, null);
+        loginPaneController.initialize();
         loginStage.showAndWait();
     }
 
@@ -307,12 +304,12 @@ public class InputPane implements Initializable, EventHandler<WindowEvent> {
     @FXML
     private void handleDisconnect(ActionEvent actionEvent) {
         LoginPane loginPaneController = fxmlLoader.getController();
-        loginPaneController.initialize(null, null);
+        loginPaneController.initialize();
         loginStage.showAndWait();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    @FXML
+    private void initialize() {
         btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
         btnDisconnect.setManaged(false);
     }

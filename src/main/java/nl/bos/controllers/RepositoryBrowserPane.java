@@ -11,7 +11,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -23,14 +22,12 @@ import javafx.stage.Stage;
 import nl.bos.MyTreeItem;
 import nl.bos.Repository;
 
-import java.net.URL;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
 
-public class RepositoryBrowserPane implements Initializable, ChangeListener<TreeItem<MyTreeItem>>, EventHandler<ActionEvent> {
+public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem>>, EventHandler<ActionEvent> {
     private static final Logger log = Logger.getLogger(RepositoryBrowserPane.class.getName());
 
     @FXML
@@ -81,8 +78,8 @@ public class RepositoryBrowserPane implements Initializable, ChangeListener<Tree
         stage.close();
     }
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+    @FXML
+    private void initialize() {
         MenuItem miDump = new MenuItem("Get Attributes");
         miDump.setOnAction(this);
         rootContextMenu.getItems().add(miDump);
