@@ -13,10 +13,12 @@ import nl.bos.controllers.BodyPane;
 import nl.bos.controllers.InputPane;
 import nl.bos.controllers.RootPane;
 
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main extends Application {
-    private static final Logger log = Logger.getLogger(Main.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     public FXMLLoader getBodyPaneLoader() {
         return bodyPaneLoader;
@@ -49,56 +51,61 @@ public class Main extends Application {
             try {
                 repositoryCon.createSessionManager();
                 if (repositoryCon.isConnectionValid()) {
-                    log.info("Developer connection created");
+                    LOGGER.info("Developer connection created");
                     devModeEnabled = true;
                 } else {
-                    log.info("Login with connect button");
+                    LOGGER.info("Login with connect button");
                 }
             } catch (DfException dfe) {
-                log.finest(dfe.getMessage());
+                LOGGER.log(Level.SEVERE, dfe.getMessage(), dfe);
             }
         } else {
-            log.info("Login with connect button");
+            LOGGER.info("Login with connect button");
         }
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> LOGGER.info("Shutdown hook")));
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RootPane.fxml"));
-        BorderPane rootPane = rootPaneLoader.load();
-        RootPane rootPaneLoaderController = rootPaneLoader.getController();
-        bodyPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/BodyPane.fxml"));
-        VBox bodyLayout = bodyPaneLoader.load();
+    public void start(Stage primaryStage) {
+        try {
+            rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RootPane.fxml"));
+            BorderPane rootPane = rootPaneLoader.load();
+            RootPane rootPaneLoaderController = rootPaneLoader.getController();
+            bodyPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/BodyPane.fxml"));
+            VBox bodyLayout = bodyPaneLoader.load();
 
-        if (devModeEnabled) {
-            BodyPane bodyPaneController = bodyPaneLoader.getController();
-            InputPane inputPaneController = bodyPaneController.getFxmlLoader().getController();
-            inputPaneController.getBtnReadQuery().setDisable(false);
-            inputPaneController.getBtnFlushCache().setDisable(false);
+            if (devModeEnabled) {
+                BodyPane bodyPaneController = bodyPaneLoader.getController();
+                InputPane inputPaneController = bodyPaneController.getFxmlLoader().getController();
+                inputPaneController.getBtnReadQuery().setDisable(false);
+                inputPaneController.getBtnFlushCache().setDisable(false);
 
-            Button btnDisconnect = inputPaneController.getBtnDisconnect();
-            btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
-            btnDisconnect.setManaged(true);
+                Button btnDisconnect = inputPaneController.getBtnDisconnect();
+                btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
+                btnDisconnect.setManaged(true);
 
-            Button btnConnect = inputPaneController.getBtnConnect();
-            btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
-            btnConnect.setManaged(false);
+                Button btnConnect = inputPaneController.getBtnConnect();
+                btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
+                btnConnect.setManaged(false);
 
-            rootPaneLoaderController.getMenubar().setDisable(false);
+                rootPaneLoaderController.getMenubar().setDisable(false);
 
-            inputPaneController.updateNodes(Repository.getInstance().getSession());
+                inputPaneController.updateNodes(Repository.getInstance().getSession());
+            }
+
+            rootPane.setCenter(bodyLayout);
+
+            Image image = new Image(getClass().getClassLoader().getResourceAsStream("nl/bos/icons/logo_16.gif"));
+            primaryStage.getIcons().add(image);
+            primaryStage.setTitle("DQL Tester FX");
+            primaryStage.setScene(new Scene(rootPane));
+
+            primaryStage.show();
+            primaryStage.toFront();
+        } catch (IOException | DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-
-        rootPane.setCenter(bodyLayout);
-
-        Image image = new Image(getClass().getClassLoader().getResourceAsStream("nl/bos/icons/logo_16.gif"));
-        primaryStage.getIcons().add(image);
-        primaryStage.setTitle("DQL Tester FX");
-        primaryStage.setScene(new Scene(rootPane));
-
-        primaryStage.show();
-        primaryStage.toFront();
     }
 }

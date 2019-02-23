@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,7 +52,7 @@ import static nl.bos.Constants.TABLE;
 import static nl.bos.Constants.TYPE;
 
 public class BodyPane {
-    private static final Logger log = Logger.getLogger(BodyPane.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(BodyPane.class.getName());
     private final MenuItem miExportToCsv, miProperties, miGetAttributes, miCopyCellToClipBoard, miCopyRowToClipBoard, miDescribeObject, miDestroyObject;
     private final Repository repositoryCon = Repository.getInstance();
 
@@ -119,7 +120,7 @@ public class BodyPane {
             String id = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
 
             try {
-                log.info(id);
+                LOGGER.info(id);
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Delete Object");
                 alert.setHeaderText(null);
@@ -130,7 +131,7 @@ public class BodyPane {
                 alert.getButtonTypes().setAll(btnYes, btnNo);
                 alert.showAndWait().ifPresent(type -> {
                     if (type == btnYes) {
-                        log.info("Deleting the object!");
+                        LOGGER.info("Deleting the object!");
                         try {
                             IDfPersistentObject object = repositoryCon.getSession().getObject(new DfId(id));
                             object.destroy();
@@ -141,7 +142,7 @@ public class BodyPane {
                             confirmation.setContentText(messageConfirmation);
                             confirmation.showAndWait();
                         } catch (DfException e) {
-                            log.finest(e.getMessage());
+                            LOGGER.log(Level.SEVERE, e.getMessage(), e);
                             Alert confirmation = new Alert(Alert.AlertType.ERROR);
                             confirmation.setTitle("Error on delete object");
                             confirmation.setHeaderText(null);
@@ -149,21 +150,21 @@ public class BodyPane {
                             confirmation.showAndWait();
                         }
                     } else {
-                        log.info("Object deletion cancelled!");
+                        LOGGER.info("Object deletion cancelled!");
                     }
                 });
             } catch (Exception e) {
-                log.finest(e.getMessage());
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
         });
     }
 
     private void handleMiDescribeObject() {
         miDescribeObject.setOnAction(actionEvent -> {
-            log.info(actionEvent.getSource().toString());
+            LOGGER.info(actionEvent.getSource().toString());
             TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
             String name = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
-            log.info(name);
+            LOGGER.info(name);
             new TableResultUtils().updateTable(describeObjectType, name);
         });
     }
@@ -201,13 +202,13 @@ public class BodyPane {
 
     private void handleMiGetAttributes() {
         miGetAttributes.setOnAction(actionEvent -> {
-            log.info(actionEvent.getSource().toString());
+            LOGGER.info(actionEvent.getSource().toString());
 
             TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
             String id = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
 
             try {
-                log.info(id);
+                LOGGER.info(id);
                 Stage getAttributes = new Stage();
                 getAttributes.setTitle(String.format("Attributes List - %s (%s)", id, repositoryCon.getRepositoryName()));
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributesPane.fxml"));
@@ -218,14 +219,14 @@ public class BodyPane {
                 controller.initTextArea(repositoryCon.getSession().getObject(new DfId(id)));
                 getAttributes.showAndWait();
             } catch (Exception e) {
-                log.finest(e.getMessage());
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
         });
     }
 
     private void handleMiProperties() {
         miProperties.setOnAction(actionEvent -> {
-            log.info(actionEvent.getSource().toString());
+            LOGGER.info(actionEvent.getSource().toString());
             TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
             MyTableColumn tableColumn = (MyTableColumn) focusedCell.getTableColumn();
             IDfAttr attr = tableColumn.getAttr();
@@ -248,10 +249,10 @@ public class BodyPane {
 
     private void handleMiExportToCsv() {
         miExportToCsv.setOnAction(actionEvent -> {
-            log.info(actionEvent.getSource().toString());
+            LOGGER.info(actionEvent.getSource().toString());
             try {
                 File tempFile = File.createTempFile("tmp_", ".csv");
-                log.info(tempFile.getPath());
+                LOGGER.info(tempFile.getPath());
                 InputStream tableResultContent = new ByteArrayInputStream(convertTableResultsToString().getBytes(Charset.forName("UTF-8")));
                 ReadableByteChannel readableByteChannel = Channels.newChannel(tableResultContent);
                 FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
@@ -263,7 +264,7 @@ public class BodyPane {
                 fileChannel.close();
 
                 if (!Desktop.isDesktopSupported()) {
-                    log.info("Desktop is not supported");
+                    LOGGER.info("Desktop is not supported");
                     return;
                 }
 
@@ -271,7 +272,7 @@ public class BodyPane {
                 if (tempFile.exists())
                     desktop.open(tempFile);
             } catch (IOException e) {
-                log.finest(e.getMessage());
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
         });
     }
@@ -330,22 +331,15 @@ public class BodyPane {
             fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/InputPane.fxml"));
             BorderPane inputPane = fxmlLoader.load();
             vboxBody.getChildren().add(inputPane);
-        } catch (IOException e) {
-            log.info(e.getMessage());
-        }
-        cmbHistory.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> {
-            String selectedHistoryItem = String.valueOf(cmbHistory.getItems().get((Integer) newValue));
-            log.info(selectedHistoryItem);
-            taStatement.setText(selectedHistoryItem);
-        });
-
-        try {
+            cmbHistory.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> {
+                String selectedHistoryItem = String.valueOf(cmbHistory.getItems().get((Integer) newValue));
+                LOGGER.info(selectedHistoryItem);
+                taStatement.setText(selectedHistoryItem);
+            });
             loadHistory();
-        } catch (IOException e) {
-            log.info(e.getMessage());
+        } catch (IOException | ParseException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             createHistoryFile();
-        } catch (ParseException e) {
-            log.info(e.getMessage());
         }
 
         tvResult.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
@@ -407,7 +401,7 @@ public class BodyPane {
                 result = true;
             nrOfTypes.close();
         } catch (DfException e) {
-            log.finest(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
         return result;
     }
@@ -421,7 +415,7 @@ public class BodyPane {
                 result = true;
             nrOfTypes.close();
         } catch (DfException e) {
-            log.finest(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
         return result;
     }
@@ -434,8 +428,9 @@ public class BodyPane {
         try (FileWriter file = new FileWriter("history.json")) {
             file.write(jsonObject.toJSONString());
             file.flush();
+            LOGGER.info("New history.json file is created");
         } catch (IOException ioe) {
-            log.info(ioe.getMessage());
+            LOGGER.log(Level.SEVERE, ioe.getMessage(), ioe);
         }
     }
 
@@ -443,7 +438,7 @@ public class BodyPane {
         JSONParser parser = new JSONParser();
         JSONObject jsonObject = (JSONObject) parser.parse(new FileReader("history.json"));
 
-        log.info(jsonObject.toJSONString());
+        LOGGER.info(jsonObject.toJSONString());
 
         JSONArray msg = (JSONArray) jsonObject.get("queries");
         Iterator iterator = msg.iterator();
@@ -497,7 +492,7 @@ public class BodyPane {
                         row.add(String.valueOf(collection.getTime(attr.getName())));
                         break;
                     default:
-                        log.finest("Error occurred while displaying the results.");
+                        LOGGER.finest("Error occurred while displaying the results.");
                         row.add("N/A");
                         break;
                 }
@@ -553,7 +548,7 @@ public class BodyPane {
         try {
             result = parsedDescription[(rowIndex * 3) + columnIndex];
         } catch (ArrayIndexOutOfBoundsException e) {
-            log.finest(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
         return result;
     }
@@ -594,24 +589,27 @@ public class BodyPane {
     }
 
     @FXML
-    private void handleDeleteHistoryItem(MouseEvent mouseEvent) throws IOException, ParseException {
+    private void handleDeleteHistoryItem(MouseEvent mouseEvent) {
         Object selectedItem = cmbHistory.getSelectionModel().getSelectedItem();
         int selectedIndex = cmbHistory.getSelectionModel().getSelectedIndex();
 
         if (cmbHistory.getItems().remove(selectedItem)) {
             ObservableList<Object> items = cmbHistory.getItems();
+            try {
+                JSONParser parser = new JSONParser();
+                JSONObject jsonObjectHistory = (JSONObject) parser.parse(new FileReader("history.json"));
+                JSONArray queries = (JSONArray) jsonObjectHistory.get("queries");
 
-            JSONParser parser = new JSONParser();
-            JSONObject jsonObject = (JSONObject) parser.parse(new FileReader("history.json"));
-            JSONArray queries = (JSONArray) jsonObject.get("queries");
-
-            queries.remove(selectedIndex);
-            cmbHistory.setValue(cmbHistory.getItems().get(0));
-            try (FileWriter file = new FileWriter("history.json")) {
-                file.write(jsonObject.toJSONString());
-                file.flush();
-            } catch (IOException e) {
-                log.finest(e.getMessage());
+                queries.remove(selectedIndex);
+                cmbHistory.setValue(cmbHistory.getItems().get(0));
+                try (FileWriter file = new FileWriter("history.json")) {
+                    file.write(jsonObjectHistory.toJSONString());
+                    file.flush();
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }
+            } catch (IOException | ParseException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
             cmbHistory.setItems(items);
         }
