@@ -8,12 +8,13 @@ import javafx.scene.control.TreeItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
 
 public class MyTreeItem extends TreeItem<String> {
-    private static final Logger log = Logger.getLogger(MyTreeItem.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MyTreeItem.class.getName());
 
     private final String type;
     private final String name;
@@ -59,7 +60,7 @@ public class MyTreeItem extends TreeItem<String> {
                 addNodesToParent(parent, children, "folder", showAllVersions);
             }
         } catch (DfException e) {
-            log.finest(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
 
         return children;

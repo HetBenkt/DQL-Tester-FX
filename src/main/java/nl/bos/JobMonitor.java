@@ -7,10 +7,11 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import nl.bos.controllers.JobEditorPane;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class JobMonitor extends Task<Void> {
-    private static final Logger log = Logger.getLogger(JobMonitor.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(JobMonitor.class.getName());
 
     private final JobEditorPane jobEditorPane;
     private final MyJobObject currentJob;
@@ -28,20 +29,24 @@ public class JobMonitor extends Task<Void> {
     }
 
     @Override
-    protected Void call() throws Exception {
+    protected Void call() {
         while (running) {
-            log.finest("Monitor...");
+            LOGGER.finest("Monitor...");
 
             Platform.runLater(() -> {
                 try {
                     IDfPersistentObject job = repository.getSession().getObject(new DfId(currentJob.getObjectId()));
                     jobEditorPane.updateFields(job);
                 } catch (DfException e) {
-                    log.finest(e.getMessage());
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 }
             });
 
-            Thread.sleep(2000);
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
         }
         return null;
     }

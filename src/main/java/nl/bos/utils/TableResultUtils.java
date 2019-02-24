@@ -12,7 +12,7 @@ import static nl.bos.Constants.TABLE;
 import static nl.bos.Constants.TYPE;
 
 public class TableResultUtils {
-    private static final Logger log = Logger.getLogger(TableResultUtils.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(TableResultUtils.class.getName());
     private final Repository repositoryCon = Repository.getInstance();
     private final Main main = Main.getInstance();
 
@@ -26,11 +26,11 @@ public class TableResultUtils {
                     updateTableWithTableInfo(currentSelected);
                     break;
                 default:
-                    log.info("Do nothing");
+                    LOGGER.info("Do nothing");
                     break;
             }
         } catch (DfException e) {
-            log.finest(e.getMessage());
+            LOGGER.finest(e.getMessage());
         }
     }
 

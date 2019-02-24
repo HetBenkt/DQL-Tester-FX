@@ -48,16 +48,12 @@ public class Main extends Application {
         if (args.length > 0) {
             Repository repositoryCon = Repository.getInstance();
             repositoryCon.setCredentials(args[0], args[1], args[2], "");
-            try {
-                repositoryCon.createSessionManager();
-                if (repositoryCon.isConnectionValid()) {
-                    LOGGER.info("Developer connection created");
-                    devModeEnabled = true;
-                } else {
-                    LOGGER.info("Login with connect button");
-                }
-            } catch (DfException dfe) {
-                LOGGER.log(Level.SEVERE, dfe.getMessage(), dfe);
+            repositoryCon.createSessionManager();
+            if (repositoryCon.isConnectionValid()) {
+                LOGGER.info("Developer connection created");
+                devModeEnabled = true;
+            } else {
+                LOGGER.info("Login with connect button");
             }
         } else {
             LOGGER.info("Login with connect button");

@@ -23,10 +23,11 @@ import org.json.simple.JSONObject;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class InputPane implements EventHandler<WindowEvent> {
-    private static final Logger log = Logger.getLogger(InputPane.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(InputPane.class.getName());
 
     private final static Stage loginStage = new Stage();
 
@@ -88,18 +89,23 @@ public class InputPane implements EventHandler<WindowEvent> {
         return loginStage;
     }
 
-    public InputPane() throws IOException {
+    public InputPane() {
         loginStage.initModality(Modality.APPLICATION_MODAL);
         loginStage.setTitle("Documentum Login");
         fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/LoginPane.fxml"));
-        VBox loginPane = fxmlLoader.load();
-        loginStage.setScene(new Scene(loginPane));
-        loginStage.setOnCloseRequest(this);
+
+        try {
+            VBox loginPane = fxmlLoader.load();
+            loginStage.setScene(new Scene(loginPane));
+            loginStage.setOnCloseRequest(this);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
     }
 
     @FXML
-    private void handleConnect(ActionEvent actionEvent) throws DfException {
-        log.info(String.valueOf(actionEvent.getSource()));
+    private void handleConnect(ActionEvent actionEvent) {
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
         repositoryCon.setClient();
         LoginPane loginPaneController = fxmlLoader.getController();
         loginPaneController.initialize();
@@ -108,7 +114,7 @@ public class InputPane implements EventHandler<WindowEvent> {
 
     @FXML
     private void handleExit(ActionEvent actionEvent) {
-        log.info(String.valueOf(actionEvent.getSource()));
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Quit the application...");
@@ -130,7 +136,7 @@ public class InputPane implements EventHandler<WindowEvent> {
             try {
                 updateNodes(session);
             } catch (DfException e) {
-                log.finest(e.getMessage());
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
         } else {
             updateNodes("Offline", "OS Username", "DC Username", "OS Domain", "Privileges", "Server Version", false);
@@ -244,30 +250,22 @@ public class InputPane implements EventHandler<WindowEvent> {
     }
 
     @FXML
-    private void handleReadQuery(ActionEvent actionEvent) throws DfException {
-        log.info(String.valueOf(actionEvent.getSource()));
+    private void handleReadQuery(ActionEvent actionEvent) {
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
 
         BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
         String statement = bodyPaneController.getTaStatement().getText();
         JSONObject jsonObject = bodyPaneController.getJsonObject();
 
-        IDfCollection result = null;
-        try {
-            result = repositoryCon.query(statement);
-        } catch (DfException dfe) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Information Dialog");
-            alert.setHeaderText(null);
-            alert.setContentText(dfe.getMessage());
-            alert.showAndWait();
-        } finally {
-            if (result != null) {
+        IDfCollection result = repositoryCon.query(statement);
+        if (result != null) {
+            try {
                 bodyPaneController.updateResultTable(result);
                 result.close();
+            } catch (DfException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
-        }
 
-        if (result != null) {
             ChoiceBox<Object> cmbHistory = bodyPaneController.getCmbHistory();
             ObservableList<Object> items = cmbHistory.getItems();
             if (statementNotExists(items, statement)) {
@@ -279,7 +277,7 @@ public class InputPane implements EventHandler<WindowEvent> {
                     file.write(jsonObject.toJSONString());
                     file.flush();
                 } catch (IOException e) {
-                    log.finest(e.getMessage());
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 }
                 cmbHistory.setItems(items);
             }

@@ -12,12 +12,13 @@ import nl.bos.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class GetAttributesPane {
-    private static final Logger log = Logger.getLogger(GetAttributesPane.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GetAttributesPane.class.getName());
 
     private final List<IDfAttr> userAttributes = new ArrayList<>();
     private final List<IDfAttr> systemAttributes = new ArrayList<>();
@@ -48,7 +49,7 @@ public class GetAttributesPane {
 
     @FXML
     private void handleExit(ActionEvent actionEvent) {
-        log.info(String.valueOf(actionEvent.getSource()));
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
         Stage stage = (Stage) btnExit.getScene().getWindow();
         stage.close();
     }
@@ -196,6 +197,7 @@ public class GetAttributesPane {
             appendTextToStringBuilder(object);
             txaAttributes.setText(String.valueOf(text));
         } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             alertStringNotFound(e.getMessage());
         }
     }

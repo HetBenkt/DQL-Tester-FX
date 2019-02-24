@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 public class MyJobObject {
-    private static final Logger log = Logger.getLogger(MyJobObject.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MyJobObject.class.getName());
 
     private final String objectId;
     private final String objectName;
@@ -41,7 +41,7 @@ public class MyJobObject {
 
     public void updateChanges(String key, String value) {
         String message = MessageFormat.format("key: {0}; value: {1}", key, value);
-        log.info(message);
+        LOGGER.info(message);
         updates.put(key, value);
     }
 
@@ -51,7 +51,7 @@ public class MyJobObject {
         Iterator it = updates.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
-            log.info(pair.getKey() + " = " + pair.getValue());
+            LOGGER.info(pair.getKey() + " = " + pair.getValue());
             updateList.append(String.format("%s ", pair.getValue()));
             it.remove();
         }

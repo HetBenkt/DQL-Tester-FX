@@ -23,12 +23,13 @@ import nl.bos.MyTreeItem;
 import nl.bos.Repository;
 
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
 
 public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem>>, EventHandler<ActionEvent> {
-    private static final Logger log = Logger.getLogger(RepositoryBrowserPane.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(RepositoryBrowserPane.class.getName());
 
     @FXML
     private TreeView<MyTreeItem> treeView;
@@ -73,7 +74,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
 
     @FXML
     private void handleExit(ActionEvent actionEvent) {
-        log.info(String.valueOf(actionEvent.getSource()));
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
         Stage stage = (Stage) btnExit.getScene().getWindow();
         stage.close();
     }
@@ -90,7 +91,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
         treeView.setRoot(treeItemBrowser);
         treeView.getSelectionModel().selectedItemProperty().addListener(this);
         treeView.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent -> {
-            log.finest(String.format("Clickcount: %s", String.valueOf(mouseEvent.getClickCount())));
+            LOGGER.finest(String.format("Clickcount: %s", String.valueOf(mouseEvent.getClickCount())));
             selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
             if (selected != null && !selected.isExpanded())
                 selected.isFirstTimeChildren = true;
@@ -131,7 +132,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
             }
 
         } catch (DfException e) {
-            log.finest(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
         ImageView imageView = new ImageView(image);
         return new MyTreeNode(treeItem, imageView);
@@ -140,7 +141,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
     @Override
     public void changed(ObservableValue<? extends TreeItem<MyTreeItem>> observable, TreeItem<MyTreeItem> oldValue, TreeItem<MyTreeItem> newValue) {
         MyTreeItem selectedItem = newValue.getValue();
-        log.info(String.format("Selected item: %s", selectedItem.getName()));
+        LOGGER.info(String.format("Selected item: %s", selectedItem.getName()));
         IDfPersistentObject selectedObject = selectedItem.getObject();
         if (selectedObject != null) {
             try {
@@ -157,7 +158,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
                 txtPermission.setText(convertPermitToLabel(selectedObject.getInt("owner_permit")));
                 txtVersion.setText(getRepeatingValue(selectedObject, "r_version_label"));
             } catch (DfException e) {
-                log.finest(e.getMessage());
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
         } else {
             txtObjectId.setText("");
@@ -207,7 +208,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
     @Override
     public void handle(ActionEvent event) {
         try {
-            log.info(selected.getValue().getObject().getObjectId().getId());
+            LOGGER.info(selected.getValue().getObject().getObjectId().getId());
             Stage dumpAttributes = new Stage();
             dumpAttributes.setTitle(String.format("Attributes List - %s (%s)", selected.getValue().getObject().getObjectId().getId(), repositoryCon.getRepositoryName()));
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributesPane.fxml"));
@@ -218,7 +219,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
             controller.initTextArea(selected.getValue().getObject());
             dumpAttributes.showAndWait();
         } catch (Exception e) {
-            log.finest(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 

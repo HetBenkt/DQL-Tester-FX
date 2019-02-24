@@ -13,13 +13,14 @@ import javafx.stage.WindowEvent;
 import nl.bos.DescribeObjectTreeItem;
 import nl.bos.Repository;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.TABLE;
 import static nl.bos.Constants.TYPE;
 
 public class DescribeObjectPane {
-    private static final Logger log = Logger.getLogger(DescribeObjectPane.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DescribeObjectPane.class.getName());
     private final Repository repositoryCon = Repository.getInstance();
 
     private DescribeObjectTreeItem currentSelected;
@@ -51,7 +52,7 @@ public class DescribeObjectPane {
 
     @FXML
     private void handleOK(ActionEvent actionEvent) {
-        log.info(String.valueOf(currentSelected));
+        LOGGER.info(String.valueOf(currentSelected));
         Stage describeObjectStage = RootPane.getDescribeObjectStage();
         describeObjectStage.fireEvent(new WindowEvent(describeObjectStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
@@ -104,7 +105,7 @@ public class DescribeObjectPane {
             }
             tables.close();
         } catch (DfException e) {
-            log.finest(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
 
         return parent;
@@ -122,7 +123,7 @@ public class DescribeObjectPane {
             }
             types.close();
         } catch (DfException e) {
-            log.finest(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
 
         return parent;

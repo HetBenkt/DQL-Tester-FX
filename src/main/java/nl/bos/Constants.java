@@ -43,7 +43,6 @@ public final class Constants {
     public static final String TYPE = "TYPE";
     public static final String TABLE = "TABLE";
 
-
     private Constants() {
     }
 }

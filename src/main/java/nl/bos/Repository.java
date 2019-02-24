@@ -7,10 +7,11 @@ import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfLoginInfo;
 
 import java.text.MessageFormat;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Repository {
-    private static final Logger log = Logger.getLogger(Repository.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Repository.class.getName());
 
     public String getErrorMessage() {
         return errorMessage;
@@ -60,10 +61,16 @@ public class Repository {
         }
     }
 
-    public IDfDocbaseMap obtainRepositoryMap() throws DfException {
-        if (client == null)
-            client = clientX.getLocalClient();
-        return client.getDocbaseMap();
+    public IDfDocbaseMap obtainRepositoryMap() {
+        IDfDocbaseMap docbaseMap = null;
+        try {
+            if (client == null)
+                client = clientX.getLocalClient();
+            docbaseMap = client.getDocbaseMap();
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return docbaseMap;
     }
 
     public void setCredentials(String repositoryName, String userName, String passkey, String domain) {
@@ -73,38 +80,52 @@ public class Repository {
         this.domain = domain;
     }
 
-    public IDfTypedObject obtainServerMap(String selectedRepository) throws DfException {
-        if (client == null)
-            client = clientX.getLocalClient();
-        return client.getServerMap(selectedRepository);
+    public IDfTypedObject obtainServerMap(String selectedRepository) {
+        IDfTypedObject serverMap = null;
+        try {
+            if (client == null)
+                client = clientX.getLocalClient();
+            serverMap = client.getServerMap(selectedRepository);
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return serverMap;
     }
 
     private void createSession() {
         try {
             session = sessionManager.getSession(repositoryName);
         } catch (DfServiceException e) {
-            log.finest(e.getMessage());
+            LOGGER.finest(e.getMessage());
             errorMessage = e.getMessage();
             sessionManager.clearIdentity(repositoryName);
         }
     }
 
-    public void setClient() throws DfException {
-        client = clientX.getLocalClient();
+    public void setClient() {
+        try {
+            client = clientX.getLocalClient();
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
     }
 
-    public void createSessionManager() throws DfException {
-        if (sessionManager == null) {
-            client = clientX.getLocalClient();
-            sessionManager = client.newSessionManager();
+    public void createSessionManager() {
+        try {
+            if (sessionManager == null) {
+                client = clientX.getLocalClient();
+                sessionManager = client.newSessionManager();
+            }
+
+            IDfLoginInfo loginInfoObj = clientX.getLoginInfo();
+            loginInfoObj.setUser(userName);
+            loginInfoObj.setPassword(passkey);
+            loginInfoObj.setDomain(domain);
+
+            sessionManager.setIdentity(repositoryName, loginInfoObj);
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-
-        IDfLoginInfo loginInfoObj = clientX.getLoginInfo();
-        loginInfoObj.setUser(userName);
-        loginInfoObj.setPassword(passkey);
-        loginInfoObj.setDomain(domain);
-
-        sessionManager.setIdentity(repositoryName, loginInfoObj);
     }
 
     public boolean isConnectionValid() {
@@ -112,13 +133,18 @@ public class Repository {
         return session != null && session.isConnected();
     }
 
-    public IDfCollection query(String query) throws DfException {
+    public IDfCollection query(String query) {
         IDfQuery q = clientX.getQuery();
         q.setDQL(query);
 
-        IDfCollection collection = q.execute(session, IDfQuery.DF_READ_QUERY);
+        IDfCollection collection = null;
+        try {
+            collection = q.execute(session, IDfQuery.DF_READ_QUERY);
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
         String message = MessageFormat.format("Query executed: {0}", query);
-        log.finest(message);
+        LOGGER.finest(message);
 
         return collection;
     }

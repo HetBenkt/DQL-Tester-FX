@@ -35,12 +35,13 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
 
 public class JobEditorPane {
-    private static final Logger log = Logger.getLogger(JobEditorPane.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(JobEditorPane.class.getName());
 
     private static final String MINUTES = "Minutes";
     private static final String HOURS = "Hours";
@@ -232,7 +233,7 @@ public class JobEditorPane {
             repeats.add(DAY_OF_YEAR);
             cbRepeat.setItems(repeats);
         } catch (DfException e) {
-            log.finest(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
 
         lvJobs.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -310,14 +311,14 @@ public class JobEditorPane {
                     rbEndDate.setSelected(!hasEndIterationValue(job));
                     rbEndMaxIterations.setSelected(hasEndIterationValue(job));
                 } catch (DfException e) {
-                    log.finest(e.getMessage());
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 }
                 btnUpdate.setDisable(true);
             }
         });
 
         cbJobsFilter.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            log.info(String.format("Category is %s", observable));
+            LOGGER.info(String.format("Category is %s", observable));
             ObservableList<MyJobObject> jobIds = FXCollections.observableArrayList();
             try {
                 IDfCollection collection;
@@ -331,7 +332,7 @@ public class JobEditorPane {
                 }
                 collection.close();
             } catch (DfException e) {
-                log.finest(e.getMessage());
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
             lvJobs.setItems(jobIds);
             txtNrOfJobsListed.setText(String.valueOf(jobIds.size()));
@@ -406,7 +407,7 @@ public class JobEditorPane {
 
     @FXML
     private void handleExit(ActionEvent actionEvent) {
-        log.info(String.valueOf(actionEvent.getSource()));
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
         Stage stage = (Stage) btnExit.getScene().getWindow();
         stage.close();
     }
@@ -425,7 +426,7 @@ public class JobEditorPane {
             }
             collection.close();
         } catch (DfException e) {
-            log.finest(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
         lvJobs.setItems(jobIds);
         txtNrOfJobsListed.setText(String.valueOf(jobIds.size()));
@@ -495,7 +496,7 @@ public class JobEditorPane {
     }
 
     @FXML
-    private void handleUpdate(ActionEvent actionEvent) throws DfException {
+    private void handleUpdate(ActionEvent actionEvent) {
         String updateList = currentJob.getUpdateList();
         repository.query(String.format("update dm_job object %s where r_object_id = '%s'", updateList, currentJob.getObjectId()));
         btnUpdate.setDisable(true);
@@ -515,32 +516,36 @@ public class JobEditorPane {
     }
 
     @FXML
-    private void handleViewLog(ActionEvent actionEvent) throws DfException, IOException {
-        IDfCollection query = repository.query(String.format("select r_object_id, object_name from dm_document where folder('/Temp/Jobs/%s') order by r_creation_date desc enable(return_top 1)", currentJob.getObjectName()));
-        while (query.next()) {
-            log.info(query.getString(ATTR_R_OBJECT_ID));
-            IDfDocument jobLog = (IDfDocument) repository.getSession().getObject(new DfId(query.getString(ATTR_R_OBJECT_ID)));
-            ByteArrayInputStream jobLogContent = jobLog.getContent();
+    private void handleViewLog(ActionEvent actionEvent) {
+        try {
+            IDfCollection query = repository.query(String.format("select r_object_id, object_name from dm_document where folder('/Temp/Jobs/%s') order by r_creation_date desc enable(return_top 1)", currentJob.getObjectName()));
+            while (query.next()) {
+                LOGGER.info(query.getString(ATTR_R_OBJECT_ID));
+                IDfDocument jobLog = (IDfDocument) repository.getSession().getObject(new DfId(query.getString(ATTR_R_OBJECT_ID)));
+                ByteArrayInputStream jobLogContent = jobLog.getContent();
 
-            File tempFile = File.createTempFile("tmp_", ".txt");
-            log.info(tempFile.getPath());
-            ReadableByteChannel readableByteChannel = Channels.newChannel(jobLogContent);
-            FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-            FileChannel fileChannel = fileOutputStream.getChannel();
-            fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+                File tempFile = File.createTempFile("tmp_", ".txt");
+                LOGGER.info(tempFile.getPath());
+                ReadableByteChannel readableByteChannel = Channels.newChannel(jobLogContent);
+                FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
+                FileChannel fileChannel = fileOutputStream.getChannel();
+                fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
 
-            jobLogContent.close();
-            readableByteChannel.close();
-            fileChannel.close();
+                jobLogContent.close();
+                readableByteChannel.close();
+                fileChannel.close();
 
-            if (!Desktop.isDesktopSupported()) {
-                log.info("Desktop is not supported");
-                return;
+                if (!Desktop.isDesktopSupported()) {
+                    LOGGER.warning("Desktop is not supported");
+                    return;
+                }
+
+                Desktop desktop = Desktop.getDesktop();
+                if (tempFile.exists())
+                    desktop.open(tempFile);
             }
-
-            Desktop desktop = Desktop.getDesktop();
-            if (tempFile.exists())
-                desktop.open(tempFile);
+        } catch (DfException | IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 

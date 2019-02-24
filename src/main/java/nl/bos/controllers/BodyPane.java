@@ -64,7 +64,7 @@ public class BodyPane {
     private TextArea taStatement;
     @FXML
     private TableView tvResult;
-    private JSONObject jsonObject;
+    private JSONObject jsonObject = new JSONObject();
     private FXMLLoader fxmlLoader;
     private ContextMenu contextMenu = new ContextMenu();
     private String description;
@@ -421,7 +421,6 @@ public class BodyPane {
     }
 
     private void createHistoryFile() {
-        jsonObject = new JSONObject();
         JSONArray list = new JSONArray();
         jsonObject.put("queries", list);
 
@@ -436,7 +435,7 @@ public class BodyPane {
 
     private void loadHistory() throws IOException, ParseException {
         JSONParser parser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) parser.parse(new FileReader("history.json"));
+        jsonObject = (JSONObject) parser.parse(new FileReader("history.json"));
 
         LOGGER.info(jsonObject.toJSONString());
 

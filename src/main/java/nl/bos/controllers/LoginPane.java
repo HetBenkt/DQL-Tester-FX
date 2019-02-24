@@ -19,20 +19,13 @@ import nl.bos.Repository;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LoginPane {
-    private static final Logger log = Logger.getLogger(LoginPane.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(LoginPane.class.getName());
 
     private final Repository repositoryCon = Repository.getInstance();
-
-    ChoiceBox<String> getChbRepository() {
-        return chbRepository;
-    }
-
-    TextField getTxtUsername() {
-        return txtUsername;
-    }
 
     @FXML
     private Label lblVersion;
@@ -50,19 +43,14 @@ public class LoginPane {
     private PasswordField txtPassword;
     @FXML
     private TextField txtDomain;
-    private String hostName;
     @FXML
     private CheckBox chkSaveLoginData;
     @FXML
     private CheckBox chkUseWindowsLogin;
 
-    String getHostName() {
-        return hostName;
-    }
-
     @FXML
-    private void handleLogin(ActionEvent actionEvent) throws DfException {
-        log.info(String.valueOf(actionEvent.getSource()));
+    private void handleLogin(ActionEvent actionEvent) {
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
         String selectedRepository = chbRepository.getValue();
         lblServer.setText(String.format("Connection to '%s'", selectedRepository));
         repositoryCon.setCredentials(selectedRepository, txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
@@ -81,23 +69,27 @@ public class LoginPane {
 
     @FXML
     private void handleCancel(ActionEvent actionEvent) {
-        log.info(String.valueOf(actionEvent.getSource()));
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
         Stage loginStage = InputPane.getLoginStage();
         loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
     @FXML
-    private void handleServerMap(ActionEvent actionEvent) throws DfException {
-        log.info(String.valueOf(actionEvent.getSource()));
+    private void handleServerMap(ActionEvent actionEvent) {
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
 
         String selectedRepository = chbRepository.getValue();
-        IDfTypedObject serverMap = repositoryCon.obtainServerMap(selectedRepository);
+        try {
+            IDfTypedObject serverMap = repositoryCon.obtainServerMap(selectedRepository);
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Info");
-        alert.setHeaderText(String.format("Server Map for Repository >> %s <<", selectedRepository));
-        alert.getDialogPane().setContent(formatContent(serverMap));
-        alert.showAndWait();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Info");
+            alert.setHeaderText(String.format("Server Map for Repository >> %s <<", selectedRepository));
+            alert.getDialogPane().setContent(formatContent(serverMap));
+            alert.showAndWait();
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
     }
 
     private HBox formatContent(IDfTypedObject typedObject) throws DfException {
@@ -131,7 +123,7 @@ public class LoginPane {
                     label.setText(String.valueOf(typedObject.getTime(attr.getName())));
                     break;
                 default:
-                    log.finest("Error occurred while displaying the results.");
+                    LOGGER.finest("Error occurred while displaying the results.");
                     break;
             }
             values.getChildren().add(label);
@@ -141,16 +133,20 @@ public class LoginPane {
     }
 
     @FXML
-    private void handleConnectionBrokerMap(ActionEvent actionEvent) throws DfException {
-        log.info(String.valueOf(actionEvent.getSource()));
+    private void handleConnectionBrokerMap(ActionEvent actionEvent) {
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
 
-        IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
+        try {
+            IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Info");
-        alert.setHeaderText("Connection Broker Map");
-        alert.getDialogPane().setContent(formatContent(repositoryMap));
-        alert.showAndWait();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Info");
+            alert.setHeaderText("Connection Broker Map");
+            alert.getDialogPane().setContent(formatContent(repositoryMap));
+            alert.showAndWait();
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
     }
 
     @FXML
@@ -167,13 +163,13 @@ public class LoginPane {
             if (repositoryCon.getClient() != null) {
                 IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
                 //noinspection deprecation
-                hostName = repositoryMap.getHostName();
+                String hostName = repositoryMap.getHostName();
                 lblServer.setText(hostName);
 
-                log.info(MessageFormat.format("Repositories for Connection Broker: {0}", hostName));
-                log.info(MessageFormat.format("Total number of Repostories: {0}", repositoryMap.getDocbaseCount()));
+                LOGGER.info(MessageFormat.format("Repositories for Connection Broker: {0}", hostName));
+                LOGGER.info(MessageFormat.format("Total number of Repostories: {0}", repositoryMap.getDocbaseCount()));
                 for (int i = 0; i < repositoryMap.getDocbaseCount(); i++) {
-                    log.info(MessageFormat.format("Repository {0}", (i + 1) + ": " + repositoryMap.getDocbaseName(i)));
+                    LOGGER.info(MessageFormat.format("Repository {0}", (i + 1) + ": " + repositoryMap.getDocbaseName(i)));
                     ObservableList<String> repositories = FXCollections.observableArrayList();
                     repositories.add(repositoryMap.getDocbaseName(i));
                     chbRepository.setItems(repositories);
@@ -181,7 +177,7 @@ public class LoginPane {
                 }
             }
         } catch (Exception e) {
-            log.info(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
@@ -206,7 +202,7 @@ public class LoginPane {
             properties.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
             return properties.getProperty("version");
         } catch (IOException e) {
-            log.info(e.getMessage());
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
         return "";
     }
@@ -221,7 +217,7 @@ public class LoginPane {
 
     @FXML
     private void handleLogout(ActionEvent actionEvent) {
-        log.info(String.valueOf(actionEvent.getSource()));
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
         repositoryCon.disconnect();
         Stage loginStage = InputPane.getLoginStage();
         loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
