@@ -13,9 +13,10 @@ import java.util.logging.Logger;
 public class JobMonitor extends Task<Void> {
     private static final Logger LOGGER = Logger.getLogger(JobMonitor.class.getName());
 
+    private final Repository repository = Repository.getInstance();
+
     private final JobEditorPane jobEditorPane;
     private final MyJobObject currentJob;
-    private final Repository repository = Repository.getInstance();
     private volatile boolean running;
 
     public JobMonitor(MyJobObject currentJob, JobEditorPane jobEditorPane) {

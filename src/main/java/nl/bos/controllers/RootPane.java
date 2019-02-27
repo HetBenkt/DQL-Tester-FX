@@ -32,17 +32,21 @@ import java.util.logging.Logger;
 public class RootPane implements EventHandler<WindowEvent> {
     private static final Logger LOGGER = Logger.getLogger(RootPane.class.getName());
 
-    public MenuBar getMenubar() {
-        return menubar;
-    }
+    private final Repository repositoryCon = Repository.getInstance();
 
     private final static Stage describeObjectStage = new Stage();
-    private final Repository repositoryCon = Repository.getInstance();
+    private FXMLLoader fxmlLoader;
 
     @FXML
     private MenuBar menubar;
 
-    private FXMLLoader fxmlLoader;
+    static Stage getDescribeObjectStage() {
+        return describeObjectStage;
+    }
+
+    public MenuBar getMenubar() {
+        return menubar;
+    }
 
     public RootPane() {
         describeObjectStage.setTitle("Describe object");
@@ -56,13 +60,19 @@ public class RootPane implements EventHandler<WindowEvent> {
         describeObjectStage.setOnCloseRequest(this);
     }
 
-    static Stage getDescribeObjectStage() {
-        return describeObjectStage;
-    }
-
     @FXML
     private void initialize() {
         //No implementation needed
+    }
+
+    @Override
+    public void handle(WindowEvent windowEvent) {
+        DescribeObjectPane describeObjectPaneController = fxmlLoader.getController();
+        String currentSelected = (String) describeObjectPaneController.getCurrentSelected().getValue();
+        String type = describeObjectPaneController.getCurrentSelected().getType();
+        String message = MessageFormat.format("Selected item ''{0}'' of type ''{1}''", currentSelected, type);
+        LOGGER.info(message);
+        new TableResultUtils().updateTable(type, currentSelected);
     }
 
     @FXML
@@ -99,16 +109,6 @@ public class RootPane implements EventHandler<WindowEvent> {
         DescribeObjectPane describeObjectPaneController = fxmlLoader.getController();
         describeObjectPaneController.initialize();
         describeObjectStage.showAndWait();
-    }
-
-    @Override
-    public void handle(WindowEvent windowEvent) {
-        DescribeObjectPane describeObjectPaneController = fxmlLoader.getController();
-        String currentSelected = (String) describeObjectPaneController.getCurrentSelected().getValue();
-        String type = describeObjectPaneController.getCurrentSelected().getType();
-        String message = MessageFormat.format("Selected item ''{0}'' of type ''{1}''", currentSelected, type);
-        LOGGER.info(message);
-        new TableResultUtils().updateTable(type, currentSelected);
     }
 
     @FXML

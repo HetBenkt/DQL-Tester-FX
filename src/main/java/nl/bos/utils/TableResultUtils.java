@@ -13,6 +13,7 @@ import static nl.bos.Constants.TYPE;
 
 public class TableResultUtils {
     private static final Logger LOGGER = Logger.getLogger(TableResultUtils.class.getName());
+
     private final Repository repositoryCon = Repository.getInstance();
     private final Main main = Main.getInstance();
 

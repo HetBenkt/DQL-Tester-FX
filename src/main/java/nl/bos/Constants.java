@@ -6,6 +6,7 @@ public final class Constants {
     public static final String TYPE_FOLDER = "dm_folder";
     public static final String TYPE_CABINET = "dm_cabinet";
     public static final String TYPE_DOCUMENT = "dm_document";
+
     //Attributes
     public static final String ATTR_OBJECT_NAME = "object_name";
     public static final String ATTR_SUBJECT = "subject";
@@ -39,6 +40,7 @@ public final class Constants {
     public static final String ATTR_MAX_ITERATIONS = "max_iterations";
     public static final String ATTR_EXPIRATION_DATE = "expiration_date";
 
+    //Others
     public static final String PATH_FORMAT = "%s/%s";
     public static final String TYPE = "TYPE";
     public static final String TABLE = "TABLE";

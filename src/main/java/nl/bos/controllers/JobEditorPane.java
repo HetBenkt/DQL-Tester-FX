@@ -43,6 +43,8 @@ import static nl.bos.Constants.*;
 public class JobEditorPane {
     private static final Logger LOGGER = Logger.getLogger(JobEditorPane.class.getName());
 
+    private final Repository repository = Repository.getInstance();
+
     private static final String MINUTES = "Minutes";
     private static final String HOURS = "Hours";
     private static final String DAYS = "Days";
@@ -61,7 +63,6 @@ public class JobEditorPane {
     private static final Image INACTIVE_ANIM = new Image("nl/bos/icons/inactive.gif");
     private static final String ANY_RUNNING_SERVER = "Any Running Server";
 
-    private final Repository repository = Repository.getInstance();
     private String currentCategory;
     private JobMonitor jobMonitor;
     private MyJobObject currentJob;
@@ -380,31 +381,6 @@ public class JobEditorPane {
         }
     }
 
-    private int getRunValue(String runMode) {
-        switch (runMode) {
-            case MINUTES:
-                return 1;
-            case HOURS:
-                return 2;
-            case DAYS:
-                return 3;
-            case WEEKS:
-                return 4;
-            case MONTHS:
-                return 5;
-            case YEARS:
-                return 6;
-            case DAY_OF_WEEK:
-                return 7;
-            case DAY_OF_MONTH:
-                return 8;
-            case DAY_OF_YEAR:
-                return 9;
-            default:
-                return -1;
-        }
-    }
-
     @FXML
     private void handleExit(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
@@ -456,19 +432,6 @@ public class JobEditorPane {
         }
     }
 
-    private void updateStatus(String lockOwner, boolean isInactive) {
-        if (!lockOwner.isEmpty()) {
-            ivState.setImage(RUNNING_ANIM);
-            txtRunning.setText("RUNNING");
-        } else if (!isInactive) {
-            ivState.setImage(ACTIVE_ANIM);
-            txtRunning.setText("");
-        } else {
-            ivState.setImage(INACTIVE_ANIM);
-            txtRunning.setText("");
-        }
-    }
-
     public void updateFields(IDfPersistentObject job) throws DfException {
         txtLastCompletionDate.setText(job.getString(ATTR_A_LAST_COMPLETION));
         chkRunAfterUpdate.setSelected(job.getBoolean(ATTR_RUN_NOW));
@@ -481,6 +444,19 @@ public class JobEditorPane {
             ivLock.setVisible(true);
 
         updateStatus(job.getString(ATTR_R_LOCK_OWNER), job.getBoolean(ATTR_IS_INACTIVE));
+    }
+
+    private void updateStatus(String lockOwner, boolean isInactive) {
+        if (!lockOwner.isEmpty()) {
+            ivState.setImage(RUNNING_ANIM);
+            txtRunning.setText("RUNNING");
+        } else if (!isInactive) {
+            ivState.setImage(ACTIVE_ANIM);
+            txtRunning.setText("");
+        } else {
+            ivState.setImage(INACTIVE_ANIM);
+            txtRunning.setText("");
+        }
     }
 
     @FXML
@@ -577,6 +553,31 @@ public class JobEditorPane {
         }
         btnUpdate.setDisable(false);
         cbWatchJob.setDisable(true);
+    }
+
+    private int getRunValue(String runMode) {
+        switch (runMode) {
+            case MINUTES:
+                return 1;
+            case HOURS:
+                return 2;
+            case DAYS:
+                return 3;
+            case WEEKS:
+                return 4;
+            case MONTHS:
+                return 5;
+            case YEARS:
+                return 6;
+            case DAY_OF_WEEK:
+                return 7;
+            case DAY_OF_MONTH:
+                return 8;
+            case DAY_OF_YEAR:
+                return 9;
+            default:
+                return -1;
+        }
     }
 
     @FXML

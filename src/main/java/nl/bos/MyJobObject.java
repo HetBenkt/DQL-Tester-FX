@@ -15,14 +15,6 @@ public class MyJobObject {
     private final boolean isRunning;
     private final Map<String, String> updates = new HashMap<>();
 
-    public MyJobObject(String objectId, String objectName, boolean isActive, String isRunning) {
-        this.objectId = objectId;
-        this.objectName = objectName;
-        this.isActive = isActive;
-
-        this.isRunning = isRunning.equals("STARTED");
-    }
-
     public String getObjectId() {
         return objectId;
     }
@@ -37,6 +29,14 @@ public class MyJobObject {
 
     public String getObjectName() {
         return objectName;
+    }
+
+    public MyJobObject(String objectId, String objectName, boolean isActive, String isRunning) {
+        this.objectId = objectId;
+        this.objectName = objectName;
+        this.isActive = isActive;
+
+        this.isRunning = isRunning.equals("STARTED");
     }
 
     public void updateChanges(String key, String value) {

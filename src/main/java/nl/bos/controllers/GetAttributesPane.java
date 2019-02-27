@@ -20,14 +20,14 @@ import java.util.regex.Pattern;
 public class GetAttributesPane {
     private static final Logger LOGGER = Logger.getLogger(GetAttributesPane.class.getName());
 
+    private final Repository repositoryCon = Repository.getInstance();
+
     private final List<IDfAttr> userAttributes = new ArrayList<>();
     private final List<IDfAttr> systemAttributes = new ArrayList<>();
     private final List<IDfAttr> applicationAttributes = new ArrayList<>();
     private final List<IDfAttr> internalAttributes = new ArrayList<>();
     private final StringBuilder text = new StringBuilder();
     private final List<Integer> previousIndexes = new ArrayList<>();
-
-    private final Repository repositoryCon = Repository.getInstance();
 
     private int lastIndex;
 
@@ -45,13 +45,6 @@ public class GetAttributesPane {
     @FXML
     private void initialize() {
         //No implementation needed
-    }
-
-    @FXML
-    private void handleExit(ActionEvent actionEvent) {
-        LOGGER.info(String.valueOf(actionEvent.getSource()));
-        Stage stage = (Stage) btnExit.getScene().getWindow();
-        stage.close();
     }
 
     void initTextArea(IDfPersistentObject object) throws DfException {
@@ -108,6 +101,13 @@ public class GetAttributesPane {
     }
 
     @FXML
+    private void handleExit(ActionEvent actionEvent) {
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
+        Stage stage = (Stage) btnExit.getScene().getWindow();
+        stage.close();
+    }
+
+    @FXML
     private void handleFind(ActionEvent actionEvent) {
         previousIndexes.clear();
         if (!chkCaseSensitive.isSelected()) {
@@ -127,14 +127,6 @@ public class GetAttributesPane {
         } else {
             alertStringNotFound(String.format("String not found: %s", patternText));
         }
-    }
-
-    private void alertStringNotFound(String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Information Dialog");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 
     @FXML
@@ -183,6 +175,14 @@ public class GetAttributesPane {
         } else {
             alertStringNotFound("EOF reached!");
         }
+    }
+
+    private void alertStringNotFound(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Information Dialog");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     @FXML

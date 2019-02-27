@@ -31,6 +31,8 @@ import static nl.bos.Constants.*;
 public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem>>, EventHandler<ActionEvent> {
     private static final Logger LOGGER = Logger.getLogger(RepositoryBrowserPane.class.getName());
 
+    private final Repository repositoryCon = Repository.getInstance();
+
     @FXML
     private TreeView<MyTreeItem> treeView;
     @FXML
@@ -67,17 +69,8 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
     private CheckBox ckbShowAllVersions;
 
     private MyTreeItem rootItem;
-
-    private final Repository repositoryCon = Repository.getInstance();
-    private final ContextMenu rootContextMenu = new ContextMenu();
     private MyTreeNode selected;
-
-    @FXML
-    private void handleExit(ActionEvent actionEvent) {
-        LOGGER.info(String.valueOf(actionEvent.getSource()));
-        Stage stage = (Stage) btnExit.getScene().getWindow();
-        stage.close();
-    }
+    private final ContextMenu rootContextMenu = new ContextMenu();
 
     @FXML
     private void initialize() {
@@ -108,6 +101,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
             }
         });
     }
+
 
     private TreeItem<MyTreeItem> buildTreeItemBrowser(MyTreeItem treeItem) {
         return createNode(treeItem);
@@ -224,6 +218,13 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
     }
 
     @FXML
+    private void handleExit(ActionEvent actionEvent) {
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
+        Stage stage = (Stage) btnExit.getScene().getWindow();
+        stage.close();
+    }
+
+    @FXML
     private void handleShowAllCabinets(ActionEvent actionEvent) {
         TreeItem<MyTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
         treeItemBrowser.setExpanded(true);
@@ -251,7 +252,6 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
             isFirstTimeChildren = true;
             isFirstTimeLeaf = true;
         }
-
 
         @Override
         public ObservableList<TreeItem<MyTreeItem>> getChildren() {

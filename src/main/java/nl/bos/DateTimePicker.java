@@ -52,7 +52,6 @@ public class DateTimePicker extends DatePicker {
             if (!newValue)
                 simulateEnterPressed();
         });
-
     }
 
     private void simulateEnterPressed() {

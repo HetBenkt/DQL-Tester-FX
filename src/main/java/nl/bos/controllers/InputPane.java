@@ -29,25 +29,12 @@ import java.util.logging.Logger;
 public class InputPane implements EventHandler<WindowEvent> {
     private static final Logger LOGGER = Logger.getLogger(InputPane.class.getName());
 
+    private final Repository repositoryCon = Repository.getInstance();
+    private final Main main = Main.getInstance();
+
     private final static Stage loginStage = new Stage();
-
-    public Button getBtnFlushCache() {
-        return btnFlushCache;
-    }
-
-    public Button getBtnReadQuery() {
-        return btnReadQuery;
-    }
-
-    public Button getBtnConnect() {
-        return btnConnect;
-    }
-
-    public Button getBtnDisconnect() {
-        return btnDisconnect;
-    }
-
     private final FXMLLoader fxmlLoader;
+
     @FXML
     private Label lblStatus;
     @FXML
@@ -81,12 +68,24 @@ public class InputPane implements EventHandler<WindowEvent> {
     @FXML
     private Tooltip ttServerVersion;
 
-
-    private final Repository repositoryCon = Repository.getInstance();
-    private final Main main = Main.getInstance();
-
     static Stage getLoginStage() {
         return loginStage;
+    }
+
+    public Button getBtnFlushCache() {
+        return btnFlushCache;
+    }
+
+    public Button getBtnReadQuery() {
+        return btnReadQuery;
+    }
+
+    public Button getBtnConnect() {
+        return btnConnect;
+    }
+
+    public Button getBtnDisconnect() {
+        return btnDisconnect;
     }
 
     public InputPane() {
@@ -104,30 +103,9 @@ public class InputPane implements EventHandler<WindowEvent> {
     }
 
     @FXML
-    private void handleConnect(ActionEvent actionEvent) {
-        LOGGER.info(String.valueOf(actionEvent.getSource()));
-        repositoryCon.setClient();
-        LoginPane loginPaneController = fxmlLoader.getController();
-        loginPaneController.initialize();
-        loginStage.showAndWait();
-    }
-
-    @FXML
-    private void handleExit(ActionEvent actionEvent) {
-        LOGGER.info(String.valueOf(actionEvent.getSource()));
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Quit the application...");
-        alert.setHeaderText(null);
-        alert.setContentText("Are you sure?");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            repositoryCon.disconnect();
-            System.exit(0);
-        } else {
-            alert.close();
-        }
+    private void initialize() {
+        btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
+        btnDisconnect.setManaged(false);
     }
 
     public void handle(WindowEvent event) {
@@ -250,6 +228,33 @@ public class InputPane implements EventHandler<WindowEvent> {
     }
 
     @FXML
+    private void handleConnect(ActionEvent actionEvent) {
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
+        repositoryCon.setClient();
+        LoginPane loginPaneController = fxmlLoader.getController();
+        loginPaneController.initialize();
+        loginStage.showAndWait();
+    }
+
+    @FXML
+    private void handleExit(ActionEvent actionEvent) {
+        LOGGER.info(String.valueOf(actionEvent.getSource()));
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Quit the application...");
+        alert.setHeaderText(null);
+        alert.setContentText("Are you sure?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            repositoryCon.disconnect();
+            System.exit(0);
+        } else {
+            alert.close();
+        }
+    }
+
+    @FXML
     private void handleReadQuery(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
 
@@ -304,11 +309,5 @@ public class InputPane implements EventHandler<WindowEvent> {
         LoginPane loginPaneController = fxmlLoader.getController();
         loginPaneController.initialize();
         loginStage.showAndWait();
-    }
-
-    @FXML
-    private void initialize() {
-        btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
-        btnDisconnect.setManaged(false);
     }
 }

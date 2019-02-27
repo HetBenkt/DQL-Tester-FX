@@ -53,8 +53,24 @@ import static nl.bos.Constants.TYPE;
 
 public class BodyPane {
     private static final Logger LOGGER = Logger.getLogger(BodyPane.class.getName());
-    private final MenuItem miExportToCsv, miProperties, miGetAttributes, miCopyCellToClipBoard, miCopyRowToClipBoard, miDescribeObject, miDestroyObject;
+
     private final Repository repositoryCon = Repository.getInstance();
+
+    private final MenuItem miExportToCsv;
+    private final MenuItem miProperties;
+    private final MenuItem miGetAttributes;
+    private final MenuItem miCopyCellToClipBoard;
+    private final MenuItem miCopyRowToClipBoard;
+    private final MenuItem miDescribeObject;
+    private final MenuItem miDestroyObject;
+
+    private JSONObject jsonObject = new JSONObject();
+    private ContextMenu contextMenu = new ContextMenu();
+
+    private FXMLLoader fxmlLoader;
+    private String description;
+    private String[] parsedDescription;
+    private String describeObjectType;
 
     @FXML
     private ChoiceBox<Object> cmbHistory;
@@ -64,12 +80,22 @@ public class BodyPane {
     private TextArea taStatement;
     @FXML
     private TableView tvResult;
-    private JSONObject jsonObject = new JSONObject();
-    private FXMLLoader fxmlLoader;
-    private ContextMenu contextMenu = new ContextMenu();
-    private String description;
-    private String[] parsedDescription;
-    private String describeObjectType;
+
+    ChoiceBox<Object> getCmbHistory() {
+        return cmbHistory;
+    }
+
+    TextArea getTaStatement() {
+        return taStatement;
+    }
+
+    JSONObject getJsonObject() {
+        return jsonObject;
+    }
+
+    public FXMLLoader getFxmlLoader() {
+        return fxmlLoader;
+    }
 
     public BodyPane() {
         miProperties = new MenuItem("Properties");
@@ -112,215 +138,6 @@ public class BodyPane {
                 miGetAttributes,
                 miDestroyObject
         );
-    }
-
-    private void handleMiDestroyObject() {
-        miDestroyObject.setOnAction(actionEvent -> {
-            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
-            String id = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
-
-            try {
-                LOGGER.info(id);
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Delete Object");
-                alert.setHeaderText(null);
-                String message = MessageFormat.format("Are you sure you want to destroy the selected object id ''{0}''?", id);
-                alert.setContentText(message);
-                ButtonType btnYes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
-                ButtonType btnNo = new ButtonType("No", ButtonBar.ButtonData.NO);
-                alert.getButtonTypes().setAll(btnYes, btnNo);
-                alert.showAndWait().ifPresent(type -> {
-                    if (type == btnYes) {
-                        LOGGER.info("Deleting the object!");
-                        try {
-                            IDfPersistentObject object = repositoryCon.getSession().getObject(new DfId(id));
-                            object.destroy();
-                            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-                            confirmation.setTitle("Confirmation delete object");
-                            confirmation.setHeaderText(null);
-                            String messageConfirmation = MessageFormat.format("Succesfully destroyed the object id ''{0}''!", id);
-                            confirmation.setContentText(messageConfirmation);
-                            confirmation.showAndWait();
-                        } catch (DfException e) {
-                            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-                            Alert confirmation = new Alert(Alert.AlertType.ERROR);
-                            confirmation.setTitle("Error on delete object");
-                            confirmation.setHeaderText(null);
-                            confirmation.setContentText(e.getMessage());
-                            confirmation.showAndWait();
-                        }
-                    } else {
-                        LOGGER.info("Object deletion cancelled!");
-                    }
-                });
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            }
-        });
-    }
-
-    private void handleMiDescribeObject() {
-        miDescribeObject.setOnAction(actionEvent -> {
-            LOGGER.info(actionEvent.getSource().toString());
-            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
-            String name = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
-            LOGGER.info(name);
-            new TableResultUtils().updateTable(describeObjectType, name);
-        });
-    }
-
-    private void handleMiCopyRowToClipBoard() {
-        miCopyRowToClipBoard.setOnAction(actionEvent -> {
-            TablePosition focusedCell = tvResult.getFocusModel().getFocusedCell();
-            ObservableList<String> row = (ObservableList<String>) tvResult.getItems().get(focusedCell.getRow());
-
-            StringBuilder value = new StringBuilder();
-
-            for (String cellValue : row) {
-                String appendText = cellValue + "\n";
-                value.append(appendText);
-            }
-
-            final Clipboard clipboard = Clipboard.getSystemClipboard();
-            final ClipboardContent content = new ClipboardContent();
-            content.putString(value.toString());
-            clipboard.setContent(content);
-        });
-    }
-
-    private void handleMiCopyCellToClipBoard() {
-        miCopyCellToClipBoard.setOnAction(actionEvent -> {
-            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
-            String value = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
-
-            final Clipboard clipboard = Clipboard.getSystemClipboard();
-            final ClipboardContent content = new ClipboardContent();
-            content.putString(value);
-            clipboard.setContent(content);
-        });
-    }
-
-    private void handleMiGetAttributes() {
-        miGetAttributes.setOnAction(actionEvent -> {
-            LOGGER.info(actionEvent.getSource().toString());
-
-            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
-            String id = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
-
-            try {
-                LOGGER.info(id);
-                Stage getAttributes = new Stage();
-                getAttributes.setTitle(String.format("Attributes List - %s (%s)", id, repositoryCon.getRepositoryName()));
-                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributesPane.fxml"));
-                VBox loginPane = fxmlLoader.load();
-                Scene scene = new Scene(loginPane);
-                getAttributes.setScene(scene);
-                GetAttributesPane controller = fxmlLoader.getController();
-                controller.initTextArea(repositoryCon.getSession().getObject(new DfId(id)));
-                getAttributes.showAndWait();
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            }
-        });
-    }
-
-    private void handleMiProperties() {
-        miProperties.setOnAction(actionEvent -> {
-            LOGGER.info(actionEvent.getSource().toString());
-            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
-            MyTableColumn tableColumn = (MyTableColumn) focusedCell.getTableColumn();
-            IDfAttr attr = tableColumn.getAttr();
-
-            String message;
-            if (attr != null) {
-                message = MessageFormat.format("Attribute Name: {0}\nData Type: {1,number,integer}\nSize: {2,number,integer}\nRepeating: {3}", attr.getName(), attr.getDataType(), attr.getLength(), String.valueOf(attr.isRepeating()));
-            } else {
-                int index = StringUtils.ordinalIndexOf(description, "\r\n\r\n", 2);
-                message = description.substring(0, index);
-            }
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Properties");
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-        });
-    }
-
-    private void handleMiExportToCsv() {
-        miExportToCsv.setOnAction(actionEvent -> {
-            LOGGER.info(actionEvent.getSource().toString());
-            try {
-                File tempFile = File.createTempFile("tmp_", ".csv");
-                LOGGER.info(tempFile.getPath());
-                InputStream tableResultContent = new ByteArrayInputStream(convertTableResultsToString().getBytes(Charset.forName("UTF-8")));
-                ReadableByteChannel readableByteChannel = Channels.newChannel(tableResultContent);
-                FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-                FileChannel fileChannel = fileOutputStream.getChannel();
-                fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-
-                tableResultContent.close();
-                readableByteChannel.close();
-                fileChannel.close();
-
-                if (!Desktop.isDesktopSupported()) {
-                    LOGGER.info("Desktop is not supported");
-                    return;
-                }
-
-                Desktop desktop = Desktop.getDesktop();
-                if (tempFile.exists())
-                    desktop.open(tempFile);
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            }
-        });
-    }
-
-    ChoiceBox<Object> getCmbHistory() {
-        return cmbHistory;
-    }
-
-    TextArea getTaStatement() {
-        return taStatement;
-    }
-
-    JSONObject getJsonObject() {
-        return jsonObject;
-    }
-
-    public FXMLLoader getFxmlLoader() {
-        return fxmlLoader;
-    }
-
-    private String convertTableResultsToString() {
-        StringBuilder result = new StringBuilder();
-
-        ObservableList columns = tvResult.getColumns();
-        for (int i = 0; i < columns.size(); i++) {
-            MyTableColumn column = (MyTableColumn) columns.get(i);
-            if (i < columns.size() - 1) {
-                String appendText = column.getText() + ";";
-                result.append(appendText);
-            } else
-                result.append(column.getText());
-        }
-        result.append("\n");
-
-        ObservableList<ObservableList<String>> rows = tvResult.getItems();
-        for (ObservableList<String> row : rows) {
-            for (int j = 0; j < row.size(); j++) {
-                String value = row.get(j);
-                if (j < row.size() - 1) {
-                    String appendText = value + ";";
-                    result.append(appendText);
-                } else
-                    result.append(value);
-            }
-            result.append("\n");
-        }
-
-        return result.toString();
     }
 
     @FXML
@@ -385,25 +202,40 @@ public class BodyPane {
         });
     }
 
+    private void loadHistory() throws IOException, ParseException {
+        JSONParser parser = new JSONParser();
+        jsonObject = (JSONObject) parser.parse(new FileReader("history.json"));
+
+        LOGGER.info(jsonObject.toJSONString());
+
+        JSONArray msg = (JSONArray) jsonObject.get("queries");
+        Iterator iterator = msg.iterator();
+        List<Object> statements = new ArrayList<>();
+        while (iterator.hasNext()) {
+            statements.add(iterator.next());
+        }
+        ObservableList<Object> value = FXCollections.observableList(statements);
+        cmbHistory.setItems(value);
+    }
+
+    private void createHistoryFile() {
+        JSONArray list = new JSONArray();
+        jsonObject.put("queries", list);
+
+        try (FileWriter file = new FileWriter("history.json")) {
+            file.write(jsonObject.toJSONString());
+            file.flush();
+            LOGGER.info("New history.json file is created");
+        } catch (IOException ioe) {
+            LOGGER.log(Level.SEVERE, ioe.getMessage(), ioe);
+        }
+    }
+
     private boolean isObjectId(String id) {
         String regex = "^[0-9a-f]{16}$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(id);
         return matcher.find();
-    }
-
-    private boolean isTableName(String name) {
-        boolean result = false;
-        try {
-            IDfCollection nrOfTypes = repositoryCon.query(String.format("select count(r_object_id) as nroftables from dm_registered where object_name = '%s'", name));
-            nrOfTypes.next();
-            if (Integer.parseInt(nrOfTypes.getString("nroftables")) > 0)
-                result = true;
-            nrOfTypes.close();
-        } catch (DfException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return result;
     }
 
     private boolean isTypeName(String name) {
@@ -420,33 +252,211 @@ public class BodyPane {
         return result;
     }
 
-    private void createHistoryFile() {
-        JSONArray list = new JSONArray();
-        jsonObject.put("queries", list);
-
-        try (FileWriter file = new FileWriter("history.json")) {
-            file.write(jsonObject.toJSONString());
-            file.flush();
-            LOGGER.info("New history.json file is created");
-        } catch (IOException ioe) {
-            LOGGER.log(Level.SEVERE, ioe.getMessage(), ioe);
+    private boolean isTableName(String name) {
+        boolean result = false;
+        try {
+            IDfCollection nrOfTypes = repositoryCon.query(String.format("select count(r_object_id) as nroftables from dm_registered where object_name = '%s'", name));
+            nrOfTypes.next();
+            if (Integer.parseInt(nrOfTypes.getString("nroftables")) > 0)
+                result = true;
+            nrOfTypes.close();
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
+        return result;
     }
 
-    private void loadHistory() throws IOException, ParseException {
-        JSONParser parser = new JSONParser();
-        jsonObject = (JSONObject) parser.parse(new FileReader("history.json"));
+    private void handleMiProperties() {
+        miProperties.setOnAction(actionEvent -> {
+            LOGGER.info(actionEvent.getSource().toString());
+            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
+            MyTableColumn tableColumn = (MyTableColumn) focusedCell.getTableColumn();
+            IDfAttr attr = tableColumn.getAttr();
 
-        LOGGER.info(jsonObject.toJSONString());
+            String message;
+            if (attr != null) {
+                message = MessageFormat.format("Attribute Name: {0}\nData Type: {1,number,integer}\nSize: {2,number,integer}\nRepeating: {3}", attr.getName(), attr.getDataType(), attr.getLength(), String.valueOf(attr.isRepeating()));
+            } else {
+                int index = StringUtils.ordinalIndexOf(description, "\r\n\r\n", 2);
+                message = description.substring(0, index);
+            }
 
-        JSONArray msg = (JSONArray) jsonObject.get("queries");
-        Iterator iterator = msg.iterator();
-        List<Object> statements = new ArrayList<>();
-        while (iterator.hasNext()) {
-            statements.add(iterator.next());
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Properties");
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
+    }
+
+    private void handleMiCopyCellToClipBoard() {
+        miCopyCellToClipBoard.setOnAction(actionEvent -> {
+            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
+            String value = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
+
+            final Clipboard clipboard = Clipboard.getSystemClipboard();
+            final ClipboardContent content = new ClipboardContent();
+            content.putString(value);
+            clipboard.setContent(content);
+        });
+    }
+
+    private void handleMiCopyRowToClipBoard() {
+        miCopyRowToClipBoard.setOnAction(actionEvent -> {
+            TablePosition focusedCell = tvResult.getFocusModel().getFocusedCell();
+            ObservableList<String> row = (ObservableList<String>) tvResult.getItems().get(focusedCell.getRow());
+
+            StringBuilder value = new StringBuilder();
+
+            for (String cellValue : row) {
+                String appendText = cellValue + "\n";
+                value.append(appendText);
+            }
+
+            final Clipboard clipboard = Clipboard.getSystemClipboard();
+            final ClipboardContent content = new ClipboardContent();
+            content.putString(value.toString());
+            clipboard.setContent(content);
+        });
+    }
+
+    private void handleMiExportToCsv() {
+        miExportToCsv.setOnAction(actionEvent -> {
+            LOGGER.info(actionEvent.getSource().toString());
+            try {
+                File tempFile = File.createTempFile("tmp_", ".csv");
+                LOGGER.info(tempFile.getPath());
+                InputStream tableResultContent = new ByteArrayInputStream(convertTableResultsToString().getBytes(Charset.forName("UTF-8")));
+                ReadableByteChannel readableByteChannel = Channels.newChannel(tableResultContent);
+                FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
+                FileChannel fileChannel = fileOutputStream.getChannel();
+                fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+
+                tableResultContent.close();
+                readableByteChannel.close();
+                fileChannel.close();
+
+                if (!Desktop.isDesktopSupported()) {
+                    LOGGER.info("Desktop is not supported");
+                    return;
+                }
+
+                Desktop desktop = Desktop.getDesktop();
+                if (tempFile.exists())
+                    desktop.open(tempFile);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
+        });
+    }
+
+    private String convertTableResultsToString() {
+        StringBuilder result = new StringBuilder();
+
+        ObservableList columns = tvResult.getColumns();
+        for (int i = 0; i < columns.size(); i++) {
+            MyTableColumn column = (MyTableColumn) columns.get(i);
+            if (i < columns.size() - 1) {
+                String appendText = column.getText() + ";";
+                result.append(appendText);
+            } else
+                result.append(column.getText());
         }
-        ObservableList<Object> value = FXCollections.observableList(statements);
-        cmbHistory.setItems(value);
+        result.append("\n");
+
+        ObservableList<ObservableList<String>> rows = tvResult.getItems();
+        for (ObservableList<String> row : rows) {
+            for (int j = 0; j < row.size(); j++) {
+                String value = row.get(j);
+                if (j < row.size() - 1) {
+                    String appendText = value + ";";
+                    result.append(appendText);
+                } else
+                    result.append(value);
+            }
+            result.append("\n");
+        }
+
+        return result.toString();
+    }
+
+    private void handleMiDescribeObject() {
+        miDescribeObject.setOnAction(actionEvent -> {
+            LOGGER.info(actionEvent.getSource().toString());
+            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
+            String name = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
+            LOGGER.info(name);
+            new TableResultUtils().updateTable(describeObjectType, name);
+        });
+    }
+
+    private void handleMiGetAttributes() {
+        miGetAttributes.setOnAction(actionEvent -> {
+            LOGGER.info(actionEvent.getSource().toString());
+
+            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
+            String id = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
+
+            try {
+                LOGGER.info(id);
+                Stage getAttributes = new Stage();
+                getAttributes.setTitle(String.format("Attributes List - %s (%s)", id, repositoryCon.getRepositoryName()));
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributesPane.fxml"));
+                VBox loginPane = fxmlLoader.load();
+                Scene scene = new Scene(loginPane);
+                getAttributes.setScene(scene);
+                GetAttributesPane controller = fxmlLoader.getController();
+                controller.initTextArea(repositoryCon.getSession().getObject(new DfId(id)));
+                getAttributes.showAndWait();
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
+        });
+    }
+
+    private void handleMiDestroyObject() {
+        miDestroyObject.setOnAction(actionEvent -> {
+            TablePosition focusedCell = (TablePosition) tvResult.getSelectionModel().getSelectedCells().get(0);
+            String id = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
+
+            try {
+                LOGGER.info(id);
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Delete Object");
+                alert.setHeaderText(null);
+                String message = MessageFormat.format("Are you sure you want to destroy the selected object id ''{0}''?", id);
+                alert.setContentText(message);
+                ButtonType btnYes = new ButtonType("Yes", ButtonBar.ButtonData.YES);
+                ButtonType btnNo = new ButtonType("No", ButtonBar.ButtonData.NO);
+                alert.getButtonTypes().setAll(btnYes, btnNo);
+                alert.showAndWait().ifPresent(type -> {
+                    if (type == btnYes) {
+                        LOGGER.info("Deleting the object!");
+                        try {
+                            IDfPersistentObject object = repositoryCon.getSession().getObject(new DfId(id));
+                            object.destroy();
+                            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+                            confirmation.setTitle("Confirmation delete object");
+                            confirmation.setHeaderText(null);
+                            String messageConfirmation = MessageFormat.format("Succesfully destroyed the object id ''{0}''!", id);
+                            confirmation.setContentText(messageConfirmation);
+                            confirmation.showAndWait();
+                        } catch (DfException e) {
+                            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                            Alert confirmation = new Alert(Alert.AlertType.ERROR);
+                            confirmation.setTitle("Error on delete object");
+                            confirmation.setHeaderText(null);
+                            confirmation.setContentText(e.getMessage());
+                            confirmation.showAndWait();
+                        }
+                    } else {
+                        LOGGER.info("Object deletion cancelled!");
+                    }
+                });
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
+        });
     }
 
     void updateResultTable(IDfCollection collection) throws DfException {
@@ -542,14 +552,22 @@ public class BodyPane {
         }
     }
 
-    private String getRowValue(int rowIndex, int columnIndex) {
-        String result = "";
-        try {
-            result = parsedDescription[(rowIndex * 3) + columnIndex];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+    private int getRowSize(String description) {
+        String fromColumns;
+        String type = description.substring(0, description.indexOf("\t"));
+
+        if (type.contains("Table")) {
+            fromColumns = description.substring(description.indexOf("Columns:"));
+        } else {
+            fromColumns = description.substring(description.indexOf("Attributes:"));
         }
-        return result;
+
+        String columnsInfo = fromColumns.substring(0, fromColumns.indexOf("\r\n"));
+        String value = columnsInfo.substring(columnsInfo.indexOf(":") + 1, columnsInfo.length()).trim();
+
+        parseDescription(description);
+
+        return Integer.parseInt(value);
     }
 
     private void parseDescription(String descriptionInput) {
@@ -569,22 +587,14 @@ public class BodyPane {
         parsedDescription = Arrays.stream(split).filter(value -> !value.equals("")).toArray(size -> new String[size]);
     }
 
-    private int getRowSize(String description) {
-        String fromColumns;
-        String type = description.substring(0, description.indexOf("\t"));
-
-        if (type.contains("Table")) {
-            fromColumns = description.substring(description.indexOf("Columns:"));
-        } else {
-            fromColumns = description.substring(description.indexOf("Attributes:"));
+    private String getRowValue(int rowIndex, int columnIndex) {
+        String result = "";
+        try {
+            result = parsedDescription[(rowIndex * 3) + columnIndex];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-
-        String columnsInfo = fromColumns.substring(0, fromColumns.indexOf("\r\n"));
-        String value = columnsInfo.substring(columnsInfo.indexOf(":") + 1, columnsInfo.length()).trim();
-
-        parseDescription(description);
-
-        return Integer.parseInt(value);
+        return result;
     }
 
     @FXML

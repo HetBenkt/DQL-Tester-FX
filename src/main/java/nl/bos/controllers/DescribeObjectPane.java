@@ -21,9 +21,11 @@ import static nl.bos.Constants.TYPE;
 
 public class DescribeObjectPane {
     private static final Logger LOGGER = Logger.getLogger(DescribeObjectPane.class.getName());
+
     private final Repository repositoryCon = Repository.getInstance();
 
     private DescribeObjectTreeItem currentSelected;
+    private ObservableList<DescribeObjectTreeItem> items;
 
     @FXML
     private Button btnOk, btnCancel;
@@ -34,33 +36,8 @@ public class DescribeObjectPane {
     @FXML
     private TextField txtNrOfItems;
 
-    public DescribeObjectTreeItem getCurrentSelected() {
+    DescribeObjectTreeItem getCurrentSelected() {
         return currentSelected;
-    }
-
-    private ObservableList<DescribeObjectTreeItem> items;
-
-    @FXML
-    private void handleTypesTables(ActionEvent actionEvent) {
-        DescribeObjectTreeItem selectedItem = cbTypesTables.getSelectionModel().getSelectedItem();
-        MultipleSelectionModel selectionModel = tvTypesTables.getSelectionModel();
-        selectionModel.select(selectedItem);
-        currentSelected = selectedItem;
-        btnOk.setDisable(false);
-        tvTypesTables.scrollTo(selectionModel.getSelectedIndex());
-    }
-
-    @FXML
-    private void handleOK(ActionEvent actionEvent) {
-        LOGGER.info(String.valueOf(currentSelected));
-        Stage describeObjectStage = RootPane.getDescribeObjectStage();
-        describeObjectStage.fireEvent(new WindowEvent(describeObjectStage, WindowEvent.WINDOW_CLOSE_REQUEST));
-    }
-
-    @FXML
-    private void handleCancel(ActionEvent actionEvent) {
-        Stage stage = (Stage) btnCancel.getScene().getWindow();
-        stage.close();
     }
 
     @FXML
@@ -71,6 +48,42 @@ public class DescribeObjectPane {
             DescribeObjectTreeItem tiTables = initTableParentWithChildren();
             initTreeView(tiTypes, tiTables);
         }
+    }
+
+    private DescribeObjectTreeItem initTypeParentWithChildren() {
+        DescribeObjectTreeItem parent = new DescribeObjectTreeItem("Types");
+
+        try {
+            IDfCollection types = repositoryCon.query("select name from dm_type order by 1");
+            while (types.next()) {
+                DescribeObjectTreeItem item = new DescribeObjectTreeItem(types.getString("name"), TYPE);
+                items.add(item);
+                parent.getChildren().add(item);
+            }
+            types.close();
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+
+        return parent;
+    }
+
+    private DescribeObjectTreeItem initTableParentWithChildren() {
+        DescribeObjectTreeItem parent = new DescribeObjectTreeItem("Tables");
+
+        try {
+            IDfCollection tables = repositoryCon.query("select object_name from dm_registered order by 1");
+            while (tables.next()) {
+                DescribeObjectTreeItem item = new DescribeObjectTreeItem(tables.getString("object_name"), TABLE);
+                items.add(item);
+                parent.getChildren().add(item);
+            }
+            tables.close();
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+
+        return parent;
     }
 
     private void initTreeView(DescribeObjectTreeItem... treeItems) {
@@ -93,40 +106,27 @@ public class DescribeObjectPane {
         });
     }
 
-    private DescribeObjectTreeItem initTableParentWithChildren() {
-        DescribeObjectTreeItem parent = new DescribeObjectTreeItem("Tables");
-
-        try {
-            IDfCollection tables = repositoryCon.query("select object_name from dm_registered order by 1");
-            while (tables.next()) {
-                DescribeObjectTreeItem item = new DescribeObjectTreeItem(tables.getString("object_name"), TABLE);
-                items.add(item);
-                parent.getChildren().add(item);
-            }
-            tables.close();
-        } catch (DfException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        return parent;
+    @FXML
+    private void handleOK(ActionEvent actionEvent) {
+        LOGGER.info(String.valueOf(currentSelected));
+        Stage describeObjectStage = RootPane.getDescribeObjectStage();
+        describeObjectStage.fireEvent(new WindowEvent(describeObjectStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
-    private DescribeObjectTreeItem initTypeParentWithChildren() {
-        DescribeObjectTreeItem parent = new DescribeObjectTreeItem("Types");
+    @FXML
+    private void handleCancel(ActionEvent actionEvent) {
+        Stage stage = (Stage) btnCancel.getScene().getWindow();
+        stage.close();
+    }
 
-        try {
-            IDfCollection types = repositoryCon.query("select name from dm_type order by 1");
-            while (types.next()) {
-                DescribeObjectTreeItem item = new DescribeObjectTreeItem(types.getString("name"), TYPE);
-                items.add(item);
-                parent.getChildren().add(item);
-            }
-            types.close();
-        } catch (DfException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        return parent;
+    @FXML
+    private void handleTypesTables(ActionEvent actionEvent) {
+        DescribeObjectTreeItem selectedItem = cbTypesTables.getSelectionModel().getSelectedItem();
+        MultipleSelectionModel selectionModel = tvTypesTables.getSelectionModel();
+        selectionModel.select(selectedItem);
+        currentSelected = selectedItem;
+        btnOk.setDisable(false);
+        tvTypesTables.scrollTo(selectionModel.getSelectedIndex());
     }
 
     @FXML

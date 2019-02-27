@@ -49,6 +49,64 @@ public class LoginPane {
     private CheckBox chkUseWindowsLogin;
 
     @FXML
+    void initialize() {
+        try {
+            if (repositoryCon.getSession() != null && repositoryCon.getSession().isConnected()) {
+                setFieldsConnect(true);
+            } else {
+                setFieldsConnect(false);
+            }
+
+            lblVersion.setText(getProjectVersion());
+
+            if (repositoryCon.getClient() != null) {
+                IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
+                //noinspection deprecation
+                String hostName = repositoryMap.getHostName();
+                lblServer.setText(hostName);
+
+                LOGGER.info(MessageFormat.format("Repositories for Connection Broker: {0}", hostName));
+                LOGGER.info(MessageFormat.format("Total number of Repostories: {0}", repositoryMap.getDocbaseCount()));
+                for (int i = 0; i < repositoryMap.getDocbaseCount(); i++) {
+                    LOGGER.info(MessageFormat.format("Repository {0}", (i + 1) + ": " + repositoryMap.getDocbaseName(i)));
+                    ObservableList<String> repositories = FXCollections.observableArrayList();
+                    repositories.add(repositoryMap.getDocbaseName(i));
+                    chbRepository.setItems(repositories);
+                    chbRepository.setValue(chbRepository.getItems().get(0));
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    private void setFieldsConnect(boolean connected) {
+        btnLogout.managedProperty().bindBidirectional(btnLogout.visibleProperty());
+        btnLogout.setManaged(connected);
+
+        btnLogin.managedProperty().bindBidirectional(btnLogin.visibleProperty());
+        btnLogin.setManaged(!connected);
+
+        chbRepository.setDisable(connected);
+        txtUsername.setDisable(connected);
+        txtPassword.setDisable(connected);
+        txtDomain.setDisable(connected);
+        chkSaveLoginData.setDisable(connected);
+        chkUseWindowsLogin.setDisable(connected);
+    }
+
+    private String getProjectVersion() {
+        final Properties properties = new Properties();
+        try {
+            properties.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
+            return properties.getProperty("version");
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return "";
+    }
+
+    @FXML
     private void handleLogin(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
         String selectedRepository = chbRepository.getValue();
@@ -147,64 +205,6 @@ public class LoginPane {
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-    }
-
-    @FXML
-    void initialize() {
-        try {
-            if (repositoryCon.getSession() != null && repositoryCon.getSession().isConnected()) {
-                setFieldsConnect(true);
-            } else {
-                setFieldsConnect(false);
-            }
-
-            lblVersion.setText(getProjectVersion());
-
-            if (repositoryCon.getClient() != null) {
-                IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
-                //noinspection deprecation
-                String hostName = repositoryMap.getHostName();
-                lblServer.setText(hostName);
-
-                LOGGER.info(MessageFormat.format("Repositories for Connection Broker: {0}", hostName));
-                LOGGER.info(MessageFormat.format("Total number of Repostories: {0}", repositoryMap.getDocbaseCount()));
-                for (int i = 0; i < repositoryMap.getDocbaseCount(); i++) {
-                    LOGGER.info(MessageFormat.format("Repository {0}", (i + 1) + ": " + repositoryMap.getDocbaseName(i)));
-                    ObservableList<String> repositories = FXCollections.observableArrayList();
-                    repositories.add(repositoryMap.getDocbaseName(i));
-                    chbRepository.setItems(repositories);
-                    chbRepository.setValue(chbRepository.getItems().get(0));
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-    }
-
-    private void setFieldsConnect(boolean connected) {
-        btnLogout.managedProperty().bindBidirectional(btnLogout.visibleProperty());
-        btnLogout.setManaged(connected);
-
-        btnLogin.managedProperty().bindBidirectional(btnLogin.visibleProperty());
-        btnLogin.setManaged(!connected);
-
-        chbRepository.setDisable(connected);
-        txtUsername.setDisable(connected);
-        txtPassword.setDisable(connected);
-        txtDomain.setDisable(connected);
-        chkSaveLoginData.setDisable(connected);
-        chkUseWindowsLogin.setDisable(connected);
-    }
-
-    private String getProjectVersion() {
-        final Properties properties = new Properties();
-        try {
-            properties.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
-            return properties.getProperty("version");
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return "";
     }
 
     @FXML

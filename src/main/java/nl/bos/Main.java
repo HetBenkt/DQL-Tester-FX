@@ -20,6 +20,12 @@ import java.util.logging.Logger;
 public class Main extends Application {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
+    private static Main mainClass;
+    private static boolean devModeEnabled = false;
+
+    private FXMLLoader bodyPaneLoader;
+    private FXMLLoader rootPaneLoader;
+
     public FXMLLoader getBodyPaneLoader() {
         return bodyPaneLoader;
     }
@@ -27,11 +33,6 @@ public class Main extends Application {
     public FXMLLoader getRootPaneLoader() {
         return rootPaneLoader;
     }
-
-    private static Main mainClass;
-    private static boolean devModeEnabled = false;
-    private FXMLLoader bodyPaneLoader;
-    private FXMLLoader rootPaneLoader;
 
     public Main() {
         mainClass = this;

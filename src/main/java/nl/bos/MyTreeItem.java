@@ -16,11 +16,12 @@ import static nl.bos.Constants.*;
 public class MyTreeItem extends TreeItem<String> {
     private static final Logger LOGGER = Logger.getLogger(MyTreeItem.class.getName());
 
+    private final Repository repositoryCon = Repository.getInstance();
+
     private final String type;
     private final String name;
     private final String path;
     private final IDfPersistentObject object;
-    private final Repository repositoryCon = Repository.getInstance();
 
     public MyTreeItem(IDfPersistentObject object, String name, String type, String path) {
         this.object = object;
@@ -34,8 +35,24 @@ public class MyTreeItem extends TreeItem<String> {
         return this.name;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public IDfPersistentObject getObject() {
+        return object;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     public boolean isDirectory() {
         return type.equals(TYPE_REPOSITORY) || type.equals(TYPE_CABINET) || type.equals(TYPE_FOLDER);
+    }
+
+    private String getPath() {
+        return path;
     }
 
     public List<MyTreeItem> listObjects(MyTreeItem parent, boolean showAllCabinets, boolean showAllVersions) {
@@ -66,14 +83,6 @@ public class MyTreeItem extends TreeItem<String> {
         return children;
     }
 
-    private String getPath() {
-        return path;
-    }
-
-    public String getType() {
-        return type;
-    }
-
     private void addNodesToParent(MyTreeItem parent, List<MyTreeItem> children, String function, boolean showAllVersions) throws DfException {
         IDfCollection folders = repositoryCon.query(String.format("select r_object_id, object_name from dm_folder where %s('%s') order by object_name", function, parent.getPath()));
         while (folders.next()) {
@@ -97,13 +106,5 @@ public class MyTreeItem extends TreeItem<String> {
             children.add(child);
         }
         documents.close();
-    }
-
-    public IDfPersistentObject getObject() {
-        return object;
-    }
-
-    public String getName() {
-        return name;
     }
 }

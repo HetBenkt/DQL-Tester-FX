@@ -13,6 +13,17 @@ import java.util.logging.Logger;
 public class Repository {
     private static final Logger LOGGER = Logger.getLogger(Repository.class.getName());
 
+    private static Repository repository;
+    private String errorMessage = "";
+    private IDfSessionManager sessionManager;
+    private IDfSession session;
+    private String repositoryName;
+    private String userName;
+    private String passkey;
+    private String domain;
+    private final IDfClientX clientX = new DfClientX();
+    private IDfClient client = null;
+
     public String getErrorMessage() {
         return errorMessage;
     }
@@ -32,17 +43,6 @@ public class Repository {
     public IDfClient getClient() {
         return client;
     }
-
-    private static Repository repository;
-    private String errorMessage = "";
-    private IDfSessionManager sessionManager;
-    private IDfSession session;
-    private String repositoryName;
-    private String userName;
-    private String passkey;
-    private String domain;
-    private final IDfClientX clientX = new DfClientX();
-    private IDfClient client = null;
 
     private Repository() {
     }
