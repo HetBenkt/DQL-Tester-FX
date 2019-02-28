@@ -27,7 +27,7 @@ OpenJDK 64-Bit Server VM 18.9 (build 11.0.1+13, mixed mode)
     * Emma
     * SonarLint
 ### Non public dependencies (Documentum Foundation Classes)
-Documentum appications are required to use DFC libraries. These can be downloaded from [OpenText My Support](https://mysupport.opentext.com)
+Documentum applications are required to use DFC libraries. These can be downloaded from [OpenText My Support](https://mysupport.opentext.com)
 The pom.xml refers to these libraries from your local .m2 maven repository. To install external/downloaded jar dependencies to your local maven repository use the commands from the Wiki page [Maven commands](https://github.com/HetBenkt/DQL-Tester-FX/wiki/Maven-commands)
 ### Run the application
 * Add 2 run configurations (Run -> Edit Configurations...)
@@ -46,7 +46,7 @@ Run configuration 'Main (dev-mode)':
 > * VM Options: --module-path "c:\javafx-sdk-11.0.1\lib" --add-modules=javafx.controls,javafx.fxml
 > * Give it the program arguments: REPOSITORY_NAME USERNAME PASSWORD
 
-Create 2 new propery files
+Create 2 new property files
 * A file called `dfc.properties` in the `src\main\resources` directory with this content
     ```
     dfc.docbroker.host[0]=<host; hostname or ip-address>

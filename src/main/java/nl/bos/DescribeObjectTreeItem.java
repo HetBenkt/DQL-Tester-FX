@@ -9,11 +9,13 @@ public class DescribeObjectTreeItem extends TreeItem {
     public DescribeObjectTreeItem(String value, String type) {
         this.type = type;
         this.value = value;
+        //noinspection unchecked
         this.setValue(value);
     }
 
     public DescribeObjectTreeItem(String value) {
         this.value = value;
+        //noinspection unchecked
         this.setValue(value);
     }
 

@@ -66,7 +66,7 @@ public class LoginPane {
                 lblServer.setText(hostName);
 
                 LOGGER.info(MessageFormat.format("Repositories for Connection Broker: {0}", hostName));
-                LOGGER.info(MessageFormat.format("Total number of Repostories: {0}", repositoryMap.getDocbaseCount()));
+                LOGGER.info(MessageFormat.format("Total number of Repositories: {0}", repositoryMap.getDocbaseCount()));
                 for (int i = 0; i < repositoryMap.getDocbaseCount(); i++) {
                     LOGGER.info(MessageFormat.format("Repository {0}", (i + 1) + ": " + repositoryMap.getDocbaseName(i)));
                     ObservableList<String> repositories = FXCollections.observableArrayList();

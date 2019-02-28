@@ -62,15 +62,15 @@ public class Repository {
     }
 
     public IDfDocbaseMap obtainRepositoryMap() {
-        IDfDocbaseMap docbaseMap = null;
+        IDfDocbaseMap repositoryMap = null;
         try {
             if (client == null)
                 client = clientX.getLocalClient();
-            docbaseMap = client.getDocbaseMap();
+            repositoryMap = client.getDocbaseMap();
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-        return docbaseMap;
+        return repositoryMap;
     }
 
     public void setCredentials(String repositoryName, String userName, String passkey, String domain) {

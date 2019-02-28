@@ -169,7 +169,7 @@ public class RootPane implements EventHandler<WindowEvent> {
     }
 
     @FXML
-    private void disbleSQLTrace(ActionEvent actionEvent) {
+    private void disableSQLTrace(ActionEvent actionEvent) {
         try {
             IDfAdminCommand command = AdminApplyCommand.getCommand(IDfAdminCommand.APPLY_SET_OPTIONS);
             command.setString("OPTION", "sqltrace");

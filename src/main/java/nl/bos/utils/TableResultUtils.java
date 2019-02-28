@@ -37,13 +37,13 @@ public class TableResultUtils {
 
     private void updateTableWithTableInfo(String currentSelected) throws DfException {
         BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
-        String tableDesciption = repositoryCon.getSession().describe(TABLE, "dm_dbo." + currentSelected);
-        bodyPaneController.updateResultTableWithStringInput(tableDesciption, Arrays.asList("Column", "Data Type", "Primary Key"));
+        String tableDescription = repositoryCon.getSession().describe(TABLE, "dm_dbo." + currentSelected);
+        bodyPaneController.updateResultTableWithStringInput(tableDescription, Arrays.asList("Column", "Data Type", "Primary Key"));
     }
 
     private void updateTableWithTypeInfo(String currentSelected) throws DfException {
         BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
-        String typeDesciption = repositoryCon.getSession().describe(TYPE, currentSelected);
-        bodyPaneController.updateResultTableWithStringInput(typeDesciption, Arrays.asList("Attribute", "Data Type", "Repeating"));
+        String typeDescription = repositoryCon.getSession().describe(TYPE, currentSelected);
+        bodyPaneController.updateResultTableWithStringInput(typeDescription, Arrays.asList("Attribute", "Data Type", "Repeating"));
     }
 }

@@ -29,7 +29,7 @@ public class DateTimePicker extends DatePicker {
         getStyleClass().add("datetime-picker");
         setConverter(new InternalConverter());
 
-        // Syncronize changes to the underlying date value back to the
+        // Synchronize changes to the underlying date value back to the
         // dateTimeValue
         valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) {
@@ -44,10 +44,10 @@ public class DateTimePicker extends DatePicker {
             }
         });
 
-        // Syncronize changes to dateTimeValue back to the underlying date value
+        // Synchronize changes to dateTimeValue back to the underlying date value
         dateTimeValue.addListener((observable, oldValue, newValue) -> setValue(newValue == null ? null : newValue.toLocalDate()));
 
-        // Persist changes onblur
+        // Persist changes on blur
         getEditor().focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue)
                 simulateEnterPressed();

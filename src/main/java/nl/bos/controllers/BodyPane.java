@@ -54,6 +54,8 @@ import static nl.bos.Constants.TYPE;
 
 public class BodyPane {
     private static final Logger LOGGER = Logger.getLogger(BodyPane.class.getName());
+    private static final String NR_OF_TABLES = "nr_of_tables";
+    private static final String NR_OF_TYPES = "nr_of_types";
 
     private final Repository repositoryCon = Repository.getInstance();
 
@@ -76,7 +78,7 @@ public class BodyPane {
     @FXML
     private ChoiceBox<Object> cmbHistory;
     @FXML
-    private VBox vboxBody;
+    private VBox vBoxBody;
     @FXML
     private TextArea taStatement;
     @FXML
@@ -151,11 +153,14 @@ public class BodyPane {
         try {
             fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/InputPane.fxml"));
             BorderPane inputPane = fxmlLoader.load();
-            vboxBody.getChildren().add(inputPane);
+            vBoxBody.getChildren().add(inputPane);
             cmbHistory.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> {
-                String selectedHistoryItem = String.valueOf(cmbHistory.getItems().get((Integer) newValue));
-                LOGGER.info(selectedHistoryItem);
-                taStatement.setText(selectedHistoryItem);
+                if (newValue.intValue() != -1) {
+                    String selectedHistoryItem = String.valueOf(cmbHistory.getItems().get((Integer) newValue));
+                    LOGGER.info(selectedHistoryItem);
+                    taStatement.setText(selectedHistoryItem);
+                } else
+                    taStatement.setText("");
             });
             loadHistory();
         } catch (IOException e) {
@@ -246,9 +251,9 @@ public class BodyPane {
     private boolean isTypeName(String name) {
         boolean result = false;
         try {
-            IDfCollection nrOfTypes = repositoryCon.query(String.format("select count(r_object_id) as nroftypes from dm_type where name = '%s'", name));
+            IDfCollection nrOfTypes = repositoryCon.query(String.format("select count(r_object_id) as %s from dm_type where name = '%s'", NR_OF_TYPES, name));
             nrOfTypes.next();
-            if (Integer.parseInt(nrOfTypes.getString("nroftypes")) > 0)
+            if (Integer.parseInt(nrOfTypes.getString(NR_OF_TYPES)) > 0)
                 result = true;
             nrOfTypes.close();
         } catch (DfException e) {
@@ -260,9 +265,9 @@ public class BodyPane {
     private boolean isTableName(String name) {
         boolean result = false;
         try {
-            IDfCollection nrOfTypes = repositoryCon.query(String.format("select count(r_object_id) as nroftables from dm_registered where object_name = '%s'", name));
+            IDfCollection nrOfTypes = repositoryCon.query(String.format("select count(r_object_id) as %s from dm_registered where object_name = '%s'", NR_OF_TABLES, name));
             nrOfTypes.next();
-            if (Integer.parseInt(nrOfTypes.getString("nroftables")) > 0)
+            if (Integer.parseInt(nrOfTypes.getString(NR_OF_TABLES)) > 0)
                 result = true;
             nrOfTypes.close();
         } catch (DfException e) {
@@ -309,10 +314,10 @@ public class BodyPane {
     private void handleMiCopyRowToClipBoard() {
         miCopyRowToClipBoard.setOnAction(actionEvent -> {
             TablePosition focusedCell = tvResult.getFocusModel().getFocusedCell();
+            //noinspection unchecked
             ObservableList<String> row = (ObservableList<String>) tvResult.getItems().get(focusedCell.getRow());
 
             StringBuilder value = new StringBuilder();
-
             for (String cellValue : row) {
                 String appendText = cellValue + "\n";
                 value.append(appendText);
@@ -369,6 +374,7 @@ public class BodyPane {
         }
         result.append("\n");
 
+        //noinspection unchecked
         ObservableList<ObservableList<String>> rows = tvResult.getItems();
         for (ObservableList<String> row : rows) {
             for (int j = 0; j < row.size(); j++) {
@@ -464,6 +470,9 @@ public class BodyPane {
         });
     }
 
+    /**
+     * @noinspection unchecked
+     */
     void updateResultTable(IDfCollection collection) throws DfException {
         tvResult.getItems().clear();
         tvResult.getColumns().clear();
@@ -522,6 +531,9 @@ public class BodyPane {
         }
     }
 
+    /**
+     * @noinspection unchecked
+     */
     public void updateResultTableWithStringInput(String description, List<String> columnNames) {
         this.description = description;
         tvResult.getItems().clear();

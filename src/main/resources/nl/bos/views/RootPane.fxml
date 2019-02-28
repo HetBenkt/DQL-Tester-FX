@@ -22,7 +22,7 @@
             </Menu>
             <Menu mnemonicParsing="false" text="Special">
                 <MenuItem mnemonicParsing="false" onAction="#enableSQLTrace" text="Enable SQL Trace"/>
-                <MenuItem mnemonicParsing="false" onAction="#disbleSQLTrace" text="Disble SQL Trace"/>
+                <MenuItem mnemonicParsing="false" onAction="#disableSQLTrace" text="Disable SQL Trace"/>
             </Menu>
         </MenuBar>
     </top>

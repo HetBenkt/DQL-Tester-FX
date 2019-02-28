@@ -58,6 +58,7 @@ public class DescribeObjectPane {
             while (types.next()) {
                 DescribeObjectTreeItem item = new DescribeObjectTreeItem(types.getString("name"), TYPE);
                 items.add(item);
+                //noinspection unchecked
                 parent.getChildren().add(item);
             }
             types.close();
@@ -68,6 +69,9 @@ public class DescribeObjectPane {
         return parent;
     }
 
+    /**
+     * @noinspection unchecked
+     */
     private DescribeObjectTreeItem initTableParentWithChildren() {
         DescribeObjectTreeItem parent = new DescribeObjectTreeItem("Tables");
 
@@ -86,6 +90,9 @@ public class DescribeObjectPane {
         return parent;
     }
 
+    /**
+     * @noinspection unchecked
+     */
     private void initTreeView(DescribeObjectTreeItem... treeItems) {
         SortedList<DescribeObjectTreeItem> sorted = items.sorted();
         cbTypesTables.setItems(sorted);
@@ -123,6 +130,7 @@ public class DescribeObjectPane {
     private void handleTypesTables(ActionEvent actionEvent) {
         DescribeObjectTreeItem selectedItem = cbTypesTables.getSelectionModel().getSelectedItem();
         MultipleSelectionModel selectionModel = tvTypesTables.getSelectionModel();
+        //noinspection unchecked
         selectionModel.select(selectedItem);
         currentSelected = selectedItem;
         btnOk.setDisable(false);

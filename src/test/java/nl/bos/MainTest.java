@@ -42,7 +42,7 @@ public class MainTest extends ApplicationTest {
         if (System.getProperty("glass.platform", "").equals("Monocle")) {
 //when we are running test headless (using Monocle), the whole vm process crash with a EXCEPTION_ACCESS_VIOLATION
 //it is some problem with -fx-effect in css files. We simply mess up how Node looks up what can be styleable
-//in java fx. i.e. javafx doesn’t think that -fx-effect is a valid css function
+//in java fx. i.e. javafx does not think that -fx-effect is a valid css function
             try {
                 final Class styleablePropertiesClass = Class.forName("javafx.scene.Node$StyleableProperties");
                 final Class cssMetaDataClass = Class.forName("javafx.css.CssMetaData");
@@ -55,7 +55,7 @@ public class MainTest extends ApplicationTest {
                 for (Object styleable : origStyleables) {
                     String propValue = (String) propertyField.get(styleable);
                     if (propValue.equals("-fx-effect")) {
-                        propertyField.set(styleable, propValue + "sometexttomessup");
+                        propertyField.set(styleable, propValue + "text");
                     }
                 }
             } catch (Exception e) {

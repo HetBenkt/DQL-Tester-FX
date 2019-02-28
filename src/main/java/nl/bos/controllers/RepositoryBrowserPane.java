@@ -85,7 +85,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
         treeView.setRoot(treeItemBrowser);
         treeView.getSelectionModel().selectedItemProperty().addListener(this);
         treeView.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent -> {
-            LOGGER.finest(String.format("Clickcount: %s", String.valueOf(mouseEvent.getClickCount())));
+            LOGGER.finest(String.format("Click-count: %s", String.valueOf(mouseEvent.getClickCount())));
             selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
             if (selected != null && !selected.isExpanded())
                 selected.isFirstTimeChildren = true;
