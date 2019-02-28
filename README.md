@@ -34,7 +34,7 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
     * dfc.jar
     * log4j.jar
 4. Copy the following jar files in this `lib` directory from the download locations
-    * [json-simple-1.1.1.jar](https://code.google.com/archive/p/json-simple/)
+    * [json-20180813.jar](http://central.maven.org/maven2/org/json/json/20180813/json-20180813.jar)
 5. In the download directory create a sub directory named: `config`
 6. Create a new file called `dfc.properties` in the `config` directory with this content
     ```
