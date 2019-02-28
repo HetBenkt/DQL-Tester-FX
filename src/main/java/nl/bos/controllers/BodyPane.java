@@ -27,10 +27,8 @@ import nl.bos.MyTableColumn;
 import nl.bos.Repository;
 import nl.bos.utils.TableResultUtils;
 import org.apache.commons.lang.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.awt.*;
 import java.io.*;
@@ -38,6 +36,9 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,8 +65,8 @@ public class BodyPane {
     private final MenuItem miDescribeObject;
     private final MenuItem miDestroyObject;
 
-    private JSONObject jsonObject = new JSONObject();
-    private ContextMenu contextMenu = new ContextMenu();
+    private final ContextMenu contextMenu = new ContextMenu();
+    private JSONObject jsonObject;
 
     private FXMLLoader fxmlLoader;
     private String description;
@@ -97,6 +98,9 @@ public class BodyPane {
         return fxmlLoader;
     }
 
+    /**
+     * @noinspection WeakerAccess
+     */
     public BodyPane() {
         miProperties = new MenuItem("Properties");
         miProperties.setDisable(true);
@@ -154,7 +158,7 @@ public class BodyPane {
                 taStatement.setText(selectedHistoryItem);
             });
             loadHistory();
-        } catch (IOException | ParseException e) {
+        } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             createHistoryFile();
         }
@@ -202,11 +206,11 @@ public class BodyPane {
         });
     }
 
-    private void loadHistory() throws IOException, ParseException {
-        JSONParser parser = new JSONParser();
-        jsonObject = (JSONObject) parser.parse(new FileReader("history.json"));
+    private void loadHistory() throws IOException {
+        String history = new String(Files.readAllBytes(Paths.get("history.json")), StandardCharsets.UTF_8);
+        jsonObject = new JSONObject(history);
 
-        LOGGER.info(jsonObject.toJSONString());
+        LOGGER.info(jsonObject.toString());
 
         JSONArray msg = (JSONArray) jsonObject.get("queries");
         Iterator iterator = msg.iterator();
@@ -220,10 +224,11 @@ public class BodyPane {
 
     private void createHistoryFile() {
         JSONArray list = new JSONArray();
+        jsonObject = new JSONObject();
         jsonObject.put("queries", list);
 
         try (FileWriter file = new FileWriter("history.json")) {
-            file.write(jsonObject.toJSONString());
+            file.write(jsonObject.toString());
             file.flush();
             LOGGER.info("New history.json file is created");
         } catch (IOException ioe) {
@@ -584,7 +589,7 @@ public class BodyPane {
         split[1] = "";
         split[2] = "";
         split[3] = "";
-        parsedDescription = Arrays.stream(split).filter(value -> !value.equals("")).toArray(size -> new String[size]);
+        parsedDescription = Arrays.stream(split).filter(value -> !value.equals("")).toArray(String[]::new);
     }
 
     private String getRowValue(int rowIndex, int columnIndex) {
@@ -605,19 +610,20 @@ public class BodyPane {
         if (cmbHistory.getItems().remove(selectedItem)) {
             ObservableList<Object> items = cmbHistory.getItems();
             try {
-                JSONParser parser = new JSONParser();
-                JSONObject jsonObjectHistory = (JSONObject) parser.parse(new FileReader("history.json"));
-                JSONArray queries = (JSONArray) jsonObjectHistory.get("queries");
+                String history = new String(Files.readAllBytes(Paths.get("history.json")), StandardCharsets.UTF_8);
+                jsonObject = new JSONObject(history);
 
+                JSONArray queries = (JSONArray) jsonObject.get("queries");
                 queries.remove(selectedIndex);
-                cmbHistory.setValue(cmbHistory.getItems().get(0));
+                if (queries.length() > 0)
+                    cmbHistory.setValue(cmbHistory.getItems().get(0));
                 try (FileWriter file = new FileWriter("history.json")) {
-                    file.write(jsonObjectHistory.toJSONString());
+                    file.write(jsonObject.toString());
                     file.flush();
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 }
-            } catch (IOException | ParseException e) {
+            } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
             cmbHistory.setItems(items);

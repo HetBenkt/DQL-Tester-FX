@@ -32,7 +32,7 @@
                     onAction="#handleLogin" text="Connect"/>
             <Button fx:id="btnLogout" defaultButton="true" mnemonicParsing="false"
                     onAction="#handleLogout" text="Disconnect" visible="false"/>
-            <Button fx:id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#handleCancel"
+            <Button id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#handleCancel"
                     text="Cancel"/>
         </HBox>
     </VBox>
@@ -48,8 +48,8 @@
         <VBox.margin>
             <Insets bottom="20.0"/>
         </VBox.margin>
-        <Button fx:id="btnServerMap" mnemonicParsing="false" onAction="#handleServerMap" text="Server Map"/>
-        <Button fx:id="btnConnectionBrokerMap" mnemonicParsing="false" onAction="#handleConnectionBrokerMap"
+        <Button id="btnServerMap" mnemonicParsing="false" onAction="#handleServerMap" text="Server Map"/>
+        <Button id="btnConnectionBrokerMap" mnemonicParsing="false" onAction="#handleConnectionBrokerMap"
                 text="Connection Broker Map"/>
     </HBox>
     <HBox spacing="5.0">

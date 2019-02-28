@@ -23,18 +23,14 @@
             <TextArea fx:id="taStatement" VBox.vgrow="ALWAYS"/>
             <Label text="DQL/SQL History"/>
             <HBox>
-                <children>
-                    <ChoiceBox fx:id="cmbHistory"/>
-                    <ImageView fx:id="btnDeleteHistoryItem" fitHeight="24.0" fitWidth="24.0"
-                               onMouseClicked="#handleDeleteHistoryItem" pickOnBounds="true" preserveRatio="true">
-                        <HBox.margin>
-                            <Insets left="5.0"/>
-                        </HBox.margin>
-                        <image>
-                            <Image url="@../icons/delete.gif"/>
-                        </image>
-                    </ImageView>
-                </children>
+                <ChoiceBox fx:id="cmbHistory"/>
+                <ImageView id="btnDeleteHistoryItem" fitHeight="24.0" fitWidth="24.0"
+                           onMouseClicked="#handleDeleteHistoryItem" pickOnBounds="true" preserveRatio="true">
+                    <HBox.margin>
+                        <Insets left="5.0"/>
+                    </HBox.margin>
+                    <Image url="@../icons/delete.gif"/>
+                </ImageView>
             </HBox>
         </VBox>
     </SplitPane>

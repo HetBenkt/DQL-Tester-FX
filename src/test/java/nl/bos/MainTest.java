@@ -7,6 +7,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
-import static org.junit.matchers.JUnitMatchers.containsString;
 import static org.testfx.api.FxToolkit.registerPrimaryStage;
 
 
@@ -74,7 +74,7 @@ public class MainTest extends ApplicationTest {
         clickOn("#txtPassword");
         write("dummy");
         clickOn("#btnLogin");
-        Assert.assertThat(Repository.getInstance().getErrorMessage(), containsString("[DM_SESSION_E_AUTH_FAIL]"));
+        Assert.assertThat(Repository.getInstance().getErrorMessage(), CoreMatchers.containsString("[DM_SESSION_E_AUTH_FAIL]"));
         clickOn("OK");
     }
 

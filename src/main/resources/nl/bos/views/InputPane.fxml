@@ -20,7 +20,7 @@
                     onAction="#handleReadQuery" text="ReadQuery"/>
             <Button fx:id="btnFlushCache" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
                     text="Flush Cache"/>
-            <Button fx:id="btnClearQuery" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+            <Button id="btnClearQuery" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
                     onAction="#handleClearQuery" text="Clear Query"/>
         </VBox>
     </left>
@@ -44,10 +44,11 @@
                 </padding>
                 <RadioButton mnemonicParsing="false" selected="true" text="ReadQuery">
                     <toggleGroup>
+                        <!--suppress JavaFxUnresolvedFxIdReference -->
                         <ToggleGroup fx:id="tgCommand"/>
                     </toggleGroup>
                 </RadioButton>
-                <RadioButton fx:id="rdbCommand" mnemonicParsing="false" text="Query" toggleGroup="$tgCommand"/>
+                <RadioButton id="rdbCommand" mnemonicParsing="false" text="Query" toggleGroup="$tgCommand"/>
                 <RadioButton mnemonicParsing="false" text="ExecQuery" toggleGroup="$tgCommand"/>
                 <RadioButton mnemonicParsing="false" text="CacheQuery" toggleGroup="$tgCommand"/>
                 <RadioButton mnemonicParsing="false" text="ODBC" toggleGroup="$tgCommand"/>
@@ -58,11 +59,11 @@
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                 </padding>
                 <Label text="Query"/>
-                <TextField fx:id="txtQuery"/>
+                <TextField id="txtQuery"/>
                 <Label text="List"/>
-                <TextField fx:id="txtList"/>
+                <TextField id="txtList"/>
                 <Label text="Sort"/>
-                <TextField fx:id="txtSort"/>
+                <TextField id="txtSort"/>
             </HBox>
         </VBox>
     </center>
@@ -81,7 +82,7 @@
                     onAction="#handleConnect" text="Connect"/>
             <Button fx:id="btnDisconnect" defaultButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
                     onAction="#handleDisconnect" text="Disconnect" visible="false"/>
-            <Button fx:id="btnExit" cancelButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+            <Button id="btnExit" cancelButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
                     onAction="#handleExit" text="Exit"/>
         </VBox>
     </right>
@@ -91,9 +92,7 @@
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
             </padding>
             <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                <image>
-                    <Image url="@../icons/type/t_dm_docbase_config_16.gif"/>
-                </image>
+                <Image url="@../icons/type/t_dm_docbase_config_16.gif"/>
             </ImageView>
             <Label fx:id="lblStatus" style="-fx-background-color: #a8a8a8" text="Offline">
                 <padding>
@@ -104,9 +103,7 @@
                 </tooltip>
             </Label>
             <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                <image>
-                    <Image url="@../icons/type/t_dm_user_16.gif"/>
-                </image>
+                <Image url="@../icons/type/t_dm_user_16.gif"/>
             </ImageView>
             <Label fx:id="lblUsernameOS" style="-fx-background-color: #d3d3d3" text="OS Username">
                 <padding>
@@ -117,9 +114,7 @@
                 </tooltip>
             </Label>
             <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                <image>
-                    <Image url="@../icons/type/t_dm_user_16.gif"/>
-                </image>
+                <Image url="@../icons/type/t_dm_user_16.gif"/>
             </ImageView>
             <Label fx:id="lblUsernameDC" style="-fx-background-color: #a8a8a8" text="DC Username">
                 <padding>
@@ -130,9 +125,7 @@
                 </tooltip>
             </Label>
             <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                <image>
-                    <Image url="@../icons/federations.gif"/>
-                </image>
+                <Image url="@../icons/federations.gif"/>
             </ImageView>
             <Label fx:id="lblDomainOS" style="-fx-background-color: #d3d3d3" text="OS Domain">
                 <padding>
@@ -143,9 +136,7 @@
                 </tooltip>
             </Label>
             <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                <image>
-                    <Image url="@../icons/sortByLock.gif"/>
-                </image>
+                <Image url="@../icons/sortByLock.gif"/>
             </ImageView>
             <Label fx:id="lblPrivileges" style="-fx-background-color: #a8a8a8" text="Privileges">
                 <padding>
@@ -156,9 +147,7 @@
                 </tooltip>
             </Label>
             <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                <image>
-                    <Image url="@../icons/type/t_dm_server_config_16.gif"/>
-                </image>
+                <Image url="@../icons/type/t_dm_server_config_16.gif"/>
             </ImageView>
             <Label fx:id="lblServerVersion" style="-fx-background-color: #d3d3d3" text="Server Version">
                 <padding>

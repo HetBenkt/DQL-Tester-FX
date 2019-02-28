@@ -17,8 +17,8 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import nl.bos.Main;
 import nl.bos.Repository;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -88,6 +88,9 @@ public class InputPane implements EventHandler<WindowEvent> {
         return btnDisconnect;
     }
 
+    /**
+     * @noinspection WeakerAccess
+     */
     public InputPane() {
         loginStage.initModality(Modality.APPLICATION_MODAL);
         loginStage.setTitle("Documentum Login");
@@ -117,7 +120,7 @@ public class InputPane implements EventHandler<WindowEvent> {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
         } else {
-            updateNodes("Offline", "OS Username", "DC Username", "OS Domain", "Privileges", "Server Version", false);
+            updateNodes();
         }
     }
 
@@ -206,25 +209,25 @@ public class InputPane implements EventHandler<WindowEvent> {
         return userPrivilegesLabel;
     }
 
-    private void updateNodes(String status, String usernameOS, String usernameDC, String domainOS, String privileges, String serverVersion, boolean isConnected) {
-        lblStatus.setText(status);
-        lblUsernameOS.setText(usernameOS);
-        lblUsernameDC.setText(usernameDC);
-        lblDomainOS.setText(domainOS);
-        lblPrivileges.setText(privileges);
-        lblServerVersion.setText(serverVersion);
+    private void updateNodes() {
+        lblStatus.setText("Offline");
+        lblUsernameOS.setText("OS Username");
+        lblUsernameDC.setText("DC Username");
+        lblDomainOS.setText("OS Domain");
+        lblPrivileges.setText("Privileges");
+        lblServerVersion.setText("Server Version");
 
-        btnReadQuery.setDisable(!isConnected);
-        btnFlushCache.setDisable(!isConnected);
+        btnReadQuery.setDisable(true);
+        btnFlushCache.setDisable(true);
 
         btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
-        btnDisconnect.setManaged(isConnected);
+        btnDisconnect.setManaged(false);
 
         btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
-        btnConnect.setManaged(!isConnected);
+        btnConnect.setManaged(true);
 
         RootPane rootPaneLoaderController = main.getRootPaneLoader().getController();
-        rootPaneLoaderController.getMenubar().setDisable(!isConnected);
+        rootPaneLoaderController.getMenubar().setDisable(true);
     }
 
     @FXML
@@ -277,9 +280,12 @@ public class InputPane implements EventHandler<WindowEvent> {
                 items.add(0, statement);
                 cmbHistory.setValue(statement);
                 JSONArray queries = (JSONArray) jsonObject.get("queries");
-                queries.add(0, statement);
+                if (queries.length() > 0) {
+                    queries.put(queries.get(0));
+                }
+                queries.put(0, statement);
                 try (FileWriter file = new FileWriter("history.json")) {
-                    file.write(jsonObject.toJSONString());
+                    file.write(jsonObject.toString());
                     file.flush();
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE, e.getMessage(), e);

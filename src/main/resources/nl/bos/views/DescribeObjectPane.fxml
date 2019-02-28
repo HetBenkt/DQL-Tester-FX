@@ -20,15 +20,16 @@
         </HBox>
         <ComboBox fx:id="cbTypesTables" onAction="#handleTypesTables" prefWidth="150.0"/>
         <HBox spacing="5.0">
-            <RadioButton fx:id="rbTypeTable" mnemonicParsing="false" onAction="#handleTypeTable" selected="true"
+            <RadioButton id="rbTypeTable" mnemonicParsing="false" onAction="#handleTypeTable" selected="true"
                          text="Type &amp; Table">
                 <toggleGroup>
+                    <!--suppress JavaFxUnresolvedFxIdReference -->
                     <ToggleGroup fx:id="tgTypeTable"/>
                 </toggleGroup>
             </RadioButton>
-            <RadioButton fx:id="rbType" mnemonicParsing="false" onAction="#handleType" text="Type"
+            <RadioButton id="rbType" mnemonicParsing="false" onAction="#handleType" text="Type"
                          toggleGroup="$tgTypeTable"/>
-            <RadioButton fx:id="rbTable" mnemonicParsing="false" onAction="#handleTable" text="Table"
+            <RadioButton id="rbTable" mnemonicParsing="false" onAction="#handleTable" text="Table"
                          toggleGroup="$tgTypeTable"/>
         </HBox>
         <HBox spacing="5.0">

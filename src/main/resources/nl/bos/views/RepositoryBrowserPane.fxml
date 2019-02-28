@@ -56,8 +56,8 @@
             <CheckBox fx:id="ckbShowAllVersions" mnemonicParsing="false" text="Show All Versions"/>
             <CheckBox fx:id="ckbShowAllCabinets" mnemonicParsing="false" onAction="#handleShowAllCabinets"
                       selected="true" text="Show All Cabinets"/>
-            <CheckBox fx:id="ckbReadOnlyMode" mnemonicParsing="false" selected="true" text="Read-only Mode"/>
-            <Button fx:id="btnFlushCache" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Flush Cache">
+            <CheckBox id="ckbReadOnlyMode" mnemonicParsing="false" selected="true" text="Read-only Mode"/>
+            <Button id="btnFlushCache" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Flush Cache">
                 <VBox.margin>
                     <Insets top="20.0"/>
                 </VBox.margin>

@@ -11,9 +11,9 @@
         </VBox.margin>
     </TextArea>
     <HBox spacing="10.0">
-        <Button fx:id="btnFind" mnemonicParsing="false" onAction="#handleFind" text="Find"/>
-        <Button fx:id="btnFindPrevious" mnemonicParsing="false" onAction="#handleFindPrevious" text="&lt;"/>
-        <Button fx:id="btnFindNext" mnemonicParsing="false" onAction="#handleFindNext" text="&gt;"/>
+        <Button id="btnFind" mnemonicParsing="false" onAction="#handleFind" text="Find"/>
+        <Button id="btnFindPrevious" mnemonicParsing="false" onAction="#handleFindPrevious" text="&lt;"/>
+        <Button id="btnFindNext" mnemonicParsing="false" onAction="#handleFindNext" text="&gt;"/>
         <CheckBox fx:id="chkCaseSensitive" mnemonicParsing="false" onAction="#handleCaseSensitive"
                   text="Case Sensitive"/>
         <TextField fx:id="txtSearch" prefColumnCount="30"/>
@@ -27,13 +27,13 @@
             <HBox spacing="5.0">
                 <Label text="Object ID"/>
                 <TextField fx:id="txtObjectId"/>
-                <Button fx:id="btnDump" mnemonicParsing="false" onAction="#handleDump" text="Dump"/>
+                <Button id="btnDump" mnemonicParsing="false" onAction="#handleDump" text="Dump"/>
             </HBox>
         </VBox>
         <VBox spacing="5.0">
-            <CheckBox fx:id="chkUseAPIkill" mnemonicParsing="false" selected="true"
+            <CheckBox id="chkUseAPIkill" mnemonicParsing="false" selected="true"
                       text="Use API Method 'kill' to remove object from cache"/>
-            <CheckBox fx:id="chkFilterList" mnemonicParsing="false" text="Filter Attributes List"/>
+            <CheckBox id="chkFilterList" mnemonicParsing="false" text="Filter Attributes List"/>
         </VBox>
         <VBox alignment="BOTTOM_RIGHT">
             <Button fx:id="btnExit" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#handleExit" text="Exit">

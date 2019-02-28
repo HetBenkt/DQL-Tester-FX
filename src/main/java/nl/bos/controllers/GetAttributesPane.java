@@ -42,6 +42,9 @@ public class GetAttributesPane {
     @FXML
     private CheckBox chkCaseSensitive;
 
+    /**
+     * @noinspection EmptyMethod
+     */
     @FXML
     private void initialize() {
         //No implementation needed

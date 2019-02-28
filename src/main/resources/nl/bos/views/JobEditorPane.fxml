@@ -104,6 +104,7 @@
                         <Insets top="3.0"/>
                     </HBox.margin>
                     <toggleGroup>
+                        <!--suppress JavaFxUnresolvedFxIdReference -->
                         <ToggleGroup fx:id="jobState"/>
                     </toggleGroup>
                 </RadioButton>
@@ -144,6 +145,7 @@
                         <Insets top="3.0"/>
                     </HBox.margin>
                     <toggleGroup>
+                        <!--suppress JavaFxUnresolvedFxIdReference -->
                         <ToggleGroup fx:id="jobEndDate"/>
                     </toggleGroup>
                 </RadioButton>
@@ -202,7 +204,7 @@
         <VBox.margin>
             <Insets left="5.0" top="10.0"/>
         </VBox.margin>
-        <Button fx:id="btnRefresh" mnemonicParsing="false" onAction="#handleRefresh" text="Refresh"/>
+        <Button id="btnRefresh" mnemonicParsing="false" onAction="#handleRefresh" text="Refresh"/>
         <Button fx:id="btnCopyJob" disable="true" mnemonicParsing="false" text="Copy Job"/>
         <Button fx:id="btnDeleteJob" disable="true" mnemonicParsing="false" text="Delete Job"/>
         <Button fx:id="btnExportJob" disable="true" mnemonicParsing="false" text="Export Job"/>
@@ -214,7 +216,7 @@
         <VBox.margin>
             <Insets top="5.0"/>
         </VBox.margin>
-        <ImageView fx:id="ivInfo" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+        <ImageView id="ivInfo" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
             <Image url="@../icons/info.png"/>
         </ImageView>
         <Label fx:id="lblStatus"/>

@@ -35,7 +35,7 @@ public class RootPane implements EventHandler<WindowEvent> {
     private final Repository repositoryCon = Repository.getInstance();
 
     private final static Stage describeObjectStage = new Stage();
-    private FXMLLoader fxmlLoader;
+    private final FXMLLoader fxmlLoader;
 
     @FXML
     private MenuBar menubar;
@@ -48,6 +48,9 @@ public class RootPane implements EventHandler<WindowEvent> {
         return menubar;
     }
 
+    /**
+     * @noinspection WeakerAccess
+     */
     public RootPane() {
         describeObjectStage.setTitle("Describe object");
         fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/DescribeObjectPane.fxml"));
@@ -60,6 +63,9 @@ public class RootPane implements EventHandler<WindowEvent> {
         describeObjectStage.setOnCloseRequest(this);
     }
 
+    /**
+     * @noinspection EmptyMethod
+     */
     @FXML
     private void initialize() {
         //No implementation needed

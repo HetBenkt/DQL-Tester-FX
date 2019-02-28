@@ -19,6 +19,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import nl.bos.Constants;
 import nl.bos.MyTreeItem;
 import nl.bos.Repository;
 
@@ -120,7 +121,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
                 if (isPrivate)
                     image = new Image(getClass().getClassLoader().getResourceAsStream("nl/bos/icons/type/t_mycabinet_16.gif"));
             } else if (treeItem.getType().equals(TYPE_DOCUMENT)) {
-                String lockOwner = treeItem.getObject().getString(ATTR_R_LOCK_OWNER);
+                String lockOwner = treeItem.getObject().getString(Constants.ATTR_R_LOCK_OWNER);
                 if (!lockOwner.equals(""))
                     image = new Image(getClass().getClassLoader().getResourceAsStream("nl/bos/icons/type/t_dm_document_lock_16.gif"));
             }
@@ -141,16 +142,16 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
             try {
                 txtObjectId.setText(selectedObject.getObjectId().getId());
                 txtObjectType.setText(selectedObject.getType().getName());
-                txtContentType.setText(selectedObject.getString("a_content_type"));
-                txtContentSize.setText(selectedObject.getString("r_content_size"));
-                txtCreationDate.setText(selectedObject.getTime("r_creation_date").asString(""));
-                txtModifyDate.setText(selectedObject.getTime("r_modify_date").asString(""));
-                txtLockOwner.setText(selectedObject.getString("r_lock_owner"));
-                txtLockMachine.setText(selectedObject.getString("r_lock_machine"));
-                txtLockDate.setText(selectedObject.getTime("r_lock_date").asString(""));
-                txtAclName.setText(selectedObject.getString("acl_name"));
-                txtPermission.setText(convertPermitToLabel(selectedObject.getInt("owner_permit")));
-                txtVersion.setText(getRepeatingValue(selectedObject, "r_version_label"));
+                txtContentType.setText(selectedObject.getString(ATTR_A_CONTENT_TYPE));
+                txtContentSize.setText(selectedObject.getString(ATTR_R_CONTENT_SIZE));
+                txtCreationDate.setText(selectedObject.getTime(ATTR_R_CREATION_DATE).asString(""));
+                txtModifyDate.setText(selectedObject.getTime(ATTR_R_MODIFY_DATE).asString(""));
+                txtLockOwner.setText(selectedObject.getString(ATTR_R_LOCK_OWNER));
+                txtLockMachine.setText(selectedObject.getString(ATTR_R_LOCK_MACHINE));
+                txtLockDate.setText(selectedObject.getTime(ATTR_R_LOCK_DATE).asString(""));
+                txtAclName.setText(selectedObject.getString(ATTR_ACL_NAME));
+                txtPermission.setText(convertPermitToLabel(selectedObject.getInt(ATTR_OWNER_PERMIT)));
+                txtVersion.setText(getRepeatingValue(selectedObject));
             } catch (DfException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
@@ -170,11 +171,11 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
         }
     }
 
-    private String getRepeatingValue(IDfPersistentObject object, String attribute) throws DfException {
-        int count = object.getValueCount(attribute);
+    private String getRepeatingValue(IDfPersistentObject object) throws DfException {
+        int count = object.getValueCount(ATTR_R_VERSION_LABEL);
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < count; i++) {
-            result.append(object.getRepeatingString(attribute, i));
+            result.append(object.getRepeatingString(ATTR_R_VERSION_LABEL, i));
             if (i != count - 1)
                 result.append(", ");
         }

@@ -3,7 +3,7 @@ package nl.bos;
 import javafx.scene.control.TreeItem;
 
 public class DescribeObjectTreeItem extends TreeItem {
-    private String value;
+    private final String value;
     private String type;
 
     public DescribeObjectTreeItem(String value, String type) {
