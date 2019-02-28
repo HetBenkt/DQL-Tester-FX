@@ -38,9 +38,9 @@ public class RepositoryBrowserPaneTest {
         PowerMockito.when(object.getRepeatingString(any(), anyInt())).thenReturn("dummy");
 
         Class<? extends RepositoryBrowserPane> repositoryBrowserClass = repositoryBrowserPane.getClass();
-        Method getRepeatingValue = repositoryBrowserClass.getDeclaredMethod("getRepeatingValue", IDfPersistentObject.class, String.class);
+        Method getRepeatingValue = repositoryBrowserClass.getDeclaredMethod("getRepeatingValue", IDfPersistentObject.class);
         getRepeatingValue.setAccessible(true);
-        String value = (String) getRepeatingValue.invoke(repositoryBrowserPane, object, "r_version_label");
+        String value = (String) getRepeatingValue.invoke(repositoryBrowserPane, object);
         assertEquals("dummy, dummy, dummy", value);
     }
 }
