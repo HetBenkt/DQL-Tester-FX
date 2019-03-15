@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -209,10 +210,16 @@ public class LoginPane {
 
     @FXML
     private void handleConnectButton(KeyEvent keyEvent) {
-        if (txtUsername.getText().length() > 0 && txtPassword.getText().length() > 0)
-            btnLogin.setDisable(false);
-        else
-            btnLogin.setDisable(true);
+        boolean hasRequiredInputs = hasRequiredInputs();
+        btnLogin.setDisable(!hasRequiredInputs);
+
+        if (hasRequiredInputs && keyEvent.getCode() == KeyCode.ENTER) {
+            btnLogin.fire();
+        }
+    }
+
+    private boolean hasRequiredInputs() {
+        return txtUsername.getText().length() > 0 && txtPassword.getText().length() > 0;
     }
 
     @FXML
