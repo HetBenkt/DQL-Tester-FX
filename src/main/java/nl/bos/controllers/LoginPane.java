@@ -48,6 +48,7 @@ public class LoginPane {
     private CheckBox chkSaveLoginData;
     @FXML
     private CheckBox chkUseWindowsLogin;
+    private String projectVersion = null;
 
     @FXML
     void initialize() {
@@ -97,14 +98,22 @@ public class LoginPane {
     }
 
     private String getProjectVersion() {
-        final Properties properties = new Properties();
+        if (projectVersion == null) {
+            readProjectVersionFromFile();
+        }
+
+        return projectVersion;
+    }
+
+    private void readProjectVersionFromFile() {
         try {
+            final Properties properties = new Properties();
             properties.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
-            return properties.getProperty("version");
+            projectVersion = properties.getProperty("version");
+
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-        return "";
     }
 
     @FXML
