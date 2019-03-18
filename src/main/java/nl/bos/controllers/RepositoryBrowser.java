@@ -19,8 +19,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import nl.bos.BrowserTreeItem;
 import nl.bos.Constants;
-import nl.bos.MyTreeItem;
 import nl.bos.Repository;
 
 import java.util.List;
@@ -29,13 +29,13 @@ import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
 
-public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem>>, EventHandler<ActionEvent> {
-    private static final Logger LOGGER = Logger.getLogger(RepositoryBrowserPane.class.getName());
+public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeItem>>, EventHandler<ActionEvent> {
+    private static final Logger LOGGER = Logger.getLogger(RepositoryBrowser.class.getName());
 
     private final Repository repositoryCon = Repository.getInstance();
 
     @FXML
-    private TreeView<MyTreeItem> treeView;
+    private TreeView<BrowserTreeItem> treeView;
     @FXML
     private TextField txtObjectId;
     @FXML
@@ -69,7 +69,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
     @FXML
     private CheckBox ckbShowAllVersions;
 
-    private MyTreeItem rootItem;
+    private BrowserTreeItem rootItem;
     private MyTreeNode selected;
     private final ContextMenu rootContextMenu = new ContextMenu();
 
@@ -79,8 +79,8 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
         miDump.setOnAction(this);
         rootContextMenu.getItems().add(miDump);
 
-        rootItem = new MyTreeItem(null, repositoryCon.getRepositoryName(), TYPE_REPOSITORY, "");
-        TreeItem<MyTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
+        rootItem = new BrowserTreeItem(null, repositoryCon.getRepositoryName(), TYPE_REPOSITORY, "");
+        TreeItem<BrowserTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
         treeItemBrowser.setExpanded(true);
         treeView.setRoot(treeItemBrowser);
         treeView.getSelectionModel().selectedItemProperty().addListener(this);
@@ -104,7 +104,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
     }
 
 
-    private TreeItem<MyTreeItem> buildTreeItemBrowser(MyTreeItem treeItem) {
+    private TreeItem<BrowserTreeItem> buildTreeItemBrowser(BrowserTreeItem treeItem) {
         return createNode(treeItem);
     }
 
@@ -113,7 +113,7 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
     // anonymously, but this could be better abstracted by creating a
     // 'FileTreeItem' subclass of TreeItem. However, this is left as an exercise
     // for the reader.
-    private TreeItem<MyTreeItem> createNode(final MyTreeItem treeItem) {
+    private TreeItem<BrowserTreeItem> createNode(final BrowserTreeItem treeItem) {
         Image image = new Image(getClass().getClassLoader().getResourceAsStream(String.format("nl/bos/icons/type/t_%s_16.gif", treeItem.getType())));
         try {
             if (treeItem.getType().equals(TYPE_CABINET)) {
@@ -134,8 +134,8 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
     }
 
     @Override
-    public void changed(ObservableValue<? extends TreeItem<MyTreeItem>> observable, TreeItem<MyTreeItem> oldValue, TreeItem<MyTreeItem> newValue) {
-        MyTreeItem selectedItem = newValue.getValue();
+    public void changed(ObservableValue<? extends TreeItem<BrowserTreeItem>> observable, TreeItem<BrowserTreeItem> oldValue, TreeItem<BrowserTreeItem> newValue) {
+        BrowserTreeItem selectedItem = newValue.getValue();
         LOGGER.info(String.format("Selected item: %s", selectedItem.getName()));
         IDfPersistentObject selectedObject = selectedItem.getObject();
         if (selectedObject != null) {
@@ -206,11 +206,11 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
             LOGGER.info(selected.getValue().getObject().getObjectId().getId());
             Stage dumpAttributes = new Stage();
             dumpAttributes.setTitle(String.format("Attributes List - %s (%s)", selected.getValue().getObject().getObjectId().getId(), repositoryCon.getRepositoryName()));
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributesPane.fxml"));
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributes.fxml"));
             VBox loginPane = fxmlLoader.load();
             Scene scene = new Scene(loginPane);
             dumpAttributes.setScene(scene);
-            GetAttributesPane controller = fxmlLoader.getController();
+            GetAttributes controller = fxmlLoader.getController();
             controller.initTextArea(selected.getValue().getObject());
             dumpAttributes.showAndWait();
         } catch (Exception e) {
@@ -227,12 +227,12 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
 
     @FXML
     private void handleShowAllCabinets(ActionEvent actionEvent) {
-        TreeItem<MyTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
+        TreeItem<BrowserTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
         treeItemBrowser.setExpanded(true);
         treeView.setRoot(treeItemBrowser);
     }
 
-    private class MyTreeNode extends TreeItem<MyTreeItem> {
+    private class MyTreeNode extends TreeItem<BrowserTreeItem> {
         // We cache whether the File is a leaf or not. A File is a leaf if
         // it is not a directory and does not have any files contained within
         // it. We cache this as isLeaf() is called often, and doing the
@@ -248,14 +248,14 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
         private boolean isFirstTimeChildren;
         private boolean isFirstTimeLeaf;
 
-        private MyTreeNode(MyTreeItem treeItem, ImageView imageView) {
+        private MyTreeNode(BrowserTreeItem treeItem, ImageView imageView) {
             super(treeItem, imageView);
             isFirstTimeChildren = true;
             isFirstTimeLeaf = true;
         }
 
         @Override
-        public ObservableList<TreeItem<MyTreeItem>> getChildren() {
+        public ObservableList<TreeItem<BrowserTreeItem>> getChildren() {
             if (isFirstTimeChildren) {
                 isFirstTimeChildren = false;
 
@@ -270,19 +270,19 @@ public class RepositoryBrowserPane implements ChangeListener<TreeItem<MyTreeItem
         public boolean isLeaf() {
             if (isFirstTimeLeaf) {
                 isFirstTimeLeaf = false;
-                MyTreeItem treeItem = getValue();
+                BrowserTreeItem treeItem = getValue();
                 isLeaf = !treeItem.isDirectory();
             }
             return isLeaf;
         }
 
-        private ObservableList<TreeItem<MyTreeItem>> buildChildren(MyTreeNode parent) {
-            MyTreeItem parentItem = parent.getValue();
+        private ObservableList<TreeItem<BrowserTreeItem>> buildChildren(MyTreeNode parent) {
+            BrowserTreeItem parentItem = parent.getValue();
             if (parentItem != null && parentItem.isDirectory()) {
-                List<MyTreeItem> treeItems = parentItem.listObjects(parentItem, ckbShowAllCabinets.isSelected(), ckbShowAllVersions.isSelected());
+                List<BrowserTreeItem> treeItems = parentItem.listObjects(parentItem, ckbShowAllCabinets.isSelected(), ckbShowAllVersions.isSelected());
                 lblNrOfItems.setText(String.format("%s items found", treeItems.size()));
-                ObservableList<TreeItem<MyTreeItem>> children = FXCollections.observableArrayList();
-                for (MyTreeItem treeItem : treeItems) {
+                ObservableList<TreeItem<BrowserTreeItem>> children = FXCollections.observableArrayList();
+                for (BrowserTreeItem treeItem : treeItems) {
                     children.add(createNode(treeItem));
                 }
                 return children;

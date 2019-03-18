@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public class MyJobObject {
-    private static final Logger LOGGER = Logger.getLogger(MyJobObject.class.getName());
+public class JobObject {
+    private static final Logger LOGGER = Logger.getLogger(JobObject.class.getName());
 
     private final String objectId;
     private final String objectName;
@@ -31,7 +31,7 @@ public class MyJobObject {
         return objectName;
     }
 
-    public MyJobObject(String objectId, String objectName, boolean isActive, String isRunning) {
+    public JobObject(String objectId, String objectName, boolean isActive, String isRunning) {
         this.objectId = objectId;
         this.objectName = objectName;
         this.isActive = isActive;

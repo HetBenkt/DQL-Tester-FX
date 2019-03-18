@@ -3,7 +3,7 @@ package nl.bos.utils;
 import com.documentum.fc.common.DfException;
 import nl.bos.Main;
 import nl.bos.Repository;
-import nl.bos.controllers.BodyPane;
+import nl.bos.controllers.QueryWithResult;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -36,14 +36,14 @@ public class TableResultUtils {
     }
 
     private void updateTableWithTableInfo(String currentSelected) throws DfException {
-        BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
+        QueryWithResult queryWithResultController = main.getBodyPaneLoader().getController();
         String tableDescription = repositoryCon.getSession().describe(TABLE, "dm_dbo." + currentSelected);
-        bodyPaneController.updateResultTableWithStringInput(tableDescription, Arrays.asList("Column", "Data Type", "Primary Key"));
+        queryWithResultController.updateResultTableWithStringInput(tableDescription, Arrays.asList("Column", "Data Type", "Primary Key"));
     }
 
     private void updateTableWithTypeInfo(String currentSelected) throws DfException {
-        BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
+        QueryWithResult queryWithResultController = main.getBodyPaneLoader().getController();
         String typeDescription = repositoryCon.getSession().describe(TYPE, currentSelected);
-        bodyPaneController.updateResultTableWithStringInput(typeDescription, Arrays.asList("Attribute", "Data Type", "Repeating"));
+        queryWithResultController.updateResultTableWithStringInput(typeDescription, Arrays.asList("Attribute", "Data Type", "Repeating"));
     }
 }

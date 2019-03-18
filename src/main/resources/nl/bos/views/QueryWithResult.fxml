@@ -5,25 +5,25 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="vBoxBody" BorderPane.alignment="CENTER"
-      xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.BodyPane">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="queryWithResultBox" BorderPane.alignment="CENTER"
+      xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.QueryWithResult">
     <SplitPane dividerPositions="0.6" orientation="VERTICAL">
         <VBox>
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
             </padding>
             <Label text="Result"/>
-            <TableView fx:id="tvResult" VBox.vgrow="ALWAYS"/>
+            <TableView fx:id="result" VBox.vgrow="ALWAYS"/>
         </VBox>
         <VBox>
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
             </padding>
             <Label text="DQL/SQL Statement"/>
-            <TextArea fx:id="taStatement" VBox.vgrow="ALWAYS"/>
+            <TextArea fx:id="statement" VBox.vgrow="ALWAYS"/>
             <Label text="DQL/SQL History"/>
             <HBox>
-                <ChoiceBox fx:id="cmbHistory"/>
+                <ChoiceBox fx:id="historyStatements"/>
                 <ImageView id="btnDeleteHistoryItem" fitHeight="24.0" fitWidth="24.0"
                            onMouseClicked="#handleDeleteHistoryItem" pickOnBounds="true" preserveRatio="true">
                     <HBox.margin>

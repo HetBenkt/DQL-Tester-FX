@@ -9,9 +9,9 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import nl.bos.controllers.BodyPane;
-import nl.bos.controllers.InputPane;
-import nl.bos.controllers.RootPane;
+import nl.bos.controllers.ConnectionWithStatus;
+import nl.bos.controllers.Menu;
+import nl.bos.controllers.QueryWithResult;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -67,29 +67,29 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RootPane.fxml"));
+            rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/Menu.fxml"));
             BorderPane rootPane = rootPaneLoader.load();
-            RootPane rootPaneLoaderController = rootPaneLoader.getController();
-            bodyPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/BodyPane.fxml"));
+            Menu menuLoaderController = rootPaneLoader.getController();
+            bodyPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/QueryWithResult.fxml"));
             VBox bodyLayout = bodyPaneLoader.load();
 
             if (devModeEnabled) {
-                BodyPane bodyPaneController = bodyPaneLoader.getController();
-                InputPane inputPaneController = bodyPaneController.getFxmlLoader().getController();
-                inputPaneController.getBtnReadQuery().setDisable(false);
-                inputPaneController.getBtnFlushCache().setDisable(false);
+                QueryWithResult queryWithResultController = bodyPaneLoader.getController();
+                ConnectionWithStatus connectionWithStatusController = queryWithResultController.getConnectionWithStatusFxmlLoader().getController();
+                connectionWithStatusController.getBtnReadQuery().setDisable(false);
+                connectionWithStatusController.getBtnFlushCache().setDisable(false);
 
-                Button btnDisconnect = inputPaneController.getBtnDisconnect();
+                Button btnDisconnect = connectionWithStatusController.getBtnDisconnect();
                 btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
                 btnDisconnect.setManaged(true);
 
-                Button btnConnect = inputPaneController.getBtnConnect();
+                Button btnConnect = connectionWithStatusController.getBtnConnect();
                 btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
                 btnConnect.setManaged(false);
 
-                rootPaneLoaderController.getMenubar().setDisable(false);
+                menuLoaderController.getMenubar().setDisable(false);
 
-                inputPaneController.updateNodes(Repository.getInstance().getSession());
+                connectionWithStatusController.updateNodes(Repository.getInstance().getSession());
             }
 
             rootPane.setCenter(bodyLayout);

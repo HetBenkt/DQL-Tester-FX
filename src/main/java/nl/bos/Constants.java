@@ -48,10 +48,17 @@ public final class Constants {
     public static final String ATTR_METHOD_ARGUMENTS = "method_arguments";
     public static final String ATTR_MAX_ITERATIONS = "max_iterations";
     public static final String ATTR_EXPIRATION_DATE = "expiration_date";
+
     //Others
     static final String PATH_FORMAT = "%s/%s";
+
     public static final String TYPE = "TYPE";
     public static final String TABLE = "TABLE";
+
+    public static final String HISTORY_JSON = "history.json";
+    public static final String QUERIES = "queries";
+    static final String NR_OF_TABLES = "nr_of_tables";
+    static final String NR_OF_TYPES = "nr_of_types";
 
     private Constants() {
     }

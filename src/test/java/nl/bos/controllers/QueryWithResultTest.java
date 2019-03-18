@@ -11,7 +11,7 @@ import org.powermock.reflect.Whitebox;
 
 import static org.powermock.api.mockito.PowerMockito.mock;
 
-public class BodyPaneTest {
+public class QueryWithResultTest {
 
     @Rule
     public PowerMockRule rule = new PowerMockRule();
@@ -30,12 +30,12 @@ public class BodyPaneTest {
     @Test
     public void getCmbHistory() {
         //given
-        final BodyPane bodyPane = new BodyPane();
+        final QueryWithResult queryWithResult = new QueryWithResult();
         ChoiceBox mockedCmbHistory = mock(ChoiceBox.class);
-        Whitebox.setInternalState(bodyPane, "cmbHistory", mockedCmbHistory);
+        Whitebox.setInternalState(queryWithResult, "cmbHistory", mockedCmbHistory);
 
         //when
-        ChoiceBox<Object> expected = bodyPane.getCmbHistory();
+        ChoiceBox<Object> expected = queryWithResult.getHistoryStatements();
 
         //then
         Assert.assertEquals(expected, mockedCmbHistory);
@@ -44,12 +44,12 @@ public class BodyPaneTest {
     @Test
     public void getTaStatement() {
         //given
-        final BodyPane bodyPane = new BodyPane();
+        final QueryWithResult queryWithResult = new QueryWithResult();
         TextArea mockedTaStatement = mock(TextArea.class);
-        Whitebox.setInternalState(bodyPane, "taStatement", mockedTaStatement);
+        Whitebox.setInternalState(queryWithResult, "taStatement", mockedTaStatement);
 
         //when
-        TextArea expected = bodyPane.getTaStatement();
+        TextArea expected = queryWithResult.getStatement();
 
         //then
         Assert.assertEquals(expected, mockedTaStatement);
@@ -58,12 +58,12 @@ public class BodyPaneTest {
     @Test
     public void getJsonObject() {
         //given
-        final BodyPane bodyPane = new BodyPane();
+        final QueryWithResult queryWithResult = new QueryWithResult();
         JSONObject mockedJsonObject = mock(JSONObject.class);
-        Whitebox.setInternalState(bodyPane, "jsonObject", mockedJsonObject);
+        Whitebox.setInternalState(queryWithResult, "jsonObject", mockedJsonObject);
 
         //when
-        JSONObject expected = bodyPane.getJsonObject();
+        JSONObject expected = queryWithResult.getJsonObject();
 
         //then
         Assert.assertEquals(expected, mockedJsonObject);
@@ -72,12 +72,12 @@ public class BodyPaneTest {
     @Test
     public void getFxmlLoader() {
         //given
-        final BodyPane bodyPane = new BodyPane();
+        final QueryWithResult queryWithResult = new QueryWithResult();
         FXMLLoader mockedFxmlLoader = mock(FXMLLoader.class);
-        Whitebox.setInternalState(bodyPane, "fxmlLoader", mockedFxmlLoader);
+        Whitebox.setInternalState(queryWithResult, "fxmlLoader", mockedFxmlLoader);
 
         //when
-        FXMLLoader expected = bodyPane.getFxmlLoader();
+        FXMLLoader expected = queryWithResult.getConnectionWithStatusFxmlLoader();
 
         //then
         Assert.assertEquals(expected, mockedFxmlLoader);

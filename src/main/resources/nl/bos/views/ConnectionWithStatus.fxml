@@ -5,7 +5,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="200.0" prefWidth="200.0"
-            xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.InputPane">
+            xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.ConnectionWithStatus">
     <left>
         <VBox alignment="TOP_CENTER" spacing="5.0"
               style="-fx-border-color: rgba(211,211,211,255); -fx-border-width: 1; -fx-border-style: solid;"

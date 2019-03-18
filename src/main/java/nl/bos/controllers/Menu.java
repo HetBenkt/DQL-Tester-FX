@@ -29,8 +29,8 @@ import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class RootPane implements EventHandler<WindowEvent> {
-    private static final Logger LOGGER = Logger.getLogger(RootPane.class.getName());
+public class Menu implements EventHandler<WindowEvent> {
+    private static final Logger LOGGER = Logger.getLogger(Menu.class.getName());
 
     private final Repository repositoryCon = Repository.getInstance();
 
@@ -51,9 +51,9 @@ public class RootPane implements EventHandler<WindowEvent> {
     /**
      * @noinspection WeakerAccess
      */
-    public RootPane() {
+    public Menu() {
         describeObjectStage.setTitle("Describe object");
-        fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/DescribeObjectPane.fxml"));
+        fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/DescribeObject.fxml"));
         try {
             HBox describeObject = fxmlLoader.load();
             describeObjectStage.setScene(new Scene(describeObject));
@@ -73,9 +73,9 @@ public class RootPane implements EventHandler<WindowEvent> {
 
     @Override
     public void handle(WindowEvent windowEvent) {
-        DescribeObjectPane describeObjectPaneController = fxmlLoader.getController();
-        String currentSelected = (String) describeObjectPaneController.getCurrentSelected().getValue();
-        String type = describeObjectPaneController.getCurrentSelected().getType();
+        DescribeObject describeObjectController = fxmlLoader.getController();
+        String currentSelected = (String) describeObjectController.getCurrentSelected().getValue();
+        String type = describeObjectController.getCurrentSelected().getType();
         String message = MessageFormat.format("Selected item ''{0}'' of type ''{1}''", currentSelected, type);
         LOGGER.info(message);
         new TableResultUtils().updateTable(type, currentSelected);
@@ -86,7 +86,7 @@ public class RootPane implements EventHandler<WindowEvent> {
         Stage browseRepositoryStage = new Stage();
         browseRepositoryStage.initModality(Modality.APPLICATION_MODAL);
         browseRepositoryStage.setTitle(String.format("Repository Browser - %s (%s)", repositoryCon.getRepositoryName(), repositoryCon.getUserName()));
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RepositoryBrowserPane.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RepositoryBrowser.fxml"));
         try {
             VBox repositoryBrowser = fxmlLoader.load();
             browseRepositoryStage.setScene(new Scene(repositoryBrowser));
@@ -100,7 +100,7 @@ public class RootPane implements EventHandler<WindowEvent> {
     private void manageJobs(ActionEvent actionEvent) {
         Stage jobEditorStage = new Stage();
         jobEditorStage.setTitle(String.format("Job Editor - %s", repositoryCon.getRepositoryName()));
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/JobEditorPane.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/JobEditor.fxml"));
         try {
             VBox jobEditor = fxmlLoader.load();
             jobEditorStage.setScene(new Scene(jobEditor));
@@ -112,8 +112,8 @@ public class RootPane implements EventHandler<WindowEvent> {
 
     @FXML
     private void describeObject(ActionEvent actionEvent) {
-        DescribeObjectPane describeObjectPaneController = fxmlLoader.getController();
-        describeObjectPaneController.initialize();
+        DescribeObject describeObjectController = fxmlLoader.getController();
+        describeObjectController.initialize();
         describeObjectStage.showAndWait();
     }
 
@@ -193,8 +193,8 @@ public class RootPane implements EventHandler<WindowEvent> {
     private void showCurrentSessions(ActionEvent actionEvent) {
         try {
             IDfCollection showSessions = repositoryCon.query("EXECUTE show_sessions");
-            BodyPane bodyPaneController = Main.getInstance().getBodyPaneLoader().getController();
-            bodyPaneController.updateResultTable(showSessions);
+            QueryWithResult queryWithResultController = Main.getInstance().getBodyPaneLoader().getController();
+            queryWithResultController.updateResultTable(showSessions);
             showSessions.close();
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);

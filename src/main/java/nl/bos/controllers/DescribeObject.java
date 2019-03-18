@@ -19,8 +19,8 @@ import java.util.logging.Logger;
 import static nl.bos.Constants.TABLE;
 import static nl.bos.Constants.TYPE;
 
-public class DescribeObjectPane {
-    private static final Logger LOGGER = Logger.getLogger(DescribeObjectPane.class.getName());
+public class DescribeObject {
+    private static final Logger LOGGER = Logger.getLogger(DescribeObject.class.getName());
 
     private final Repository repositoryCon = Repository.getInstance();
 
@@ -116,7 +116,7 @@ public class DescribeObjectPane {
     @FXML
     private void handleOK(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(currentSelected));
-        Stage describeObjectStage = RootPane.getDescribeObjectStage();
+        Stage describeObjectStage = Menu.getDescribeObjectStage();
         describeObjectStage.fireEvent(new WindowEvent(describeObjectStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 

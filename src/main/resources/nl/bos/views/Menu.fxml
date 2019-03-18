@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
             minWidth="-Infinity" prefHeight="900.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8.0.121"
-            fx:controller="nl.bos.controllers.RootPane">
+            fx:controller="nl.bos.controllers.Menu">
     <top>
         <MenuBar fx:id="menubar" disable="true" BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="Tools">

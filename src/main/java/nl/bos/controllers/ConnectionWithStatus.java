@@ -26,8 +26,8 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class InputPane implements EventHandler<WindowEvent> {
-    private static final Logger LOGGER = Logger.getLogger(InputPane.class.getName());
+public class ConnectionWithStatus implements EventHandler<WindowEvent> {
+    private static final Logger LOGGER = Logger.getLogger(ConnectionWithStatus.class.getName());
 
     private final Repository repositoryCon = Repository.getInstance();
     private final Main main = Main.getInstance();
@@ -91,10 +91,10 @@ public class InputPane implements EventHandler<WindowEvent> {
     /**
      * @noinspection WeakerAccess
      */
-    public InputPane() {
+    public ConnectionWithStatus() {
         loginStage.initModality(Modality.APPLICATION_MODAL);
         loginStage.setTitle("Documentum Login");
-        fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/LoginPane.fxml"));
+        fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/Login.fxml"));
 
         try {
             VBox loginPane = fxmlLoader.load();
@@ -154,8 +154,8 @@ public class InputPane implements EventHandler<WindowEvent> {
         btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
         btnConnect.setManaged(!session.isConnected());
 
-        RootPane rootPaneLoaderController = main.getRootPaneLoader().getController();
-        rootPaneLoaderController.getMenubar().setDisable(!session.isConnected());
+        Menu menuLoaderController = main.getRootPaneLoader().getController();
+        menuLoaderController.getMenubar().setDisable(!session.isConnected());
     }
 
     private String getClientCapabilityLabel(int clientCapability) {
@@ -226,16 +226,16 @@ public class InputPane implements EventHandler<WindowEvent> {
         btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
         btnConnect.setManaged(true);
 
-        RootPane rootPaneLoaderController = main.getRootPaneLoader().getController();
-        rootPaneLoaderController.getMenubar().setDisable(true);
+        Menu menuLoaderController = main.getRootPaneLoader().getController();
+        menuLoaderController.getMenubar().setDisable(true);
     }
 
     @FXML
     private void handleConnect(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
         repositoryCon.setClient();
-        LoginPane loginPaneController = fxmlLoader.getController();
-        loginPaneController.initialize();
+        Login loginController = fxmlLoader.getController();
+        loginController.initialize();
         loginStage.showAndWait();
     }
 
@@ -261,20 +261,20 @@ public class InputPane implements EventHandler<WindowEvent> {
     private void handleReadQuery(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
 
-        BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
-        String statement = bodyPaneController.getTaStatement().getText();
-        JSONObject jsonObject = bodyPaneController.getJsonObject();
+        QueryWithResult queryWithResultController = main.getBodyPaneLoader().getController();
+        String statement = queryWithResultController.getStatement().getText();
+        JSONObject jsonObject = queryWithResultController.getJsonObject();
 
         IDfCollection result = repositoryCon.query(statement);
         if (result != null) {
             try {
-                bodyPaneController.updateResultTable(result);
+                queryWithResultController.updateResultTable(result);
                 result.close();
             } catch (DfException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
 
-            ChoiceBox<Object> cmbHistory = bodyPaneController.getCmbHistory();
+            ChoiceBox<Object> cmbHistory = queryWithResultController.getHistoryStatements();
             ObservableList<Object> items = cmbHistory.getItems();
             if (statementNotExists(items, statement)) {
                 items.add(0, statement);
@@ -306,14 +306,14 @@ public class InputPane implements EventHandler<WindowEvent> {
 
     @FXML
     private void handleClearQuery(ActionEvent actionEvent) {
-        BodyPane bodyPaneController = main.getBodyPaneLoader().getController();
-        bodyPaneController.getTaStatement().clear();
+        QueryWithResult queryWithResultController = main.getBodyPaneLoader().getController();
+        queryWithResultController.getStatement().clear();
     }
 
     @FXML
     private void handleDisconnect(ActionEvent actionEvent) {
-        LoginPane loginPaneController = fxmlLoader.getController();
-        loginPaneController.initialize();
+        Login loginController = fxmlLoader.getController();
+        loginController.initialize();
         loginStage.showAndWait();
     }
 }

@@ -5,7 +5,7 @@ import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import nl.bos.controllers.JobEditorPane;
+import nl.bos.controllers.JobEditor;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,14 +15,14 @@ public class JobMonitor extends Task<Void> {
 
     private final Repository repository = Repository.getInstance();
 
-    private final JobEditorPane jobEditorPane;
-    private final MyJobObject currentJob;
+    private final JobEditor jobEditor;
+    private final JobObject currentJob;
     private volatile boolean running;
 
-    public JobMonitor(MyJobObject currentJob, JobEditorPane jobEditorPane) {
+    public JobMonitor(JobObject currentJob, JobEditor jobEditor) {
         this.running = true;
         this.currentJob = currentJob;
-        this.jobEditorPane = jobEditorPane;
+        this.jobEditor = jobEditor;
     }
 
     public synchronized void stop() {
@@ -37,7 +37,7 @@ public class JobMonitor extends Task<Void> {
             Platform.runLater(() -> {
                 try {
                     IDfPersistentObject job = repository.getSession().getObject(new DfId(currentJob.getObjectId()));
-                    jobEditorPane.updateFields(job);
+                    jobEditor.updateFields(job);
                 } catch (DfException e) {
                     LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 }

@@ -22,8 +22,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class LoginPane {
-    private static final Logger LOGGER = Logger.getLogger(LoginPane.class.getName());
+public class Login {
+    private static final Logger LOGGER = Logger.getLogger(Login.class.getName());
 
     private final Repository repositoryCon = Repository.getInstance();
 
@@ -114,7 +114,7 @@ public class LoginPane {
         repositoryCon.setCredentials(selectedRepository, txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
         repositoryCon.createSessionManager();
         if (repositoryCon.isConnectionValid()) {
-            Stage loginStage = InputPane.getLoginStage();
+            Stage loginStage = ConnectionWithStatus.getLoginStage();
             loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -128,7 +128,7 @@ public class LoginPane {
     @FXML
     private void handleCancel(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
-        Stage loginStage = InputPane.getLoginStage();
+        Stage loginStage = ConnectionWithStatus.getLoginStage();
         loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
@@ -219,7 +219,7 @@ public class LoginPane {
     private void handleLogout(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
         repositoryCon.disconnect();
-        Stage loginStage = InputPane.getLoginStage();
+        Stage loginStage = ConnectionWithStatus.getLoginStage();
         loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 }

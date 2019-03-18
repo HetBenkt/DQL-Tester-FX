@@ -5,10 +5,16 @@ import com.documentum.com.IDfClientX;
 import com.documentum.fc.client.*;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfLoginInfo;
+import javafx.scene.control.Alert;
 
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static nl.bos.Constants.NR_OF_TABLES;
+import static nl.bos.Constants.NR_OF_TYPES;
 
 public class Repository {
     private static final Logger LOGGER = Logger.getLogger(Repository.class.getName());
@@ -141,11 +147,51 @@ public class Repository {
         try {
             collection = q.execute(session, IDfQuery.DF_READ_QUERY);
         } catch (DfException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Information Dialog");
+            alert.setHeaderText(null);
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
         String message = MessageFormat.format("Query executed: {0}", query);
         LOGGER.finest(message);
 
         return collection;
+    }
+
+    boolean isTypeName(String name) {
+        boolean result = false;
+        try {
+            IDfCollection nrOfTypes = repository.query(String.format("select count(r_object_id) as %s from dm_type where name = '%s'", NR_OF_TYPES, name));
+            nrOfTypes.next();
+            if (Integer.parseInt(nrOfTypes.getString(NR_OF_TYPES)) > 0)
+                result = true;
+            nrOfTypes.close();
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return result;
+    }
+
+    boolean isTableName(String name) {
+        boolean result = false;
+        try {
+            IDfCollection nrOfTypes = repository.query(String.format("select count(r_object_id) as %s from dm_registered where object_name = '%s'", NR_OF_TABLES, name));
+            nrOfTypes.next();
+            if (Integer.parseInt(nrOfTypes.getString(NR_OF_TABLES)) > 0)
+                result = true;
+            nrOfTypes.close();
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return result;
+    }
+
+    boolean isObjectId(String id) {
+        String regex = "^[0-9a-f]{16}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(id);
+        return matcher.find();
     }
 }

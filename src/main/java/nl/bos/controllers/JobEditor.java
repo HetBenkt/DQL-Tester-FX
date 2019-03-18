@@ -22,7 +22,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import nl.bos.DateTimePicker;
 import nl.bos.JobMonitor;
-import nl.bos.MyJobObject;
+import nl.bos.JobObject;
 import nl.bos.Repository;
 
 import java.awt.*;
@@ -40,8 +40,8 @@ import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
 
-public class JobEditorPane {
-    private static final Logger LOGGER = Logger.getLogger(JobEditorPane.class.getName());
+public class JobEditor {
+    private static final Logger LOGGER = Logger.getLogger(JobEditor.class.getName());
 
     private final Repository repository = Repository.getInstance();
 
@@ -65,7 +65,7 @@ public class JobEditorPane {
 
     private String currentCategory;
     private JobMonitor jobMonitor;
-    private MyJobObject currentJob;
+    private JobObject currentJob;
 
     @FXML
     private HBox hbButtons;
@@ -80,7 +80,7 @@ public class JobEditorPane {
     @FXML
     private Button btnViewLog;
     @FXML
-    private ListView<MyJobObject> lvJobs;
+    private ListView<JobObject> lvJobs;
     @FXML
     private ChoiceBox<String> cbJobsFilter;
     @FXML
@@ -171,11 +171,11 @@ public class JobEditorPane {
     @FXML
     private void initialize() {
         try {
-            ObservableList<MyJobObject> jobIds = FXCollections.observableArrayList();
+            ObservableList<JobObject> jobIds = FXCollections.observableArrayList();
             ObservableList<String> categories = FXCollections.observableArrayList();
             IDfCollection collection = repository.query("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job order by title, object_name");
             while (collection.next()) {
-                jobIds.add(new MyJobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
+                jobIds.add(new JobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
                 String type = collection.getString(ATTR_TITLE);
                 if (!categories.contains(type))
                     categories.add(type);
@@ -187,7 +187,7 @@ public class JobEditorPane {
                 private final ImageView imageView = new ImageView();
 
                 @Override
-                protected void updateItem(MyJobObject item, boolean empty) {
+                protected void updateItem(JobObject item, boolean empty) {
                     super.updateItem(item, empty);
                     if (empty) {
                         setText(null);
@@ -320,7 +320,7 @@ public class JobEditorPane {
 
         cbJobsFilter.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             LOGGER.info(String.format("Category is %s", observable));
-            ObservableList<MyJobObject> jobIds = FXCollections.observableArrayList();
+            ObservableList<JobObject> jobIds = FXCollections.observableArrayList();
             try {
                 IDfCollection collection;
                 currentCategory = observable.getValue();
@@ -329,7 +329,7 @@ public class JobEditorPane {
                 else
                     collection = repository.query("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job order by title, object_name");
                 while (collection.next()) {
-                    jobIds.add(new MyJobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
+                    jobIds.add(new JobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
                 }
                 collection.close();
             } catch (DfException e) {
@@ -390,7 +390,7 @@ public class JobEditorPane {
 
     @FXML
     private void handleRefresh(ActionEvent actionEvent) {
-        ObservableList<MyJobObject> jobIds = FXCollections.observableArrayList();
+        ObservableList<JobObject> jobIds = FXCollections.observableArrayList();
         try {
             IDfCollection collection;
             if (currentCategory != null && !currentCategory.isEmpty())
@@ -398,7 +398,7 @@ public class JobEditorPane {
             else
                 collection = repository.query("select r_object_id, title, object_name, is_inactive, a_current_status from dm_job order by title, object_name");
             while (collection.next()) {
-                jobIds.add(new MyJobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
+                jobIds.add(new JobObject(collection.getString(ATTR_R_OBJECT_ID), collection.getString(ATTR_OBJECT_NAME), !collection.getBoolean(ATTR_IS_INACTIVE), collection.getString(ATTR_A_CURRENT_STATUS)));
             }
             collection.close();
         } catch (DfException e) {

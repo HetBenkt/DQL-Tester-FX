@@ -80,9 +80,9 @@ public class MainTest extends ApplicationTest {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RootPane.fxml"));
+        FXMLLoader rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/Menu.fxml"));
         BorderPane rootPane = rootPaneLoader.load();
-        FXMLLoader bodyPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/BodyPane.fxml"));
+        FXMLLoader bodyPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/QueryWithResult.fxml"));
         VBox bodyLayout = bodyPaneLoader.load();
 
         rootPane.setCenter(bodyLayout);

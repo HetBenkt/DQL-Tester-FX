@@ -17,8 +17,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GetAttributesPane {
-    private static final Logger LOGGER = Logger.getLogger(GetAttributesPane.class.getName());
+public class GetAttributes {
+    private static final Logger LOGGER = Logger.getLogger(GetAttributes.class.getName());
 
     private final Repository repositoryCon = Repository.getInstance();
 
@@ -50,7 +50,7 @@ public class GetAttributesPane {
         //No implementation needed
     }
 
-    void initTextArea(IDfPersistentObject object) throws DfException {
+    public void initTextArea(IDfPersistentObject object) throws DfException {
         appendTextToStringBuilder(object);
 
         txaAttributes.setText(String.valueOf(text));
