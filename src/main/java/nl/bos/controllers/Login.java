@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -47,6 +48,7 @@ public class Login {
     private CheckBox chkSaveLoginData;
     @FXML
     private CheckBox chkUseWindowsLogin;
+    private String projectVersion = null;
 
     @FXML
     void initialize() {
@@ -96,14 +98,22 @@ public class Login {
     }
 
     private String getProjectVersion() {
-        final Properties properties = new Properties();
+        if (projectVersion == null) {
+            readProjectVersionFromFile();
+        }
+
+        return projectVersion;
+    }
+
+    private void readProjectVersionFromFile() {
         try {
+            final Properties properties = new Properties();
             properties.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
-            return properties.getProperty("version");
+            projectVersion = properties.getProperty("version");
+
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-        return "";
     }
 
     @FXML
@@ -209,10 +219,16 @@ public class Login {
 
     @FXML
     private void handleConnectButton(KeyEvent keyEvent) {
-        if (txtUsername.getText().length() > 0 && txtPassword.getText().length() > 0)
-            btnLogin.setDisable(false);
-        else
-            btnLogin.setDisable(true);
+        boolean hasRequiredInputs = hasRequiredInputs();
+        btnLogin.setDisable(!hasRequiredInputs);
+
+        if (hasRequiredInputs && keyEvent.getCode() == KeyCode.ENTER) {
+            btnLogin.fire();
+        }
+    }
+
+    private boolean hasRequiredInputs() {
+        return txtUsername.getText().length() > 0 && txtPassword.getText().length() > 0;
     }
 
     @FXML

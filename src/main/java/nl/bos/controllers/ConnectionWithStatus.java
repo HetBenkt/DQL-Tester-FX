@@ -22,6 +22,8 @@ import org.json.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -159,54 +161,26 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     }
 
     private String getClientCapabilityLabel(int clientCapability) {
-        String clientCapabilityLabel = "";
+        Map<Integer, String> clientCapabilityLabels = new HashMap<>();
+        clientCapabilityLabels.put(0, "Consumer");
+        clientCapabilityLabels.put(1, "Consumer");
+        clientCapabilityLabels.put(2, "Contributor");
+        clientCapabilityLabels.put(4, "Coordinator");
+        clientCapabilityLabels.put(8, "System Administrator");
 
-        switch (clientCapability) {
-            case 0:
-                clientCapabilityLabel = "Consumer";
-                break;
-            case 1:
-                clientCapabilityLabel = "Consumer";
-                break;
-            case 2:
-                clientCapabilityLabel = "Contributor";
-                break;
-            case 4:
-                clientCapabilityLabel = "Coordinator";
-                break;
-            case 8:
-                clientCapabilityLabel = "System Administrator";
-                break;
-        }
-
-        return clientCapabilityLabel;
+        return clientCapabilityLabels.getOrDefault(clientCapability, "");
     }
 
     private String getUserPrivilegesLabel(int userPrivileges) {
-        String userPrivilegesLabel = "";
+        Map<Integer, String> userPrivilegeLabels = new HashMap<>();
+        userPrivilegeLabels.put(0, "None");
+        userPrivilegeLabels.put(1, "Create Type");
+        userPrivilegeLabels.put(2, "Create Cabinet");
+        userPrivilegeLabels.put(4, "Create Group");
+        userPrivilegeLabels.put(8, "Sysadmin");
+        userPrivilegeLabels.put(16, "Superuser");
 
-        switch (userPrivileges) {
-            case 0:
-                userPrivilegesLabel = "None";
-                break;
-            case 1:
-                userPrivilegesLabel = "Create Type";
-                break;
-            case 2:
-                userPrivilegesLabel = "Create Cabinet";
-                break;
-            case 4:
-                userPrivilegesLabel = "Create Group";
-                break;
-            case 8:
-                userPrivilegesLabel = "Sysadmin";
-                break;
-            case 16:
-                userPrivilegesLabel = "Superuser";
-                break;
-        }
-
-        return userPrivilegesLabel;
+        return userPrivilegeLabels.getOrDefault(userPrivileges, "");
     }
 
     private void updateNodes() {
