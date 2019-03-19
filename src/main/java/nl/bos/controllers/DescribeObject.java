@@ -42,7 +42,7 @@ public class DescribeObject {
 
     @FXML
     void initialize() {
-        if (repositoryCon.getClient() != null) {
+        if (repositoryCon.getSession() != null) {
             items = FXCollections.observableArrayList();
             DescribeObjectTreeItem tiTypes = initTypeParentWithChildren();
             DescribeObjectTreeItem tiTables = initTableParentWithChildren();
