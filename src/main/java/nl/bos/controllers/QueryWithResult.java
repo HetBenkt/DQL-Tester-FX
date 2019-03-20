@@ -76,14 +76,15 @@ public class QueryWithResult {
     private void initialize() {
         contextMenuOnResultTable = new ContextMenuOnResultTable(result);
         result.getSelectionModel().setCellSelectionEnabled(true);
-        result.addEventHandler(MouseEvent.MOUSE_CLICKED, contextMenuOnResultTable::rightMouseClick);
+        result.addEventHandler(MouseEvent.MOUSE_CLICKED, contextMenuOnResultTable::onRightMouseClick);
 
         loadConnectionWithStatusFxml();
+
         if (historyFileReady()) {
             loadHistory();
         }
 
-        historyStatements.getSelectionModel().selectedIndexProperty().addListener(this::handleHistoryStatements);
+        historyStatements.getSelectionModel().selectedIndexProperty().addListener(this::onHistoryStatementsSelection);
     }
 
     private boolean historyFileReady() {
@@ -91,9 +92,17 @@ public class QueryWithResult {
         if (historyFile.exists()) {
             return true;
         } else {
-            createHistoryFile();
-            return true;
+            return isHistoryFileCreated();
         }
+    }
+
+    private void onHistoryStatementsSelection(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+        if (newValue.intValue() != -1) {
+            String selectedHistoryItem = String.valueOf(historyStatements.getItems().get((Integer) newValue));
+            LOGGER.info(selectedHistoryItem);
+            statement.setText(selectedHistoryItem);
+        } else
+            statement.setText("");
     }
 
     private void loadConnectionWithStatusFxml() {
@@ -126,7 +135,7 @@ public class QueryWithResult {
         }
     }
 
-    private void createHistoryFile() {
+    private boolean isHistoryFileCreated() {
         JSONArray list = new JSONArray();
         jsonObject = new JSONObject();
         jsonObject.put(QUERIES, list);
@@ -135,8 +144,38 @@ public class QueryWithResult {
             file.write(jsonObject.toString());
             file.flush();
             LOGGER.info("New history.json file is created");
+            return true;
         } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE, ioe.getMessage(), ioe);
+        }
+        return false;
+    }
+
+    @FXML
+    private void handleDeleteHistoryItem(MouseEvent mouseEvent) {
+        Object selectedItem = historyStatements.getSelectionModel().getSelectedItem();
+        int selectedIndex = historyStatements.getSelectionModel().getSelectedIndex();
+
+        if (historyStatements.getItems().remove(selectedItem)) {
+            ObservableList<Object> items = historyStatements.getItems();
+            try {
+                String history = new String(Files.readAllBytes(Paths.get(HISTORY_JSON)), StandardCharsets.UTF_8);
+                jsonObject = new JSONObject(history);
+
+                JSONArray queries = (JSONArray) jsonObject.get(QUERIES);
+                queries.remove(selectedIndex);
+                if (queries.length() > 0)
+                    historyStatements.setValue(historyStatements.getItems().get(0));
+                try (FileWriter file = new FileWriter(HISTORY_JSON)) {
+                    file.write(jsonObject.toString());
+                    file.flush();
+                } catch (IOException e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
+            historyStatements.setItems(items);
         }
     }
 
@@ -194,8 +233,6 @@ public class QueryWithResult {
         }
         result.getColumns().addAll(columns);
         result.setItems(rows);
-
-        contextMenuOnResultTable.revalidate(rows);
     }
 
     /**
@@ -230,8 +267,6 @@ public class QueryWithResult {
         }
         result.getColumns().addAll(columns);
         result.setItems(rows);
-
-        contextMenuOnResultTable.revalidate(rows);
     }
 
     private int getRowSize(String description) {
@@ -250,6 +285,16 @@ public class QueryWithResult {
         parseDescription(description);
 
         return Integer.parseInt(value);
+    }
+
+    private String getRowValue(int rowIndex, int columnIndex) {
+        String result = "";
+        try {
+            result = parsedDescription[(rowIndex * 3) + columnIndex];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return result;
     }
 
     private void parseDescription(String descriptionInput) {
@@ -272,52 +317,5 @@ public class QueryWithResult {
         split[2] = "";
         split[3] = "";
         parsedDescription = Arrays.stream(split).filter(value -> !value.equals("")).toArray(String[]::new);
-    }
-
-    private String getRowValue(int rowIndex, int columnIndex) {
-        String result = "";
-        try {
-            result = parsedDescription[(rowIndex * 3) + columnIndex];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return result;
-    }
-
-    @FXML
-    private void handleDeleteHistoryItem(MouseEvent mouseEvent) {
-        Object selectedItem = historyStatements.getSelectionModel().getSelectedItem();
-        int selectedIndex = historyStatements.getSelectionModel().getSelectedIndex();
-
-        if (historyStatements.getItems().remove(selectedItem)) {
-            ObservableList<Object> items = historyStatements.getItems();
-            try {
-                String history = new String(Files.readAllBytes(Paths.get(HISTORY_JSON)), StandardCharsets.UTF_8);
-                jsonObject = new JSONObject(history);
-
-                JSONArray queries = (JSONArray) jsonObject.get(QUERIES);
-                queries.remove(selectedIndex);
-                if (queries.length() > 0)
-                    historyStatements.setValue(historyStatements.getItems().get(0));
-                try (FileWriter file = new FileWriter(HISTORY_JSON)) {
-                    file.write(jsonObject.toString());
-                    file.flush();
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
-                }
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            }
-            historyStatements.setItems(items);
-        }
-    }
-
-    private void handleHistoryStatements(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
-        if (newValue.intValue() != -1) {
-            String selectedHistoryItem = String.valueOf(historyStatements.getItems().get((Integer) newValue));
-            LOGGER.info(selectedHistoryItem);
-            statement.setText(selectedHistoryItem);
-        } else
-            statement.setText("");
     }
 }

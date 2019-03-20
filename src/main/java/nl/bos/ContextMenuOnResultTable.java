@@ -96,51 +96,70 @@ public class ContextMenuOnResultTable {
         );
     }
 
-    public void rightMouseClick(MouseEvent t) {
-        if (t.getButton() == MouseButton.SECONDARY) {
-            if (result.getSelectionModel().getSelectedCells().size() != 0) {
-                TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
-                AttributeTableColumn tableColumn = (AttributeTableColumn) focusedCell.getTableColumn();
-                IDfAttr attr = tableColumn.getAttr();
-                if (attr != null) {
-                    Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
-                    if (repository.isObjectId(String.valueOf(cellData))) {
-                        getAttributes.setDisable(false);
-                        destroyObject.setDisable(false);
-                    } else {
-                        getAttributes.setDisable(true);
-                        destroyObject.setDisable(true);
-                    }
-                    if (repository.isTypeName(String.valueOf(cellData))) {
-                        describeObjectType = TYPE;
-                        describeObject.setDisable(false);
-                    } else if (repository.isTableName(String.valueOf(cellData))) {
-                        describeObjectType = TABLE;
-                        describeObject.setDisable(false);
-                    } else {
-                        describeObject.setDisable(true);
-                    }
-                } else {
-                    getAttributes.setDisable(true);
-                    destroyObject.setDisable(true);
-                    describeObject.setDisable(true);
-                }
-                showProperties.setDisable(false);
-                copyCellToClipBoard.setDisable(false);
-                copyRowToClipBoard.setDisable(false);
-            } else {
-                showProperties.setDisable(true);
-                copyCellToClipBoard.setDisable(true);
-                copyRowToClipBoard.setDisable(true);
-            }
-            contextMenu.show(result, t.getScreenX(), t.getScreenY());
-        } else if (t.getButton() == MouseButton.PRIMARY) {
+    public void onRightMouseClick(MouseEvent t) {
+        if (t.getButton() == MouseButton.PRIMARY) {
             contextMenu.hide();
+        } else if (t.getButton() == MouseButton.SECONDARY) {
+            validateMenuItems();
+            contextMenu.show(result, t.getScreenX(), t.getScreenY());
         }
     }
 
-    public void revalidate(ObservableList<ObservableList> rows) {
-        exportToCsv.setDisable(rows.isEmpty());
+    private void validateMenuItems() {
+        exportToCsv.setDisable(hasNoRowsInResultTable());
+
+        showProperties.setDisable(hasNoSelectedCellsInResultTable());
+        copyCellToClipBoard.setDisable(hasNoSelectedCellsInResultTable());
+        copyRowToClipBoard.setDisable(hasNoSelectedCellsInResultTable());
+        describeObject.setDisable(selectionIsNotAnDescribeObjectType());
+
+        getAttributes.setDisable(selectionIsNotAnObjectId());
+        destroyObject.setDisable(selectionIsNotAnObjectId());
+
+        updateDescribeObjectType();
+    }
+
+    private void updateDescribeObjectType() {
+        if (result.getSelectionModel().getSelectedCells().size() != 0) {
+            TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
+            Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
+
+            if (repository.isTypeName(String.valueOf(cellData))) {
+                describeObjectType = TYPE;
+            } else if (repository.isTableName(String.valueOf(cellData))) {
+                describeObjectType = TABLE;
+            }
+        }
+    }
+
+    private boolean selectionIsNotAnDescribeObjectType() {
+        if (result.getSelectionModel().getSelectedCells().size() == 0) {
+            return true;
+        } else {
+            TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
+            Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
+
+            return !(repository.isTypeName(String.valueOf(cellData)) || repository.isTableName(String.valueOf(cellData)));
+        }
+    }
+
+    private boolean selectionIsNotAnObjectId() {
+        if (result.getSelectionModel().getSelectedCells().size() == 0) {
+            return true;
+        } else {
+            TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
+            Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
+
+            return !repository.isObjectId(String.valueOf(cellData));
+        }
+    }
+
+    private boolean hasNoRowsInResultTable() {
+        return result.getItems().isEmpty();
+    }
+
+    private boolean hasNoSelectedCellsInResultTable() {
+        return result.getSelectionModel().getSelectedCells().isEmpty();
     }
 
     public void setDescription(String description) {
