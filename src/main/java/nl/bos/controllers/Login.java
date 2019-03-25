@@ -61,7 +61,7 @@ public class Login {
 
             lblVersion.setText(getProjectVersion());
 
-            if (repositoryCon.getSession() != null) {
+            if (repositoryCon.getClient() != null) {
                 IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
                 //noinspection deprecation
                 String hostName = repositoryMap.getHostName();
