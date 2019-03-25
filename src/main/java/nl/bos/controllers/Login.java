@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import nl.bos.Repository;
+import nl.bos.utils.AppAlert;
 
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -127,11 +128,7 @@ public class Login {
             Stage loginStage = ConnectionWithStatus.getLoginStage();
             loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
         } else {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Information Dialog");
-            alert.setHeaderText(null);
-            alert.setContentText(repositoryCon.getErrorMessage());
-            alert.showAndWait();
+            AppAlert.warn("Information Dialog", repositoryCon.getErrorMessage());
         }
     }
 
@@ -149,12 +146,7 @@ public class Login {
         String selectedRepository = chbRepository.getValue();
         try {
             IDfTypedObject serverMap = repositoryCon.obtainServerMap(selectedRepository);
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Info");
-            alert.setHeaderText(String.format("Server Map for Repository >> %s <<", selectedRepository));
-            alert.getDialogPane().setContent(formatContent(serverMap));
-            alert.showAndWait();
+            AppAlert.infoWithPanel("Info", formatContent(serverMap));
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -206,12 +198,7 @@ public class Login {
 
         try {
             IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Info");
-            alert.setHeaderText("Connection Broker Map");
-            alert.getDialogPane().setContent(formatContent(repositoryMap));
-            alert.showAndWait();
+            AppAlert.infoWithPanel("Info", formatContent(repositoryMap));
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }

@@ -6,9 +6,13 @@ import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfAttr;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import nl.bos.Repository;
+import nl.bos.utils.AppAlert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,7 +132,7 @@ public class GetAttributes {
             lastIndex = matcher.end();
             txaAttributes.selectRange(matcher.start(), lastIndex);
         } else {
-            alertStringNotFound(String.format("String not found: %s", patternText));
+            AppAlert.warn("Information Dialog", String.format("String not found: %s", patternText));
         }
     }
 
@@ -151,7 +155,7 @@ public class GetAttributes {
                 lastIndex = matcher.end();
                 txaAttributes.selectRange(matcher.start(), lastIndex);
             } else {
-                alertStringNotFound(String.format("String not found: %s", patternText));
+                AppAlert.warn("Information Dialog", String.format("String not found: %s", patternText));
             }
         }
     }
@@ -176,16 +180,8 @@ public class GetAttributes {
             lastIndex = matcher.end();
             txaAttributes.selectRange(matcher.start(), lastIndex);
         } else {
-            alertStringNotFound("EOF reached!");
+            AppAlert.warn("Information Dialog", "EOF reached!");
         }
-    }
-
-    private void alertStringNotFound(String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Information Dialog");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 
     @FXML
@@ -201,7 +197,7 @@ public class GetAttributes {
             txaAttributes.setText(String.valueOf(text));
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            alertStringNotFound(e.getMessage());
+            AppAlert.error("Information Dialog", e.getMessage());
         }
     }
 

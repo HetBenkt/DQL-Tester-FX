@@ -11,7 +11,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
@@ -22,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import nl.bos.Main;
 import nl.bos.Repository;
+import nl.bos.utils.AppAlert;
 import nl.bos.utils.TableResultUtils;
 
 import java.io.IOException;
@@ -123,17 +123,13 @@ public class Menu implements EventHandler<WindowEvent> {
             IDfCollection lastSql = repositoryCon.query("EXECUTE get_last_sql");
             lastSql.next();
 
-            Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
-            confirmation.setTitle("Last executed SQL");
-            confirmation.setHeaderText(null);
             GridPane gridPane = new GridPane();
             gridPane.setMaxWidth(Double.MAX_VALUE);
             TextArea textArea = new TextArea(lastSql.getString("result"));
             textArea.setEditable(false);
             textArea.setWrapText(true);
             gridPane.add(textArea, 0, 0);
-            confirmation.getDialogPane().setContent(gridPane);
-            confirmation.showAndWait();
+            AppAlert.infoWithPanel("", gridPane);
 
             lastSql.close();
         } catch (DfException e) {
@@ -156,11 +152,7 @@ public class Menu implements EventHandler<WindowEvent> {
             IDfCollection setOptions = repositoryCon.getSession().apply(null, "SET_OPTIONS", args, dataType, values);
             setOptions.next();
             if (setOptions.getBoolean("result")) {
-                Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
-                confirmation.setTitle("SQL Trace is enabled");
-                confirmation.setHeaderText(null);
-                confirmation.setContentText("Please check the repository log for the enabled trace");
-                confirmation.showAndWait();
+                AppAlert.info("SQL Trace is enabled", "Please check the repository log for the enabled trace");
             }
             setOptions.close();
         } catch (DfException e) {
@@ -177,11 +169,7 @@ public class Menu implements EventHandler<WindowEvent> {
             IDfCollection execute = command.execute(repositoryCon.getSession());
             execute.next();
             if (execute.getBoolean("result")) {
-                Alert confirmation = new Alert(Alert.AlertType.INFORMATION);
-                confirmation.setTitle("SQL Trace is disabled");
-                confirmation.setHeaderText(null);
-                confirmation.setContentText("Please check the repository log for the disabled trace");
-                confirmation.showAndWait();
+                AppAlert.info("SQL Trace is disabled", "Please check the repository log for the disabled trace");
             }
             execute.close();
         } catch (DfException e) {

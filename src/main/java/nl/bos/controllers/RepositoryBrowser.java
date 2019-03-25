@@ -93,11 +93,11 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
                 selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
                 //item is selected - this prevents fail when clicking on empty space
                 if (selected != null && !selected.getValue().getType().equals(TYPE_REPOSITORY)) {
-                    //open context menu on current screen position
+                    //open context contextmenu on current screen position
                     rootContextMenu.show(treeView, mouseEvent.getScreenX(), mouseEvent.getScreenY());
                 }
             } else {
-                //any other click cause hiding menu
+                //any other click cause hiding contextmenu
                 rootContextMenu.hide();
             }
         });

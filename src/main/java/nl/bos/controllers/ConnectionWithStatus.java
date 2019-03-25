@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import nl.bos.Main;
 import nl.bos.Repository;
+import nl.bos.utils.AppAlert;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -217,17 +218,10 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private void handleExit(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Quit the application...");
-        alert.setHeaderText(null);
-        alert.setContentText("Are you sure?");
-
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        Optional<ButtonType> quitAppConfirmation = AppAlert.confWithResponse("Quit the application...", "Are you sure?");
+        if (quitAppConfirmation.isPresent() && quitAppConfirmation.get() == ButtonType.OK) {
             repositoryCon.disconnect();
             System.exit(0);
-        } else {
-            alert.close();
         }
     }
 

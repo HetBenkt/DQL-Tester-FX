@@ -17,7 +17,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import nl.bos.AttributeTableColumn;
-import nl.bos.ContextMenuOnResultTable;
+import nl.bos.contextmenu.ContextMenuOnResultTable;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -239,7 +239,7 @@ public class QueryWithResult {
      * @noinspection unchecked
      */
     public void updateResultTableWithStringInput(String description, List<String> columnNames) {
-        contextMenuOnResultTable.setDescription(description);
+        contextMenuOnResultTable.getMenuItemShowPropertiesAction().setDescription(description);
 
         result.getItems().clear();
         result.getColumns().clear();

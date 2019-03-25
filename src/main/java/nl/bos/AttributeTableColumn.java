@@ -11,7 +11,7 @@ public class AttributeTableColumn extends TableColumn {
         super(name);
     }
 
-    IDfAttr getAttr() {
+    public IDfAttr getAttr() {
         return attr;
     }
 
