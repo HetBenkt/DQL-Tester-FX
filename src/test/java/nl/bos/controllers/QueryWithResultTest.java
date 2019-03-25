@@ -5,7 +5,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import org.json.JSONObject;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.powermock.reflect.Whitebox;
 
@@ -17,14 +20,9 @@ public class QueryWithResultTest {
     public PowerMockRule rule = new PowerMockRule();
 
     @BeforeClass
-    public static void javaFXInit() {
+    public static void initToolkit() {
         PlatformImpl.startup(() -> {
         });
-    }
-
-    @AfterClass
-    public static void javaFXExit() {
-        PlatformImpl.exit();
     }
 
     @Test
@@ -32,7 +30,7 @@ public class QueryWithResultTest {
         //given
         final QueryWithResult queryWithResult = new QueryWithResult();
         ChoiceBox mockedCmbHistory = mock(ChoiceBox.class);
-        Whitebox.setInternalState(queryWithResult, "cmbHistory", mockedCmbHistory);
+        Whitebox.setInternalState(queryWithResult, "historyStatements", mockedCmbHistory);
 
         //when
         ChoiceBox<Object> expected = queryWithResult.getHistoryStatements();
@@ -46,7 +44,7 @@ public class QueryWithResultTest {
         //given
         final QueryWithResult queryWithResult = new QueryWithResult();
         TextArea mockedTaStatement = mock(TextArea.class);
-        Whitebox.setInternalState(queryWithResult, "taStatement", mockedTaStatement);
+        Whitebox.setInternalState(queryWithResult, "statement", mockedTaStatement);
 
         //when
         TextArea expected = queryWithResult.getStatement();
@@ -74,7 +72,7 @@ public class QueryWithResultTest {
         //given
         final QueryWithResult queryWithResult = new QueryWithResult();
         FXMLLoader mockedFxmlLoader = mock(FXMLLoader.class);
-        Whitebox.setInternalState(queryWithResult, "fxmlLoader", mockedFxmlLoader);
+        Whitebox.setInternalState(queryWithResult, "connectionWithStatusFxmlLoader", mockedFxmlLoader);
 
         //when
         FXMLLoader expected = queryWithResult.getConnectionWithStatusFxmlLoader();
