@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import nl.bos.DescribeObjectTreeItem;
+import nl.bos.Main;
 import nl.bos.Repository;
 
 import java.util.logging.Level;
@@ -23,6 +24,7 @@ public class DescribeObject {
     private static final Logger LOGGER = Logger.getLogger(DescribeObject.class.getName());
 
     private final Repository repository = Repository.getInstance();
+    private final Main main = Main.getInstance();
 
     private DescribeObjectTreeItem currentSelected;
     private ObservableList<DescribeObjectTreeItem> items;
@@ -36,12 +38,12 @@ public class DescribeObject {
     @FXML
     private TextField txtNrOfItems;
 
-    DescribeObjectTreeItem getCurrentSelected() {
+    public DescribeObjectTreeItem getCurrentSelected() {
         return currentSelected;
     }
 
     @FXML
-    void initialize() {
+    public void initialize() {
         if (repository.getSession() != null) {
             items = FXCollections.observableArrayList();
             DescribeObjectTreeItem tiTypes = initTypeParentWithChildren();
@@ -116,7 +118,8 @@ public class DescribeObject {
     @FXML
     private void handleOK(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(currentSelected));
-        Stage describeObjectStage = Menu.getDescribeObjectStage();
+        Menu menu = main.getRootPaneLoader().getController();
+        Stage describeObjectStage = menu.getDescribeObjectAction().getDescribeObjectStage();
         describeObjectStage.fireEvent(new WindowEvent(describeObjectStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 

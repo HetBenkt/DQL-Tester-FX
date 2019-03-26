@@ -182,7 +182,7 @@ public class QueryWithResult {
     /**
      * @noinspection unchecked
      */
-    void updateResultTable(IDfCollection collection) throws DfException {
+    public void updateResultTable(IDfCollection collection) throws DfException {
         result.getItems().clear();
         result.getColumns().clear();
 
