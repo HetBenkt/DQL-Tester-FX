@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 public class Menu implements EventHandler<WindowEvent> {
     private static final Logger LOGGER = Logger.getLogger(Menu.class.getName());
 
-    private final Repository repositoryCon = Repository.getInstance();
+    private final Repository repository = Repository.getInstance();
 
     private final static Stage describeObjectStage = new Stage();
     private final FXMLLoader fxmlLoader;
@@ -85,7 +85,7 @@ public class Menu implements EventHandler<WindowEvent> {
     private void browseRepository(ActionEvent actionEvent) {
         Stage browseRepositoryStage = new Stage();
         browseRepositoryStage.initModality(Modality.APPLICATION_MODAL);
-        browseRepositoryStage.setTitle(String.format("Repository Browser - %s (%s)", repositoryCon.getRepositoryName(), repositoryCon.getUserName()));
+        browseRepositoryStage.setTitle(String.format("Repository Browser - %s (%s)", repository.getRepositoryName(), repository.getUserName()));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RepositoryBrowser.fxml"));
         try {
             VBox repositoryBrowser = fxmlLoader.load();
@@ -99,7 +99,7 @@ public class Menu implements EventHandler<WindowEvent> {
     @FXML
     private void manageJobs(ActionEvent actionEvent) {
         Stage jobEditorStage = new Stage();
-        jobEditorStage.setTitle(String.format("Job Editor - %s", repositoryCon.getRepositoryName()));
+        jobEditorStage.setTitle(String.format("Job Editor - %s", repository.getRepositoryName()));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/JobEditor.fxml"));
         try {
             VBox jobEditor = fxmlLoader.load();
@@ -120,7 +120,7 @@ public class Menu implements EventHandler<WindowEvent> {
     @FXML
     private void getLastSQL(ActionEvent actionEvent) {
         try {
-            IDfCollection lastSql = repositoryCon.query("EXECUTE get_last_sql");
+            IDfCollection lastSql = repository.query("EXECUTE get_last_sql");
             lastSql.next();
 
             GridPane gridPane = new GridPane();
@@ -149,7 +149,7 @@ public class Menu implements EventHandler<WindowEvent> {
             IDfList values = new DfList();
             values.append("sqltrace");
             values.append("T");
-            IDfCollection setOptions = repositoryCon.getSession().apply(null, "SET_OPTIONS", args, dataType, values);
+            IDfCollection setOptions = repository.getSession().apply(null, "SET_OPTIONS", args, dataType, values);
             setOptions.next();
             if (setOptions.getBoolean("result")) {
                 AppAlert.info("SQL Trace is enabled", "Please check the repository log for the enabled trace");
@@ -166,7 +166,7 @@ public class Menu implements EventHandler<WindowEvent> {
             IDfAdminCommand command = AdminApplyCommand.getCommand(IDfAdminCommand.APPLY_SET_OPTIONS);
             command.setString("OPTION", "sqltrace");
             command.setBoolean("VALUE", false);
-            IDfCollection execute = command.execute(repositoryCon.getSession());
+            IDfCollection execute = command.execute(repository.getSession());
             execute.next();
             if (execute.getBoolean("result")) {
                 AppAlert.info("SQL Trace is disabled", "Please check the repository log for the disabled trace");
@@ -180,7 +180,7 @@ public class Menu implements EventHandler<WindowEvent> {
     @FXML
     private void showCurrentSessions(ActionEvent actionEvent) {
         try {
-            IDfCollection showSessions = repositoryCon.query("EXECUTE show_sessions");
+            IDfCollection showSessions = repository.query("EXECUTE show_sessions");
             QueryWithResult queryWithResultController = Main.getInstance().getBodyPaneLoader().getController();
             queryWithResultController.updateResultTable(showSessions);
             showSessions.close();

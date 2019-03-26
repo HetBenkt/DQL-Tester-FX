@@ -26,6 +26,8 @@ import static org.testfx.api.FxToolkit.registerPrimaryStage;
 public class MainTest extends ApplicationTest {
     private static final Logger log = Logger.getLogger(MainTest.class.getName());
 
+    private final Repository repository = Repository.getInstance();
+
     @BeforeClass
     public static void setupSpec() throws Exception {
         if (Boolean.getBoolean("headless")) {
@@ -74,7 +76,7 @@ public class MainTest extends ApplicationTest {
         clickOn("#txtPassword");
         write("dummy");
         clickOn("#btnLogin");
-        Assert.assertThat(Repository.getInstance().getErrorMessage(), CoreMatchers.containsString("[DM_SESSION_E_AUTH_FAIL]"));
+        Assert.assertThat(repository.getErrorMessage(), CoreMatchers.containsString("[DM_SESSION_E_AUTH_FAIL]"));
         clickOn("OK");
     }
 

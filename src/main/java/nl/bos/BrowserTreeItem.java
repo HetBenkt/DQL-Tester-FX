@@ -16,7 +16,7 @@ import static nl.bos.Constants.*;
 public class BrowserTreeItem extends TreeItem<String> {
     private static final Logger LOGGER = Logger.getLogger(BrowserTreeItem.class.getName());
 
-    private final Repository repositoryCon = Repository.getInstance();
+    private final Repository repository = Repository.getInstance();
 
     private final String type;
     private final String name;
@@ -62,11 +62,11 @@ public class BrowserTreeItem extends TreeItem<String> {
             if (TYPE_REPOSITORY.equals(parent.getType())) {
                 IDfCollection cabinets;
                 if (showAllCabinets)
-                    cabinets = repositoryCon.query("select r_object_id, object_name, is_private from dm_cabinet order by object_name");
+                    cabinets = repository.query("select r_object_id, object_name, is_private from dm_cabinet order by object_name");
                 else
-                    cabinets = repositoryCon.query("select r_object_id, object_name, is_private from dm_cabinet where is_private = 0 order by object_name");
+                    cabinets = repository.query("select r_object_id, object_name, is_private from dm_cabinet where is_private = 0 order by object_name");
                 while (cabinets.next()) {
-                    IDfPersistentObject cabinet = repositoryCon.getSession().getObject(new DfId(cabinets.getString(ATTR_R_OBJECT_ID)));
+                    IDfPersistentObject cabinet = repository.getSession().getObject(new DfId(cabinets.getString(ATTR_R_OBJECT_ID)));
                     BrowserTreeItem child = new BrowserTreeItem(cabinet, cabinets.getString(ATTR_OBJECT_NAME), TYPE_CABINET, String.format(PATH_FORMAT, parent.getPath(), cabinets.getString(ATTR_OBJECT_NAME)));
                     children.add(child);
                 }
@@ -84,9 +84,9 @@ public class BrowserTreeItem extends TreeItem<String> {
     }
 
     private void addNodesToParent(BrowserTreeItem parent, List<BrowserTreeItem> children, String function, boolean showAllVersions) throws DfException {
-        IDfCollection folders = repositoryCon.query(String.format("select r_object_id, object_name from dm_folder where %s('%s') order by object_name", function, parent.getPath()));
+        IDfCollection folders = repository.query(String.format("select r_object_id, object_name from dm_folder where %s('%s') order by object_name", function, parent.getPath()));
         while (folders.next()) {
-            IDfPersistentObject folder = repositoryCon.getSession().getObject(new DfId(folders.getString(ATTR_R_OBJECT_ID)));
+            IDfPersistentObject folder = repository.getSession().getObject(new DfId(folders.getString(ATTR_R_OBJECT_ID)));
             BrowserTreeItem child = new BrowserTreeItem(folder, folders.getString(ATTR_OBJECT_NAME), TYPE_FOLDER, String.format(PATH_FORMAT, parent.getPath(), folders.getString(ATTR_OBJECT_NAME)));
             children.add(child);
         }
@@ -97,11 +97,11 @@ public class BrowserTreeItem extends TreeItem<String> {
     private void addDocuments(List<BrowserTreeItem> children, BrowserTreeItem parent, boolean showAllVersions) throws DfException {
         IDfCollection documents;
         if (showAllVersions)
-            documents = repositoryCon.query(String.format("select r_object_id, object_name from dm_sysobject (ALL) where folder('%s') and r_object_type != 'dm_folder' and r_object_type not in (select name from dm_type where super_name = 'dm_folder') order by object_name", parent.getPath()));
+            documents = repository.query(String.format("select r_object_id, object_name from dm_sysobject (ALL) where folder('%s') and r_object_type != 'dm_folder' and r_object_type not in (select name from dm_type where super_name = 'dm_folder') order by object_name", parent.getPath()));
         else
-            documents = repositoryCon.query(String.format("select r_object_id, object_name from dm_sysobject where folder('%s') and r_object_type != 'dm_folder' and r_object_type not in (select name from dm_type where super_name = 'dm_folder') order by object_name", parent.getPath()));
+            documents = repository.query(String.format("select r_object_id, object_name from dm_sysobject where folder('%s') and r_object_type != 'dm_folder' and r_object_type not in (select name from dm_type where super_name = 'dm_folder') order by object_name", parent.getPath()));
         while (documents.next()) {
-            IDfPersistentObject document = repositoryCon.getSession().getObject(new DfId(documents.getString(ATTR_R_OBJECT_ID)));
+            IDfPersistentObject document = repository.getSession().getObject(new DfId(documents.getString(ATTR_R_OBJECT_ID)));
             BrowserTreeItem child = new BrowserTreeItem(document, documents.getString(ATTR_OBJECT_NAME), TYPE_DOCUMENT, String.format(PATH_FORMAT, parent.getPath(), documents.getString(ATTR_OBJECT_NAME)));
             children.add(child);
         }

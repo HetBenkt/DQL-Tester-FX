@@ -22,7 +22,7 @@ import static nl.bos.Constants.TYPE;
 public class DescribeObject {
     private static final Logger LOGGER = Logger.getLogger(DescribeObject.class.getName());
 
-    private final Repository repositoryCon = Repository.getInstance();
+    private final Repository repository = Repository.getInstance();
 
     private DescribeObjectTreeItem currentSelected;
     private ObservableList<DescribeObjectTreeItem> items;
@@ -42,7 +42,7 @@ public class DescribeObject {
 
     @FXML
     void initialize() {
-        if (repositoryCon.getSession() != null) {
+        if (repository.getSession() != null) {
             items = FXCollections.observableArrayList();
             DescribeObjectTreeItem tiTypes = initTypeParentWithChildren();
             DescribeObjectTreeItem tiTables = initTableParentWithChildren();
@@ -54,7 +54,7 @@ public class DescribeObject {
         DescribeObjectTreeItem parent = new DescribeObjectTreeItem("Types");
 
         try {
-            IDfCollection types = repositoryCon.query("select name from dm_type order by 1");
+            IDfCollection types = repository.query("select name from dm_type order by 1");
             while (types.next()) {
                 DescribeObjectTreeItem item = new DescribeObjectTreeItem(types.getString("name"), TYPE);
                 items.add(item);
@@ -76,7 +76,7 @@ public class DescribeObject {
         DescribeObjectTreeItem parent = new DescribeObjectTreeItem("Tables");
 
         try {
-            IDfCollection tables = repositoryCon.query("select object_name from dm_registered order by 1");
+            IDfCollection tables = repository.query("select object_name from dm_registered order by 1");
             while (tables.next()) {
                 DescribeObjectTreeItem item = new DescribeObjectTreeItem(tables.getString("object_name"), TABLE);
                 items.add(item);

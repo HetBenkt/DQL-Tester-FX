@@ -32,7 +32,7 @@ import static nl.bos.Constants.*;
 public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeItem>>, EventHandler<ActionEvent> {
     private static final Logger LOGGER = Logger.getLogger(RepositoryBrowser.class.getName());
 
-    private final Repository repositoryCon = Repository.getInstance();
+    private final Repository repository = Repository.getInstance();
 
     @FXML
     private TreeView<BrowserTreeItem> treeView;
@@ -79,7 +79,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         miDump.setOnAction(this);
         rootContextMenu.getItems().add(miDump);
 
-        rootItem = new BrowserTreeItem(null, repositoryCon.getRepositoryName(), TYPE_REPOSITORY, "");
+        rootItem = new BrowserTreeItem(null, repository.getRepositoryName(), TYPE_REPOSITORY, "");
         TreeItem<BrowserTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
         treeItemBrowser.setExpanded(true);
         treeView.setRoot(treeItemBrowser);
@@ -205,7 +205,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         try {
             LOGGER.info(selected.getValue().getObject().getObjectId().getId());
             Stage dumpAttributes = new Stage();
-            dumpAttributes.setTitle(String.format("Attributes List - %s (%s)", selected.getValue().getObject().getObjectId().getId(), repositoryCon.getRepositoryName()));
+            dumpAttributes.setTitle(String.format("Attributes List - %s (%s)", selected.getValue().getObject().getObjectId().getId(), repository.getRepositoryName()));
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributes.fxml"));
             VBox loginPane = fxmlLoader.load();
             Scene scene = new Scene(loginPane);

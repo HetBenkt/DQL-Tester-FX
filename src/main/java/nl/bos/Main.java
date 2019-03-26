@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 public class Main extends Application {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
+    private final Repository repository = Repository.getInstance();
+
     private static Main mainClass;
     private static boolean devModeEnabled = false;
 
@@ -46,11 +48,11 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
+        Main main = new Main();
         if (args.length > 0) {
-            Repository repositoryCon = Repository.getInstance();
-            repositoryCon.setCredentials(args[0], args[1], args[2], "");
-            repositoryCon.createSessionManager();
-            if (repositoryCon.isConnectionValid()) {
+            main.repository.setCredentials(args[0], args[1], args[2], "");
+            main.repository.createSessionManager();
+            if (main.repository.isConnectionValid()) {
                 LOGGER.info("Developer connection created");
                 devModeEnabled = true;
             } else {
@@ -89,7 +91,7 @@ public class Main extends Application {
 
                 menuLoaderController.getMenubar().setDisable(false);
 
-                connectionWithStatusController.updateNodes(Repository.getInstance().getSession());
+                connectionWithStatusController.updateNodes(repository.getSession());
             }
 
             rootPane.setCenter(bodyLayout);

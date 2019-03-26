@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 public class GetAttributes {
     private static final Logger LOGGER = Logger.getLogger(GetAttributes.class.getName());
 
-    private final Repository repositoryCon = Repository.getInstance();
+    private final Repository repository = Repository.getInstance();
 
     private final List<IDfAttr> userAttributes = new ArrayList<>();
     private final List<IDfAttr> systemAttributes = new ArrayList<>();
@@ -187,7 +187,7 @@ public class GetAttributes {
     @FXML
     private void handleDump(ActionEvent actionEvent) {
         try {
-            IDfPersistentObject object = repositoryCon.getSession().getObject(new DfId(txtObjectId.getText()));
+            IDfPersistentObject object = repository.getSession().getObject(new DfId(txtObjectId.getText()));
             text.setLength(0);
             userAttributes.clear();
             applicationAttributes.clear();

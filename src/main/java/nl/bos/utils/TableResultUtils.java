@@ -14,7 +14,7 @@ import static nl.bos.Constants.TYPE;
 public class TableResultUtils {
     private static final Logger LOGGER = Logger.getLogger(TableResultUtils.class.getName());
 
-    private final Repository repositoryCon = Repository.getInstance();
+    private final Repository repository = Repository.getInstance();
     private final Main main = Main.getInstance();
 
     public void updateTable(String type, String currentSelected) {
@@ -37,13 +37,13 @@ public class TableResultUtils {
 
     private void updateTableWithTableInfo(String currentSelected) throws DfException {
         QueryWithResult queryWithResultController = main.getBodyPaneLoader().getController();
-        String tableDescription = repositoryCon.getSession().describe(TABLE, "dm_dbo." + currentSelected);
+        String tableDescription = repository.getSession().describe(TABLE, "dm_dbo." + currentSelected);
         queryWithResultController.updateResultTableWithStringInput(tableDescription, Arrays.asList("Column", "Data Type", "Primary Key"));
     }
 
     private void updateTableWithTypeInfo(String currentSelected) throws DfException {
         QueryWithResult queryWithResultController = main.getBodyPaneLoader().getController();
-        String typeDescription = repositoryCon.getSession().describe(TYPE, currentSelected);
+        String typeDescription = repository.getSession().describe(TYPE, currentSelected);
         queryWithResultController.updateResultTableWithStringInput(typeDescription, Arrays.asList("Attribute", "Data Type", "Repeating"));
     }
 }

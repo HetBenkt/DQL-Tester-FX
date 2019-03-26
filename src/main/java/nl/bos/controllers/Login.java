@@ -27,7 +27,7 @@ import java.util.logging.Logger;
 public class Login {
     private static final Logger LOGGER = Logger.getLogger(Login.class.getName());
 
-    private final Repository repositoryCon = Repository.getInstance();
+    private final Repository repository = Repository.getInstance();
 
     @FXML
     private Label lblVersion;
@@ -54,7 +54,7 @@ public class Login {
     @FXML
     void initialize() {
         try {
-            if (repositoryCon.getSession() != null && repositoryCon.getSession().isConnected()) {
+            if (repository.getSession() != null && repository.getSession().isConnected()) {
                 setFieldsConnect(true);
             } else {
                 setFieldsConnect(false);
@@ -62,8 +62,8 @@ public class Login {
 
             lblVersion.setText(getProjectVersion());
 
-            if (repositoryCon.getClient() != null) {
-                IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
+            if (repository.getClient() != null) {
+                IDfDocbaseMap repositoryMap = repository.obtainRepositoryMap();
                 //noinspection deprecation
                 String hostName = repositoryMap.getHostName();
                 lblServer.setText(hostName);
@@ -122,13 +122,13 @@ public class Login {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
         String selectedRepository = chbRepository.getValue();
         lblServer.setText(String.format("Connection to '%s'", selectedRepository));
-        repositoryCon.setCredentials(selectedRepository, txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
-        repositoryCon.createSessionManager();
-        if (repositoryCon.isConnectionValid()) {
+        repository.setCredentials(selectedRepository, txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
+        repository.createSessionManager();
+        if (repository.isConnectionValid()) {
             Stage loginStage = ConnectionWithStatus.getLoginStage();
             loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
         } else {
-            AppAlert.warn("Information Dialog", repositoryCon.getErrorMessage());
+            AppAlert.warn("Information Dialog", repository.getErrorMessage());
         }
     }
 
@@ -145,7 +145,7 @@ public class Login {
 
         String selectedRepository = chbRepository.getValue();
         try {
-            IDfTypedObject serverMap = repositoryCon.obtainServerMap(selectedRepository);
+            IDfTypedObject serverMap = repository.obtainServerMap(selectedRepository);
             AppAlert.infoWithPanel("Info", formatContent(serverMap));
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -197,7 +197,7 @@ public class Login {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
 
         try {
-            IDfDocbaseMap repositoryMap = repositoryCon.obtainRepositoryMap();
+            IDfDocbaseMap repositoryMap = repository.obtainRepositoryMap();
             AppAlert.infoWithPanel("Info", formatContent(repositoryMap));
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -221,7 +221,7 @@ public class Login {
     @FXML
     private void handleLogout(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
-        repositoryCon.disconnect();
+        repository.disconnect();
         Stage loginStage = ConnectionWithStatus.getLoginStage();
         loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }

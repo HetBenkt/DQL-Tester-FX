@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private static final Logger LOGGER = Logger.getLogger(ConnectionWithStatus.class.getName());
 
-    private final Repository repositoryCon = Repository.getInstance();
+    private final Repository repository = Repository.getInstance();
     private final Main main = Main.getInstance();
 
     private final static Stage loginStage = new Stage();
@@ -115,7 +115,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     }
 
     public void handle(WindowEvent event) {
-        IDfSession session = repositoryCon.getSession();
+        IDfSession session = repository.getSession();
         if (session != null && session.isConnected()) {
             try {
                 updateNodes(session);
@@ -131,7 +131,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         IDfUser user = session.getUser(session.getLoginUserName());
 
         lblStatus.setText(session.getDocbaseName());
-        ttStatus.setText(String.format("Connected repository: %s\nRepository hostname: %s\nRepository ID: %s\nConnection Broker hostname: %s\nConnection Broker port: %s", session.getDocbaseName(), repositoryCon.obtainServerMap(session.getDocbaseName()).getString("i_host_name"), session.getDocbaseId(), repositoryCon.obtainRepositoryMap().getRepeatingString("i_host_name", 0), repositoryCon.obtainRepositoryMap().getRepeatingString("i_port_number", 0)));
+        ttStatus.setText(String.format("Connected repository: %s\nRepository hostname: %s\nRepository ID: %s\nConnection Broker hostname: %s\nConnection Broker port: %s", session.getDocbaseName(), repository.obtainServerMap(session.getDocbaseName()).getString("i_host_name"), session.getDocbaseId(), repository.obtainRepositoryMap().getRepeatingString("i_host_name", 0), repository.obtainRepositoryMap().getRepeatingString("i_port_number", 0)));
 
         lblUsernameOS.setText(user.getUserOSName());
         ttOSUsername.setText(String.format("Operating System Username: %s\nDefault Folder: %s", user.getUserOSName(), user.getDefaultFolder()));
@@ -146,7 +146,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         ttPrivileges.setText(String.format("Documentum User Privileges: %s (%d)\nClient Capability: %s (%d)", getUserPrivilegesLabel(user.getUserPrivileges()), user.getUserPrivileges(), getClientCapabilityLabel(user.getClientCapability()), user.getClientCapability()));
 
         lblServerVersion.setText(session.getServerVersion());
-        ttServerVersion.setText(String.format("Documentum Server Version: %s \nConnection Broker Version: %s", session.getServerVersion(), repositoryCon.obtainServerMap(session.getDocbaseName()).getString("i_docbroker_version")));
+        ttServerVersion.setText(String.format("Documentum Server Version: %s \nConnection Broker Version: %s", session.getServerVersion(), repository.obtainServerMap(session.getDocbaseName()).getString("i_docbroker_version")));
 
         btnReadQuery.setDisable(!session.isConnected());
         btnFlushCache.setDisable(!session.isConnected());
@@ -208,7 +208,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     @FXML
     private void handleConnect(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
-        repositoryCon.setClient();
+        repository.setClient();
         Login loginController = fxmlLoader.getController();
         loginController.initialize();
         loginStage.showAndWait();
@@ -220,7 +220,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
 
         Optional<ButtonType> quitAppConfirmation = AppAlert.confWithResponse("Quit the application...", "Are you sure?");
         if (quitAppConfirmation.isPresent() && quitAppConfirmation.get() == ButtonType.OK) {
-            repositoryCon.disconnect();
+            repository.disconnect();
             System.exit(0);
         }
     }
@@ -233,7 +233,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         String statement = queryWithResultController.getStatement().getText();
         JSONObject jsonObject = queryWithResultController.getJsonObject();
 
-        IDfCollection result = repositoryCon.query(statement);
+        IDfCollection result = repository.query(statement);
         if (result != null) {
             try {
                 queryWithResultController.updateResultTable(result);
