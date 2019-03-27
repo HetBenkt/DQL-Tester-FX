@@ -136,7 +136,7 @@ public class Repository {
 
     public boolean isConnectionValid() {
         createSession();
-        return session != null && session.isConnected();
+        return isConnected();
     }
 
     public IDfCollection query(String query) {
@@ -189,5 +189,9 @@ public class Repository {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(id);
         return matcher.find();
+    }
+
+    public boolean isConnected() {
+        return session != null && session.isConnected();
     }
 }
