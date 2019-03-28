@@ -17,7 +17,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import nl.bos.AttributeTableColumn;
+import nl.bos.Repository;
 import nl.bos.contextmenu.ContextMenuOnResultTable;
+import nl.bos.utils.Controllers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -74,6 +76,8 @@ public class QueryWithResult {
 
     @FXML
     private void initialize() {
+        Controllers.put(this.getClass().getSimpleName(), this);
+
         contextMenuOnResultTable = new ContextMenuOnResultTable(result);
         result.getSelectionModel().setCellSelectionEnabled(true);
         result.addEventHandler(MouseEvent.MOUSE_CLICKED, contextMenuOnResultTable::onRightMouseClick);
@@ -182,7 +186,7 @@ public class QueryWithResult {
     /**
      * @noinspection unchecked
      */
-    public void updateResultTable(IDfCollection collection) throws DfException {
+    void updateResultTable(IDfCollection collection) throws DfException {
         result.getItems().clear();
         result.getColumns().clear();
 
@@ -271,7 +275,7 @@ public class QueryWithResult {
 
     private int getRowSize(String description) {
         String fromColumns;
-        String type = description.substring(0, description.indexOf("\t"));
+        String type = description.substring(0, description.indexOf('\t'));
 
         if (type.contains("Table")) {
             fromColumns = description.substring(description.indexOf("Columns:"));
@@ -280,7 +284,7 @@ public class QueryWithResult {
         }
 
         String columnsInfo = fromColumns.substring(0, fromColumns.indexOf("\r\n"));
-        String value = columnsInfo.substring(columnsInfo.indexOf(":") + 1, columnsInfo.length()).trim();
+        String value = columnsInfo.substring(columnsInfo.indexOf(':') + 1).trim();
 
         parseDescription(description);
 
@@ -288,18 +292,21 @@ public class QueryWithResult {
     }
 
     private String getRowValue(int rowIndex, int columnIndex) {
-        String result = "";
+        String rowValue = "";
+
         try {
-            result = parsedDescription[(rowIndex * 3) + columnIndex];
+            rowValue = parsedDescription[(rowIndex * 3) + columnIndex];
+
         } catch (ArrayIndexOutOfBoundsException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-        return result;
+
+        return rowValue;
     }
 
     private void parseDescription(String descriptionInput) {
         String[] split;
-        String type = descriptionInput.substring(0, descriptionInput.indexOf("\t"));
+        String type = descriptionInput.substring(0, descriptionInput.indexOf('\t'));
 
         if (type.contains("Table")) {
             split = descriptionInput.substring(descriptionInput.indexOf("\r\n", descriptionInput.indexOf("Columns:")))
@@ -317,5 +324,21 @@ public class QueryWithResult {
         split[2] = "";
         split[3] = "";
         parsedDescription = Arrays.stream(split).filter(value -> !value.equals("")).toArray(String[]::new);
+    }
+
+    public void executeQuery(String query) {
+        IDfCollection collection = Repository.getInstance().query(query);
+
+        if (collection == null) {
+            return;
+        }
+
+        try {
+            updateResultTable(collection);
+            collection.close();
+
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, String.format("Error running query: [%s]", query), e);
+        }
     }
 }

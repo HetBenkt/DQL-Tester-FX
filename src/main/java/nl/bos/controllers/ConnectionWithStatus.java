@@ -15,9 +15,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import nl.bos.Main;
 import nl.bos.Repository;
 import nl.bos.utils.AppAlert;
+import nl.bos.utils.Controllers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -33,9 +33,8 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private static final Logger LOGGER = Logger.getLogger(ConnectionWithStatus.class.getName());
 
     private final Repository repository = Repository.getInstance();
-    private final Main main = Main.getInstance();
 
-    private final static Stage loginStage = new Stage();
+    private static final Stage loginStage = new Stage();
     private final FXMLLoader fxmlLoader;
 
     @FXML
@@ -95,6 +94,8 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
      * @noinspection WeakerAccess
      */
     public ConnectionWithStatus() {
+        Controllers.put(this.getClass().getSimpleName(), this);
+
         loginStage.initModality(Modality.APPLICATION_MODAL);
         loginStage.setTitle("Documentum Login");
         fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/Login.fxml"));
@@ -157,7 +158,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
         btnConnect.setManaged(!session.isConnected());
 
-        Menu menuLoaderController = main.getRootPaneLoader().getController();
+        Menu menuLoaderController = (Menu) Controllers.get(Menu.class.getSimpleName());
         menuLoaderController.getMenubar().setDisable(!session.isConnected());
     }
 
@@ -201,7 +202,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
         btnConnect.setManaged(true);
 
-        Menu menuLoaderController = main.getRootPaneLoader().getController();
+        Menu menuLoaderController = (Menu) Controllers.get(Menu.class.getSimpleName());
         menuLoaderController.getMenubar().setDisable(true);
     }
 
@@ -229,7 +230,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private void handleReadQuery(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
 
-        QueryWithResult queryWithResultController = main.getBodyPaneLoader().getController();
+        QueryWithResult queryWithResultController = (QueryWithResult) Controllers.get(QueryWithResult.class.getSimpleName());
         String statement = queryWithResultController.getStatement().getText();
         JSONObject jsonObject = queryWithResultController.getJsonObject();
 
@@ -274,7 +275,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
 
     @FXML
     private void handleClearQuery(ActionEvent actionEvent) {
-        QueryWithResult queryWithResultController = main.getBodyPaneLoader().getController();
+        QueryWithResult queryWithResultController = (QueryWithResult) Controllers.get(QueryWithResult.class.getSimpleName());
         queryWithResultController.getStatement().clear();
     }
 

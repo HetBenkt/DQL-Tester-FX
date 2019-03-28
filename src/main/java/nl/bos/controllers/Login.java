@@ -122,7 +122,9 @@ public class Login {
         lblServer.setText(String.format("Connection to '%s'", selectedRepository));
         repository.setCredentials(selectedRepository, txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
         repository.createSessionManager();
-        if (repository.isConnectionValid()) {
+        repository.createSession();
+
+        if (repository.isConnected()) {
             Stage loginStage = ConnectionWithStatus.getLoginStage();
             loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
         } else {

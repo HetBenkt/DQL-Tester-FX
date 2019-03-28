@@ -11,7 +11,6 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import nl.bos.DescribeObjectTreeItem;
-import nl.bos.Main;
 import nl.bos.Repository;
 
 import java.util.logging.Level;
@@ -24,19 +23,21 @@ public class DescribeObject {
     private static final Logger LOGGER = Logger.getLogger(DescribeObject.class.getName());
 
     private final Repository repository = Repository.getInstance();
-    private final Main main = Main.getInstance();
 
     private DescribeObjectTreeItem currentSelected;
     private ObservableList<DescribeObjectTreeItem> items;
 
     @FXML
-    private Button btnOk, btnCancel;
+    private Button btnOk;
+    @FXML
+    private Button btnCancel;
     @FXML
     private TreeView tvTypesTables;
     @FXML
     private ComboBox<DescribeObjectTreeItem> cbTypesTables;
     @FXML
     private TextField txtNrOfItems;
+    private Stage describeObjectStage;
 
     public DescribeObjectTreeItem getCurrentSelected() {
         return currentSelected;
@@ -118,8 +119,6 @@ public class DescribeObject {
     @FXML
     private void handleOK(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(currentSelected));
-        Menu menu = main.getRootPaneLoader().getController();
-        Stage describeObjectStage = menu.getDescribeObjectAction().getDescribeObjectStage();
         describeObjectStage.fireEvent(new WindowEvent(describeObjectStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
@@ -161,5 +160,9 @@ public class DescribeObject {
         items = FXCollections.observableArrayList();
         DescribeObjectTreeItem tiTables = initTableParentWithChildren();
         initTreeView(tiTables);
+    }
+
+    public void setStage(Stage describeObjectStage) {
+        this.describeObjectStage = describeObjectStage;
     }
 }

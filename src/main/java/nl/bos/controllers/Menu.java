@@ -3,6 +3,7 @@ package nl.bos.controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuBar;
 import nl.bos.menu.menuitem.action.*;
+import nl.bos.utils.Controllers;
 
 public class Menu {
     @FXML
@@ -11,6 +12,8 @@ public class Menu {
     private DescribeObjectAction describeObjectAction;
 
     public Menu() {
+        Controllers.put(this.getClass().getSimpleName(), this);
+
         describeObjectAction = new DescribeObjectAction();
     }
 

@@ -14,6 +14,7 @@ import nl.bos.controllers.Menu;
 import nl.bos.controllers.QueryWithResult;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,8 +23,7 @@ public class Main extends Application {
 
     private final Repository repository = Repository.getInstance();
 
-    private static Main mainClass;
-    private static boolean devModeEnabled = false;
+    private boolean devModeEnabled = false;
 
     private FXMLLoader bodyPaneLoader;
     private FXMLLoader rootPaneLoader;
@@ -36,38 +36,15 @@ public class Main extends Application {
         return rootPaneLoader;
     }
 
-    public Main() {
-        mainClass = this;
-    }
-
-    public static synchronized Main getInstance() {
-        if (mainClass == null) {
-            mainClass = new Main();
-        }
-        return mainClass;
-    }
-
     public static void main(String[] args) {
-        Main main = new Main();
-        if (args.length > 0) {
-            main.repository.setCredentials(args[0], args[1], args[2], "");
-            main.repository.createSessionManager();
-            if (main.repository.isConnectionValid()) {
-                LOGGER.info("Developer connection created");
-                devModeEnabled = true;
-            } else {
-                LOGGER.info("Login with connect button");
-            }
-        } else {
-            LOGGER.info("Login with connect button");
-        }
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> LOGGER.info("Shutdown hook")));
         launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
+        tryDevModeConnection();
+
         try {
             rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/Menu.fxml"));
             BorderPane rootPane = rootPaneLoader.load();
@@ -103,8 +80,40 @@ public class Main extends Application {
 
             primaryStage.show();
             primaryStage.toFront();
+
         } catch (IOException | DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    private void shutdown() {
+        LOGGER.info("Shutdown");
+        repository.disconnect();
+    }
+
+    private void tryDevModeConnection() {
+        List<String> parameters = getParameters().getRaw();
+
+        if (parameters.size() < 3) {
+            LOGGER.info("Login with connect button");
+            return;
+        }
+
+        String repositoryName = parameters.get(0);
+        String username = parameters.get(1);
+        String password = parameters.get(2);
+
+        repository.setCredentials(repositoryName, username, password, "");
+
+        repository.createSessionManager();
+        repository.createSession();
+
+        if (repository.isConnected()) {
+            LOGGER.info("Developer connection created");
+            devModeEnabled = true;
+
+        } else {
+            LOGGER.info("Login with connect button");
         }
     }
 }

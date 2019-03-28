@@ -61,7 +61,7 @@ public class Repository {
     }
 
     public void disconnect() {
-        if (repository != null && session != null && session.isConnected()) {
+        if (repository != null && isConnected()) {
             sessionManager.release(session);
             sessionManager.clearIdentity(repositoryName);
         }
@@ -98,7 +98,7 @@ public class Repository {
         return serverMap;
     }
 
-    private void createSession() {
+    public void createSession() {
         try {
             session = sessionManager.getSession(repositoryName);
         } catch (DfServiceException e) {
@@ -132,11 +132,6 @@ public class Repository {
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-    }
-
-    public boolean isConnectionValid() {
-        createSession();
-        return isConnected();
     }
 
     public IDfCollection query(String query) {

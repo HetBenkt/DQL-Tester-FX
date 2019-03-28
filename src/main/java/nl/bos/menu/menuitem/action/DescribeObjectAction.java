@@ -45,6 +45,7 @@ public class DescribeObjectAction implements EventHandler<WindowEvent> {
         describeObjectStage.setOnCloseRequest(this);
 
         DescribeObject describeObjectController = fxmlLoader.getController();
+        describeObjectController.setStage(describeObjectStage);
         describeObjectController.initialize();
         describeObjectStage.showAndWait();
     }
