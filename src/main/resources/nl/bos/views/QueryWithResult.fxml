@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="queryWithResultBox" BorderPane.alignment="CENTER"
       xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.QueryWithResult">
-    <SplitPane dividerPositions="0.6" orientation="VERTICAL">
+    <SplitPane dividerPositions="0.6" orientation="VERTICAL"  VBox.vgrow="ALWAYS">
         <VBox>
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
@@ -23,7 +23,7 @@
             <TextArea fx:id="statement" VBox.vgrow="ALWAYS"/>
             <Label text="DQL/SQL History"/>
             <HBox>
-                <ChoiceBox fx:id="historyStatements"/>
+                <ComboBox fx:id="historyStatements" prefHeight="25.0"/>
                 <ImageView id="btnDeleteHistoryItem" fitHeight="24.0" fitWidth="24.0"
                            onMouseClicked="#handleDeleteHistoryItem" pickOnBounds="true" preserveRatio="true">
                     <HBox.margin>

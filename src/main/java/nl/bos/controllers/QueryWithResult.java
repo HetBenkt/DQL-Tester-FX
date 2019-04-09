@@ -1,27 +1,7 @@
 package nl.bos.controllers;
 
-import com.documentum.fc.client.IDfCollection;
-import com.documentum.fc.common.DfException;
-import com.documentum.fc.common.IDfAttr;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import javafx.util.Callback;
-import nl.bos.AttributeTableColumn;
-import nl.bos.Repository;
-import nl.bos.contextmenu.ContextMenuOnResultTable;
-import nl.bos.utils.Controllers;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import static nl.bos.Constants.HISTORY_JSON;
+import static nl.bos.Constants.QUERIES;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -36,8 +16,33 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static nl.bos.Constants.HISTORY_JSON;
-import static nl.bos.Constants.QUERIES;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.documentum.fc.client.IDfCollection;
+import com.documentum.fc.common.DfException;
+import com.documentum.fc.common.IDfAttr;
+
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.util.Callback;
+import nl.bos.AttributeTableColumn;
+import nl.bos.Repository;
+import nl.bos.contextmenu.ContextMenuOnResultTable;
+import nl.bos.utils.Controllers;
 
 public class QueryWithResult {
     private static final Logger LOGGER = Logger.getLogger(QueryWithResult.class.getName());
@@ -50,7 +55,7 @@ public class QueryWithResult {
     private String[] parsedDescription;
 
     @FXML
-    private ChoiceBox<Object> historyStatements;
+    private ComboBox <String> historyStatements;
     @FXML
     private VBox queryWithResultBox;
     @FXML
@@ -58,7 +63,7 @@ public class QueryWithResult {
     @FXML
     private TableView result;
 
-    ChoiceBox<Object> getHistoryStatements() {
+    ComboBox<String> getHistoryStatements() {
         return historyStatements;
     }
 
@@ -127,13 +132,27 @@ public class QueryWithResult {
             LOGGER.info(jsonObject.toString());
 
             JSONArray msg = (JSONArray) jsonObject.get(QUERIES);
-            Iterator iterator = msg.iterator();
-            List<Object> statements = new ArrayList<>();
+            Iterator<Object> iterator = msg.iterator();
+            List<String> statements = new ArrayList<>();
             while (iterator.hasNext()) {
-                statements.add(iterator.next());
+                statements.add((String)iterator.next());
             }
-            ObservableList<Object> value = FXCollections.observableList(statements);
+            ObservableList<String> value = FXCollections.observableList(statements);
             historyStatements.setItems(value);
+            Callback<ListView<String>, ListCell<String>> factory = lv -> new ListCell<String>() {
+
+
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if(item!=null) {
+                    	setText(item.substring(0, Math.min(item.length(), 100)).replaceAll("\n", " "));
+                    	setTooltip(new Tooltip(item));
+                    }
+                }
+
+            };
+            historyStatements.setCellFactory(factory);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -161,7 +180,7 @@ public class QueryWithResult {
         int selectedIndex = historyStatements.getSelectionModel().getSelectedIndex();
 
         if (historyStatements.getItems().remove(selectedItem)) {
-            ObservableList<Object> items = historyStatements.getItems();
+            ObservableList<String> items = historyStatements.getItems();
             try {
                 String history = new String(Files.readAllBytes(Paths.get(HISTORY_JSON)), StandardCharsets.UTF_8);
                 jsonObject = new JSONObject(history);

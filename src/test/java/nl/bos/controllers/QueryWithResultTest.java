@@ -1,9 +1,7 @@
 package nl.bos.controllers;
 
-import com.sun.javafx.application.PlatformImpl;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextArea;
+import static org.powermock.api.mockito.PowerMockito.mock;
+
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -12,7 +10,11 @@ import org.junit.Test;
 import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.powermock.reflect.Whitebox;
 
-import static org.powermock.api.mockito.PowerMockito.mock;
+import com.sun.javafx.application.PlatformImpl;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
 
 public class QueryWithResultTest {
 
@@ -29,11 +31,11 @@ public class QueryWithResultTest {
     public void getCmbHistory() {
         //given
         final QueryWithResult queryWithResult = new QueryWithResult();
-        ChoiceBox mockedCmbHistory = mock(ChoiceBox.class);
+        ComboBox<String> mockedCmbHistory = mock(ComboBox.class);
         Whitebox.setInternalState(queryWithResult, "historyStatements", mockedCmbHistory);
 
         //when
-        ChoiceBox<Object> expected = queryWithResult.getHistoryStatements();
+        ComboBox<String> expected = queryWithResult.getHistoryStatements();
 
         //then
         Assert.assertEquals(expected, mockedCmbHistory);

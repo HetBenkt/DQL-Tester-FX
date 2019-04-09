@@ -1,26 +1,5 @@
 package nl.bos.controllers;
 
-import com.documentum.fc.client.IDfCollection;
-import com.documentum.fc.client.IDfSession;
-import com.documentum.fc.client.IDfUser;
-import com.documentum.fc.common.DfException;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-import nl.bos.Repository;
-import nl.bos.utils.AppAlert;
-import nl.bos.utils.Controllers;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,6 +7,33 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.documentum.fc.client.IDfCollection;
+import com.documentum.fc.client.IDfSession;
+import com.documentum.fc.client.IDfUser;
+import com.documentum.fc.common.DfException;
+
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import nl.bos.Repository;
+import nl.bos.utils.AppAlert;
+import nl.bos.utils.Controllers;
 
 public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private static final Logger LOGGER = Logger.getLogger(ConnectionWithStatus.class.getName());
@@ -243,8 +249,8 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
 
-            ChoiceBox<Object> cmbHistory = queryWithResultController.getHistoryStatements();
-            ObservableList<Object> items = cmbHistory.getItems();
+            ComboBox<String> cmbHistory = queryWithResultController.getHistoryStatements();
+            ObservableList<String> items = cmbHistory.getItems();
             if (statementNotExists(items, statement)) {
                 items.add(0, statement);
                 cmbHistory.setValue(statement);
