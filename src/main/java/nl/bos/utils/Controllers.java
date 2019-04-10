@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class Controllers {
-    private final static Map<String, Object> registeredControllers = new HashMap<>();
+    private static final Map<String, Object> registeredControllers = new HashMap<>();
 
     private Controllers() {
     }
