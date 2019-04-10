@@ -1,6 +1,16 @@
 package nl.bos;
 
 public final class Constants {
+    //General
+    static final String APP_TITLE = "DQL Tester FX";
+
+    //Messages
+    static final String MSG_DEV_CONNECTION_CREATED = "Developer connection created";
+    static final String MSG_USE_CONNECT_BUTTON = "Login with connect button";
+    static final String MSG_SHUTDOWN_HOOK = "Shutdown with disconnect from repository";
+    static final String MSG_TITLE_INFO_DIALOG = "Information Dialog";
+    static final String MSG_JOB_STARTED = "STARTED";
+
     //Types
     public static final String TYPE_REPOSITORY = "repository";
     public static final String ATTR_R_VERSION_LABEL = "r_version_label";

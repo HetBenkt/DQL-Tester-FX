@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -88,7 +89,7 @@ public class QueryWithResult {
             loadHistory();
         }
 
-        historyStatements.getSelectionModel().selectedIndexProperty().addListener(this::onHistoryStatementsSelection);
+        historyStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onHistoryStatementsSelection(newValue));
     }
 
     private boolean historyFileReady() {
@@ -100,7 +101,7 @@ public class QueryWithResult {
         }
     }
 
-    private void onHistoryStatementsSelection(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+    private void onHistoryStatementsSelection(Number newValue) {
         if (newValue.intValue() != -1) {
             String selectedHistoryItem = String.valueOf(historyStatements.getItems().get((Integer) newValue));
             LOGGER.info(selectedHistoryItem);
@@ -147,7 +148,7 @@ public class QueryWithResult {
         try (FileWriter file = new FileWriter(HISTORY_JSON)) {
             file.write(jsonObject.toString());
             file.flush();
-            LOGGER.info("New history.json file is created");
+            LOGGER.info(MessageFormat.format("New {0} file is created", HISTORY_JSON));
             return true;
         } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE, ioe.getMessage(), ioe);

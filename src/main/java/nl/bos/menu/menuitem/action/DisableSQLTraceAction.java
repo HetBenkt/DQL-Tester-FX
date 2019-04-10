@@ -13,17 +13,16 @@ import java.util.logging.Logger;
 public class DisableSQLTraceAction {
     private static final Logger LOGGER = Logger.getLogger(ManageJobsAction.class.getName());
 
-    private final Repository repository = Repository.getInstance();
-
     public DisableSQLTraceAction() {
         try {
             IDfAdminCommand command = AdminApplyCommand.getCommand(IDfAdminCommand.APPLY_SET_OPTIONS);
             command.setString("OPTION", "sqltrace");
             command.setBoolean("VALUE", false);
+            Repository repository = Repository.getInstance();
             IDfCollection execute = command.execute(repository.getSession());
             execute.next();
             if (execute.getBoolean("result")) {
-                AppAlert.info("SQL Trace is disabled", "Please check the repository log for the disabled trace");
+                AppAlert.information("SQL Trace is disabled", "Please check the repository log for the disabled trace");
             }
             execute.close();
         } catch (DfException e) {

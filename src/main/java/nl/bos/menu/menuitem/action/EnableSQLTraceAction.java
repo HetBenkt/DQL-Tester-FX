@@ -13,8 +13,6 @@ import java.util.logging.Logger;
 public class EnableSQLTraceAction {
     private static final Logger LOGGER = Logger.getLogger(ManageJobsAction.class.getName());
 
-    private final Repository repository = Repository.getInstance();
-
     public EnableSQLTraceAction() {
         try {
             IDfList args = new DfList();
@@ -26,10 +24,11 @@ public class EnableSQLTraceAction {
             IDfList values = new DfList();
             values.append("sqltrace");
             values.append("T");
+            Repository repository = Repository.getInstance();
             IDfCollection setOptions = repository.getSession().apply(null, "SET_OPTIONS", args, dataType, values);
             setOptions.next();
             if (setOptions.getBoolean("result")) {
-                AppAlert.info("SQL Trace is enabled", "Please check the repository log for the enabled trace");
+                AppAlert.information("SQL Trace is enabled", "Please check the repository log for the enabled trace");
             }
             setOptions.close();
         } catch (DfException e) {

@@ -43,6 +43,6 @@ public class MenuItemShowPropertiesAction implements EventHandler<ActionEvent> {
             message = description.substring(0, index);
         }
 
-        AppAlert.info("Properties", message);
+        AppAlert.information("Properties", message);
     }
 }

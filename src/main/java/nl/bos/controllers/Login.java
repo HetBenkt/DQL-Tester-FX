@@ -128,7 +128,7 @@ public class Login {
             Stage loginStage = ConnectionWithStatus.getLoginStage();
             loginStage.fireEvent(new WindowEvent(loginStage, WindowEvent.WINDOW_CLOSE_REQUEST));
         } else {
-            AppAlert.warn("Information Dialog", repository.getErrorMessage());
+            AppAlert.warning("Information Dialog", repository.getErrorMessage());
         }
     }
 
@@ -146,7 +146,7 @@ public class Login {
         String selectedRepository = chbRepository.getValue();
         try {
             IDfTypedObject serverMap = repository.obtainServerMap(selectedRepository);
-            AppAlert.infoWithPanel("Info", formatContent(serverMap));
+            AppAlert.informationWithPanel("Info", formatContent(serverMap));
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -198,7 +198,7 @@ public class Login {
 
         try {
             IDfDocbaseMap repositoryMap = repository.obtainRepositoryMap();
-            AppAlert.infoWithPanel("Info", formatContent(repositoryMap));
+            AppAlert.informationWithPanel("Info", formatContent(repositoryMap));
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }

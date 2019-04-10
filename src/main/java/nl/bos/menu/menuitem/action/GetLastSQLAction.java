@@ -13,10 +13,9 @@ import java.util.logging.Logger;
 public class GetLastSQLAction {
     private static final Logger LOGGER = Logger.getLogger(GetLastSQLAction.class.getName());
 
-    private final Repository repository = Repository.getInstance();
-
     public GetLastSQLAction() {
         try {
+            Repository repository = Repository.getInstance();
             IDfCollection lastSql = repository.query("EXECUTE get_last_sql");
             lastSql.next();
 
@@ -26,7 +25,7 @@ public class GetLastSQLAction {
             textArea.setEditable(false);
             textArea.setWrapText(true);
             gridPane.add(textArea, 0, 0);
-            AppAlert.infoWithPanel("", gridPane);
+            AppAlert.informationWithPanel("", gridPane);
 
             lastSql.close();
         } catch (DfException e) {

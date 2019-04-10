@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import static nl.bos.Constants.MSG_JOB_STARTED;
+
 public class JobObject {
     private static final Logger LOGGER = Logger.getLogger(JobObject.class.getName());
 
@@ -36,7 +38,7 @@ public class JobObject {
         this.objectName = objectName;
         this.isActive = isActive;
 
-        this.isRunning = isRunning.equals("STARTED");
+        this.isRunning = isRunning.equals(MSG_JOB_STARTED);
     }
 
     public void updateChanges(String key, String value) {
