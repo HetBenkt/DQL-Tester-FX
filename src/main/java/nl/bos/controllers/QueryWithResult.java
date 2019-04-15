@@ -1,41 +1,15 @@
 package nl.bos.controllers;
 
-import static nl.bos.Constants.HISTORY_JSON;
-import static nl.bos.Constants.QUERIES;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfAttr;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -44,6 +18,25 @@ import nl.bos.AttributeTableColumn;
 import nl.bos.Repository;
 import nl.bos.contextmenu.ContextMenuOnResultTable;
 import nl.bos.utils.Controllers;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static nl.bos.Constants.HISTORY_JSON;
+import static nl.bos.Constants.QUERIES;
 
 public class QueryWithResult {
     private static final Logger LOGGER = Logger.getLogger(QueryWithResult.class.getName());
@@ -56,7 +49,7 @@ public class QueryWithResult {
     private String[] parsedDescription;
 
     @FXML
-    private ComboBox <String> historyStatements;
+    private ComboBox<String> historyStatements;
     @FXML
     private VBox queryWithResultBox;
     @FXML
@@ -87,7 +80,6 @@ public class QueryWithResult {
         contextMenuOnResultTable = new ContextMenuOnResultTable(result);
         result.getSelectionModel().setCellSelectionEnabled(true);
         result.addEventHandler(MouseEvent.MOUSE_CLICKED, contextMenuOnResultTable::onRightMouseClick);
-
         loadConnectionWithStatusFxml();
 
         if (historyFileReady()) {
@@ -136,7 +128,7 @@ public class QueryWithResult {
             Iterator<Object> iterator = msg.iterator();
             List<String> statements = new ArrayList<>();
             while (iterator.hasNext()) {
-                statements.add((String)iterator.next());
+                statements.add((String) iterator.next());
             }
             ObservableList<String> value = FXCollections.observableList(statements);
             historyStatements.setItems(value);
@@ -146,9 +138,9 @@ public class QueryWithResult {
                 @Override
                 protected void updateItem(String item, boolean empty) {
                     super.updateItem(item, empty);
-                    if(item!=null) {
-                    	setText(item.substring(0, Math.min(item.length(), 100)).replaceAll("\n", " "));
-                    	setTooltip(new Tooltip(item));
+                    if (item != null) {
+                        setText(item.substring(0, Math.min(item.length(), 100)).replaceAll("\n", " "));
+                        setTooltip(new Tooltip(item));
                     }
                 }
 
@@ -206,7 +198,7 @@ public class QueryWithResult {
     /**
      * @noinspection unchecked
      */
-    void updateResultTable(IDfCollection collection) throws DfException {
+    int updateResultTable(IDfCollection collection) throws DfException {
         result.getItems().clear();
         result.getColumns().clear();
 
@@ -257,6 +249,8 @@ public class QueryWithResult {
         }
         result.getColumns().addAll(columns);
         result.setItems(rows);
+
+        return rowCount;
     }
 
     /**

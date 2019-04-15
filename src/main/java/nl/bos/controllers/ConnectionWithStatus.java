@@ -1,32 +1,16 @@
 package nl.bos.controllers;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.client.IDfSession;
 import com.documentum.fc.client.IDfUser;
 import com.documentum.fc.common.DfException;
-
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -34,6 +18,19 @@ import javafx.stage.WindowEvent;
 import nl.bos.Repository;
 import nl.bos.utils.AppAlert;
 import nl.bos.utils.Controllers;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static nl.bos.Constants.HISTORY_JSON;
 
@@ -77,6 +74,14 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private Tooltip ttPrivileges;
     @FXML
     private Tooltip ttServerVersion;
+    @FXML
+    private TextField resultCount;
+    @FXML
+    private TextField timeQuery;
+    @FXML
+    private TextField timeList;
+    @FXML
+    private TextField timeSort;
 
     static Stage getLoginStage() {
         return loginStage;
@@ -96,6 +101,10 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
 
     public Button getBtnDisconnect() {
         return btnDisconnect;
+    }
+
+    public TextField getTimeSort() {
+        return timeSort;
     }
 
     /**
@@ -242,11 +251,20 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         String statement = queryWithResultController.getStatement().getText();
         JSONObject jsonObject = queryWithResultController.getJsonObject();
 
+        Instant start = Instant.now();
         IDfCollection result = repository.query(statement);
+        Instant end = Instant.now();
+        timeQuery.setText(getDurationInSeconds(start, end));
+
         if (result != null) {
             try {
-                queryWithResultController.updateResultTable(result);
+                Instant startList = Instant.now();
+                int rowCount = queryWithResultController.updateResultTable(result);
                 result.close();
+
+                Instant endList = Instant.now();
+                timeList.setText(getDurationInSeconds(startList, endList));
+                resultCount.setText(String.valueOf(rowCount));
             } catch (DfException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
@@ -270,6 +288,13 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
                 cmbHistory.setItems(items);
             }
         }
+    }
+
+    String getDurationInSeconds(Instant start, Instant end) {
+        long millis = Duration.between(start, end).toMillis();
+        Timestamp ts = new Timestamp(millis);
+        double time = ts.getTime();
+        return String.valueOf(time / 1000) + " sec.";
     }
 
     private boolean statementNotExists(ObservableList items, String statement) {

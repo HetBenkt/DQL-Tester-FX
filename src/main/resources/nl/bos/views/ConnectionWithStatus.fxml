@@ -35,7 +35,7 @@
                 <Insets top="5.0"/>
             </BorderPane.margin>
             <Label text="Command"/>
-            <HBox alignment="TOP_CENTER" spacing="5.0">
+            <HBox alignment="TOP_CENTER" disable="true" spacing="5.0">
                 <VBox.margin>
                     <Insets bottom="20.0"/>
                 </VBox.margin>
@@ -59,11 +59,11 @@
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                 </padding>
                 <Label text="Query"/>
-                <TextField id="txtQuery"/>
+                <TextField id="txtQuery" fx:id="timeQuery" alignment="CENTER" editable="false"/>
                 <Label text="List"/>
-                <TextField id="txtList"/>
+                <TextField id="txtList" fx:id="timeList" alignment="CENTER" editable="false"/>
                 <Label text="Sort"/>
-                <TextField id="txtSort"/>
+                <TextField id="txtSort" fx:id="timeSort" alignment="CENTER" editable="false"/>
             </HBox>
         </VBox>
     </center>
@@ -77,7 +77,7 @@
             <BorderPane.margin>
                 <Insets left="5.0" right="5.0" top="5.0"/>
             </BorderPane.margin>
-            <TextField/>
+            <TextField fx:id="resultCount" alignment="CENTER" editable="false"/>
             <Button fx:id="btnConnect" defaultButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
                     onAction="#handleConnect" text="Connect"/>
             <Button fx:id="btnDisconnect" defaultButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
