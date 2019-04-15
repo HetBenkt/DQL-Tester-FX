@@ -35,6 +35,8 @@ import nl.bos.Repository;
 import nl.bos.utils.AppAlert;
 import nl.bos.utils.Controllers;
 
+import static nl.bos.Constants.HISTORY_JSON;
+
 public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private static final Logger LOGGER = Logger.getLogger(ConnectionWithStatus.class.getName());
 
@@ -225,7 +227,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private void handleExit(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
 
-        Optional<ButtonType> quitAppConfirmation = AppAlert.confWithResponse("Quit the application...", "Are you sure?");
+        Optional<ButtonType> quitAppConfirmation = AppAlert.confirmationWithResponse("Quit the application...", "Are you sure?");
         if (quitAppConfirmation.isPresent() && quitAppConfirmation.get() == ButtonType.OK) {
             repository.disconnect();
             System.exit(0);
@@ -259,7 +261,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
                     queries.put(queries.get(0));
                 }
                 queries.put(0, statement);
-                try (FileWriter file = new FileWriter("history.json")) {
+                try (FileWriter file = new FileWriter(HISTORY_JSON)) {
                     file.write(jsonObject.toString());
                     file.flush();
                 } catch (IOException e) {

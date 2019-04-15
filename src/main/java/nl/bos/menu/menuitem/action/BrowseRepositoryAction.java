@@ -14,11 +14,10 @@ import java.util.logging.Logger;
 public class BrowseRepositoryAction {
     private static final Logger LOGGER = Logger.getLogger(BrowseRepositoryAction.class.getName());
 
-    private final Repository repository = Repository.getInstance();
-
     public BrowseRepositoryAction() {
         Stage browseRepositoryStage = new Stage();
         browseRepositoryStage.initModality(Modality.APPLICATION_MODAL);
+        Repository repository = Repository.getInstance();
         browseRepositoryStage.setTitle(String.format("Repository Browser - %s (%s)", repository.getRepositoryName(), repository.getUserName()));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RepositoryBrowser.fxml"));
         try {

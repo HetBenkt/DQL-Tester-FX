@@ -34,7 +34,7 @@ public class MenuItemDestroyObjectAction implements EventHandler<ActionEvent> {
             LOGGER.info(id);
 
             String message = MessageFormat.format("Are you sure you want to destroy the selected object id ''{0}''?", id);
-            Optional<ButtonType> deleteObjectConfirmation = AppAlert.warnWithResponse("Delete Object", message);
+            Optional<ButtonType> deleteObjectConfirmation = AppAlert.warningWithResponse("Delete Object", message);
 
             deleteObjectConfirmation.ifPresent(type -> {
                 if (type.getButtonData() == ButtonBar.ButtonData.YES) {
@@ -43,7 +43,7 @@ public class MenuItemDestroyObjectAction implements EventHandler<ActionEvent> {
                         IDfPersistentObject object = repository.getSession().getObject(new DfId(id));
                         object.destroy();
                         String messageConfirmation = MessageFormat.format("Succesfully destroyed the object id ''{0}''!", id);
-                        AppAlert.conf("Confirmation delete object", messageConfirmation);
+                        AppAlert.confirmation("Confirmation delete object", messageConfirmation);
                     } catch (DfException e) {
                         LOGGER.log(Level.SEVERE, e.getMessage(), e);
                         AppAlert.error("Error on delete object", e.getMessage());

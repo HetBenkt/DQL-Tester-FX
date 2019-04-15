@@ -19,8 +19,8 @@ public class ContextMenuOnResultTable {
     private final MenuItem describeObject;
     private final MenuItem destroyObject;
 
-    private TableView result;
-    private MenuItemShowPropertiesAction menuItemShowPropertiesAction;
+    private final TableView result;
+    private final MenuItemShowPropertiesAction menuItemShowPropertiesAction;
 
     public ContextMenuOnResultTable(TableView result) {
         this.result = result;

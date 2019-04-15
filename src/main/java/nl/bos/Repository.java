@@ -13,8 +13,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static nl.bos.Constants.NR_OF_TABLES;
-import static nl.bos.Constants.NR_OF_TYPES;
+import static nl.bos.Constants.*;
 
 public class Repository {
     private static final Logger LOGGER = Logger.getLogger(Repository.class.getName());
@@ -143,7 +142,7 @@ public class Repository {
             collection = q.execute(session, IDfQuery.DF_READ_QUERY);
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            AppAlert.warn("Information Dialog", e.getMessage());
+            AppAlert.warning(MSG_TITLE_INFO_DIALOG, e.getMessage());
         }
         String message = MessageFormat.format("Query executed: {0}", query);
         LOGGER.finest(message);

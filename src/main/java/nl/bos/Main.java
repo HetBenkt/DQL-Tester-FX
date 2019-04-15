@@ -18,23 +18,14 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static nl.bos.Constants.*;
+
 public class Main extends Application {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     private final Repository repository = Repository.getInstance();
 
     private boolean devModeEnabled = false;
-
-    private FXMLLoader bodyPaneLoader;
-    private FXMLLoader rootPaneLoader;
-
-    public FXMLLoader getBodyPaneLoader() {
-        return bodyPaneLoader;
-    }
-
-    public FXMLLoader getRootPaneLoader() {
-        return rootPaneLoader;
-    }
 
     public static void main(String[] args) {
         launch(args);
@@ -46,10 +37,10 @@ public class Main extends Application {
         tryDevModeConnection();
 
         try {
-            rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/Menu.fxml"));
+            FXMLLoader rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/Menu.fxml"));
             BorderPane rootPane = rootPaneLoader.load();
             Menu menuLoaderController = rootPaneLoader.getController();
-            bodyPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/QueryWithResult.fxml"));
+            FXMLLoader bodyPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/QueryWithResult.fxml"));
             VBox bodyLayout = bodyPaneLoader.load();
 
             if (devModeEnabled) {
@@ -75,7 +66,7 @@ public class Main extends Application {
 
             Image image = new Image(getClass().getClassLoader().getResourceAsStream("nl/bos/icons/logo_16.gif"));
             primaryStage.getIcons().add(image);
-            primaryStage.setTitle("DQL Tester FX");
+            primaryStage.setTitle(APP_TITLE);
             primaryStage.setScene(new Scene(rootPane));
 
             primaryStage.show();
@@ -87,7 +78,7 @@ public class Main extends Application {
     }
 
     private void shutdown() {
-        LOGGER.info("Shutdown");
+        LOGGER.info(MSG_SHUTDOWN_HOOK);
         repository.disconnect();
     }
 
@@ -95,7 +86,7 @@ public class Main extends Application {
         List<String> parameters = getParameters().getRaw();
 
         if (parameters.size() < 3) {
-            LOGGER.info("Login with connect button");
+            LOGGER.info(MSG_USE_CONNECT_BUTTON);
             return;
         }
 
@@ -109,11 +100,11 @@ public class Main extends Application {
         repository.createSession();
 
         if (repository.isConnected()) {
-            LOGGER.info("Developer connection created");
+            LOGGER.info(MSG_DEV_CONNECTION_CREATED);
             devModeEnabled = true;
 
         } else {
-            LOGGER.info("Login with connect button");
+            LOGGER.info(MSG_USE_CONNECT_BUTTON);
         }
     }
 }

@@ -1,0 +1,6 @@
+.idea/
+documentum/
+target/
+src/main/resources/dfc.properties
+src/main/resources/log4j.properties
+history.json

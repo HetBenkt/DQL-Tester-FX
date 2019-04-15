@@ -82,12 +82,4 @@ public class QueryWithResultTest {
         //then
         Assert.assertEquals(expected, mockedFxmlLoader);
     }
-
-    @Test
-    public void updateResultTable() {
-    }
-
-    @Test
-    public void updateResultTableWithStringInput() {
-    }
 }

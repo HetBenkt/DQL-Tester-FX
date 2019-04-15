@@ -132,7 +132,7 @@ public class GetAttributes {
             lastIndex = matcher.end();
             txaAttributes.selectRange(matcher.start(), lastIndex);
         } else {
-            AppAlert.warn("Information Dialog", String.format("String not found: %s", patternText));
+            AppAlert.warning("Information Dialog", String.format("String not found: %s", patternText));
         }
     }
 
@@ -155,7 +155,7 @@ public class GetAttributes {
                 lastIndex = matcher.end();
                 txaAttributes.selectRange(matcher.start(), lastIndex);
             } else {
-                AppAlert.warn("Information Dialog", String.format("String not found: %s", patternText));
+                AppAlert.warning("Information Dialog", String.format("String not found: %s", patternText));
             }
         }
     }
@@ -180,7 +180,7 @@ public class GetAttributes {
             lastIndex = matcher.end();
             txaAttributes.selectRange(matcher.start(), lastIndex);
         } else {
-            AppAlert.warn("Information Dialog", "EOF reached!");
+            AppAlert.warning("Information Dialog", "EOF reached!");
         }
     }
 

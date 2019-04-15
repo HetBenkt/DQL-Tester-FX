@@ -13,10 +13,9 @@ import java.util.logging.Logger;
 public class ManageJobsAction {
     private static final Logger LOGGER = Logger.getLogger(ManageJobsAction.class.getName());
 
-    private final Repository repository = Repository.getInstance();
-
     public ManageJobsAction() {
         Stage jobEditorStage = new Stage();
+        Repository repository = Repository.getInstance();
         jobEditorStage.setTitle(String.format("Job Editor - %s", repository.getRepositoryName()));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/JobEditor.fxml"));
         try {

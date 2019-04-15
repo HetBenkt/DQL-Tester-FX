@@ -9,16 +9,12 @@ public class Menu {
     @FXML
     private MenuBar menubar;
 
-    private DescribeObjectAction describeObjectAction;
+    private final DescribeObjectAction describeObjectAction;
 
     public Menu() {
         Controllers.put(this.getClass().getSimpleName(), this);
 
         describeObjectAction = new DescribeObjectAction();
-    }
-
-    DescribeObjectAction getDescribeObjectAction() {
-        return describeObjectAction;
     }
 
     public MenuBar getMenubar() {

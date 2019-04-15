@@ -19,10 +19,6 @@ public class DescribeObjectAction implements EventHandler<WindowEvent> {
     private final Stage describeObjectStage = new Stage();
     private FXMLLoader fxmlLoader;
 
-    public Stage getDescribeObjectStage() {
-        return describeObjectStage;
-    }
-
     @Override
     public void handle(WindowEvent windowEvent) {
         DescribeObject describeObjectController = fxmlLoader.getController();
