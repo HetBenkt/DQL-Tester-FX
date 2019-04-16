@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import nl.bos.DescribeObjectTreeItem;
 import nl.bos.controllers.DescribeObject;
 import nl.bos.utils.TableResultUtils;
 
@@ -22,11 +23,15 @@ public class DescribeObjectAction implements EventHandler<WindowEvent> {
     @Override
     public void handle(WindowEvent windowEvent) {
         DescribeObject describeObjectController = fxmlLoader.getController();
-        String currentSelected = (String) describeObjectController.getCurrentSelected().getValue();
-        String type = describeObjectController.getCurrentSelected().getType();
-        String message = MessageFormat.format("Selected item ''{0}'' of type ''{1}''", currentSelected, type);
-        LOGGER.info(message);
-        new TableResultUtils().updateTable(type, currentSelected);
+        DescribeObjectTreeItem currentSelected = describeObjectController.getCurrentSelected();
+
+        if (currentSelected != null) {
+            String currentSelectedValue = (String) currentSelected.getValue();
+            String type = currentSelected.getType();
+            String message = MessageFormat.format("Selected item ''{0}'' of type ''{1}''", currentSelected, type);
+            LOGGER.info(message);
+            new TableResultUtils().updateTable(type, currentSelectedValue);
+        }
     }
 
     public void execute() {
