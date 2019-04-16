@@ -17,14 +17,13 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import nl.bos.Repository;
 import nl.bos.utils.AppAlert;
+import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -254,7 +253,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         Instant start = Instant.now();
         IDfCollection result = repository.query(statement);
         Instant end = Instant.now();
-        timeQuery.setText(getDurationInSeconds(start, end));
+        timeQuery.setText(Calculations.getDurationInSeconds(start, end));
 
         if (result != null) {
             try {
@@ -263,7 +262,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
                 result.close();
 
                 Instant endList = Instant.now();
-                timeList.setText(getDurationInSeconds(startList, endList));
+                timeList.setText(Calculations.getDurationInSeconds(startList, endList));
                 resultCount.setText(String.valueOf(rowCount));
             } catch (DfException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -288,13 +287,6 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
                 cmbHistory.setItems(items);
             }
         }
-    }
-
-    String getDurationInSeconds(Instant start, Instant end) {
-        long millis = Duration.between(start, end).toMillis();
-        Timestamp ts = new Timestamp(millis);
-        double time = ts.getTime();
-        return String.valueOf(time / 1000) + " sec.";
     }
 
     private boolean statementNotExists(ObservableList items, String statement) {

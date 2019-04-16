@@ -5,8 +5,16 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import nl.bos.Repository;
 import nl.bos.contextmenu.menuitem.action.*;
+import nl.bos.controllers.ConnectionWithStatus;
+import nl.bos.controllers.QueryWithResult;
+import nl.bos.utils.Calculations;
+import nl.bos.utils.Controllers;
+
+import java.time.Instant;
+import java.util.logging.Logger;
 
 public class ContextMenuOnResultTable {
+    private static final Logger LOGGER = Logger.getLogger(ContextMenuOnResultTable.class.getName());
     private final Repository repository = Repository.getInstance();
 
     private final ContextMenu contextMenu = new ContextMenu();
@@ -70,6 +78,22 @@ public class ContextMenuOnResultTable {
     public void onRightMouseClick(MouseEvent t) {
         if (t.getButton() == MouseButton.PRIMARY) {
             contextMenu.hide();
+
+            if (t.getTarget().getClass().getName().contains("TableColumnHeader")) {
+                QueryWithResult queryWithResultController = (QueryWithResult) Controllers.get(QueryWithResult.class.getSimpleName());
+                ConnectionWithStatus connectionWithStatusController = (ConnectionWithStatus) Controllers.get(ConnectionWithStatus.class.getSimpleName());
+
+                Instant start = queryWithResultController.getStart();
+                if (start != null) {
+                    Instant end = Instant.now();
+                    LOGGER.info("End..." + end);
+                    connectionWithStatusController.getTimeSort().setText(Calculations.getDurationInSeconds(start, end));
+                } else {
+                    connectionWithStatusController.getTimeSort().setText("");
+                }
+
+                queryWithResultController.cleanStart();
+            }
         } else if (t.getButton() == MouseButton.SECONDARY) {
             validateMenuItems();
             contextMenu.show(result, t.getScreenX(), t.getScreenY());

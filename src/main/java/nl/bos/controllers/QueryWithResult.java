@@ -3,6 +3,7 @@ package nl.bos.controllers;
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfAttr;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -28,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -57,6 +59,8 @@ public class QueryWithResult {
     @FXML
     private TableView result;
 
+    private Instant start;
+
     ComboBox<String> getHistoryStatements() {
         return historyStatements;
     }
@@ -73,6 +77,14 @@ public class QueryWithResult {
         return connectionWithStatusFxmlLoader;
     }
 
+    public Instant getStart() {
+        return start;
+    }
+
+    public void cleanStart() {
+        this.start = null;
+    }
+
     @FXML
     private void initialize() {
         Controllers.put(this.getClass().getSimpleName(), this);
@@ -80,6 +92,10 @@ public class QueryWithResult {
         contextMenuOnResultTable = new ContextMenuOnResultTable(result);
         result.getSelectionModel().setCellSelectionEnabled(true);
         result.addEventHandler(MouseEvent.MOUSE_CLICKED, contextMenuOnResultTable::onRightMouseClick);
+        result.getSortOrder().addListener((InvalidationListener) change -> {
+            start = Instant.now();
+            LOGGER.info("Start..." + Instant.now());
+        });
         loadConnectionWithStatusFxml();
 
         if (historyFileReady()) {
@@ -132,7 +148,7 @@ public class QueryWithResult {
             }
             ObservableList<String> value = FXCollections.observableList(statements);
             historyStatements.setItems(value);
-            Callback<ListView<String>, ListCell<String>> factory = lv -> new ListCell<String>() {
+            Callback<ListView<String>, ListCell<String>> factory = lv -> new ListCell<>() {
 
 
                 @Override
