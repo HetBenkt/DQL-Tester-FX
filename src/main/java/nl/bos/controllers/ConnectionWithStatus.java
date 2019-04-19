@@ -129,19 +129,24 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private void initialize() {
         btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
         btnDisconnect.setManaged(false);
+
+        updateNodesBasedOnConnectionStatus();
     }
 
-    public void handle(WindowEvent event) {
-        IDfSession session = repository.getSession();
-        if (session != null && session.isConnected()) {
+    private void updateNodesBasedOnConnectionStatus() {
+        if (repository.isConnected()) {
             try {
-                updateNodes(session);
+                updateNodes(repository.getSession());
             } catch (DfException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
         } else {
             updateNodes();
         }
+    }
+
+    public void handle(WindowEvent event) {
+        updateNodesBasedOnConnectionStatus();
     }
 
     public void updateNodes(IDfSession session) throws DfException {
