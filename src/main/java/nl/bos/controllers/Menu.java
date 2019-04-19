@@ -2,6 +2,7 @@ package nl.bos.controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuBar;
+import nl.bos.Repository;
 import nl.bos.menu.menuitem.action.*;
 import nl.bos.utils.Controllers;
 
@@ -17,7 +18,14 @@ public class Menu {
         describeObjectAction = new DescribeObjectAction();
     }
 
-    public MenuBar getMenubar() {
+    @FXML
+    private void initialize() {
+        if (Repository.getInstance().isConnected()) {
+            menubar.setDisable(false);
+        }
+    }
+
+    MenuBar getMenubar() {
         return menubar;
     }
 

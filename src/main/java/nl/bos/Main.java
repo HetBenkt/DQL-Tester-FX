@@ -1,17 +1,12 @@
 package nl.bos;
 
-import com.documentum.fc.common.DfException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import nl.bos.controllers.ConnectionWithStatus;
-import nl.bos.controllers.Menu;
-import nl.bos.controllers.QueryWithResult;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,8 +20,6 @@ public class Main extends Application {
 
     private final Repository repository = Repository.getInstance();
 
-    private boolean devModeEnabled = false;
-
     public static void main(String[] args) {
         launch(args);
     }
@@ -37,44 +30,24 @@ public class Main extends Application {
         tryDevModeConnection();
 
         try {
-            FXMLLoader rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/Menu.fxml"));
-            BorderPane rootPane = rootPaneLoader.load();
-            Menu menuLoaderController = rootPaneLoader.getController();
-            FXMLLoader bodyPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/QueryWithResult.fxml"));
-            VBox bodyLayout = bodyPaneLoader.load();
-
-            if (devModeEnabled) {
-                QueryWithResult queryWithResultController = bodyPaneLoader.getController();
-                ConnectionWithStatus connectionWithStatusController = queryWithResultController.getConnectionWithStatusFxmlLoader().getController();
-                connectionWithStatusController.getBtnReadQuery().setDisable(false);
-                connectionWithStatusController.getBtnFlushCache().setDisable(false);
-
-                Button btnDisconnect = connectionWithStatusController.getBtnDisconnect();
-                btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
-                btnDisconnect.setManaged(true);
-
-                Button btnConnect = connectionWithStatusController.getBtnConnect();
-                btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
-                btnConnect.setManaged(false);
-
-                menuLoaderController.getMenubar().setDisable(false);
-
-                connectionWithStatusController.updateNodes(repository.getSession());
-            }
+            BorderPane rootPane = new FXMLLoader(getClass().getResource("/nl/bos/views/Menu.fxml")).load();
+            VBox bodyLayout = new FXMLLoader(getClass().getResource("/nl/bos/views/QueryWithResult.fxml")).load();
 
             rootPane.setCenter(bodyLayout);
 
             Image image = new Image(getClass().getClassLoader().getResourceAsStream("nl/bos/icons/logo_16.gif"));
-            primaryStage.getIcons().add(image);
-            primaryStage.setTitle(APP_TITLE);
+
             primaryStage.setScene(new Scene(rootPane));
+            primaryStage.getIcons().add(image);
 
-            primaryStage.show();
-            primaryStage.toFront();
-
-        } catch (IOException | DfException e) {
+        } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
+
+        primaryStage.setTitle(APP_TITLE);
+
+        primaryStage.show();
+        primaryStage.toFront();
     }
 
     private void shutdown() {
@@ -101,7 +74,6 @@ public class Main extends Application {
 
         if (repository.isConnected()) {
             LOGGER.info(MSG_DEV_CONNECTION_CREATED);
-            devModeEnabled = true;
 
         } else {
             LOGGER.info(MSG_USE_CONNECT_BUTTON);
