@@ -1,5 +1,6 @@
 package nl.bos.controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuBar;
 import nl.bos.Repository;
@@ -62,5 +63,13 @@ public class Menu {
     @FXML
     private void showCurrentSessions() {
         new ShowCurrentSessionsAction();
+    }
+
+    public void openAPIScriptWindow(ActionEvent actionEvent) {
+        new OpenAPIScriptWindowAction();
+    }
+
+    public void openDQLScriptWindow(ActionEvent actionEvent) {
+
     }
 }
