@@ -3,7 +3,6 @@ package nl.bos.menu.menuitem.action;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -15,7 +14,6 @@ public class OpenAPIScriptWindowAction {
 
     public OpenAPIScriptWindowAction() {
         Stage apiScriptStage = new Stage();
-        apiScriptStage.initModality(Modality.APPLICATION_MODAL);
         apiScriptStage.setTitle("Execute API Script");
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/APIScriptWindow.fxml"));

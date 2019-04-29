@@ -106,6 +106,14 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         return timeSort;
     }
 
+    TextField getTimeQuery() {
+        return timeQuery;
+    }
+
+    TextField getTimeList() {
+        return timeList;
+    }
+
     /**
      * @noinspection WeakerAccess
      */
@@ -149,7 +157,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         updateNodesBasedOnConnectionStatus();
     }
 
-    public void updateNodes(IDfSession session) throws DfException {
+    private void updateNodes(IDfSession session) throws DfException {
         IDfUser user = session.getUser(session.getLoginUserName());
 
         lblStatus.setText(session.getDocbaseName());

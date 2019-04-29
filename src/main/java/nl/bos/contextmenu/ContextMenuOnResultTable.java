@@ -89,7 +89,7 @@ public class ContextMenuOnResultTable {
                     LOGGER.info("End..." + end);
                     connectionWithStatusController.getTimeSort().setText(Calculations.getDurationInSeconds(start, end));
                 } else {
-                    connectionWithStatusController.getTimeSort().setText("");
+                    connectionWithStatusController.getTimeSort().setText("0.000 sec.");
                 }
 
                 queryWithResultController.cleanStart();

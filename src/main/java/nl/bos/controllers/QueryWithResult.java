@@ -18,6 +18,7 @@ import javafx.util.Callback;
 import nl.bos.AttributeTableColumn;
 import nl.bos.Repository;
 import nl.bos.contextmenu.ContextMenuOnResultTable;
+import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -73,7 +74,7 @@ public class QueryWithResult {
         return jsonObject;
     }
 
-    public FXMLLoader getConnectionWithStatusFxmlLoader() {
+    FXMLLoader getConnectionWithStatusFxmlLoader() {
         return connectionWithStatusFxmlLoader;
     }
 
@@ -357,14 +358,23 @@ public class QueryWithResult {
     }
 
     public void executeQuery(String query) {
+        ConnectionWithStatus connectionWithStatusController = (ConnectionWithStatus) Controllers.get(ConnectionWithStatus.class.getSimpleName());
+
+        Instant start = Instant.now();
         IDfCollection collection = Repository.getInstance().query(query);
+        Instant end = Instant.now();
+        connectionWithStatusController.getTimeQuery().setText(Calculations.getDurationInSeconds(start, end));
 
         if (collection == null) {
             return;
         }
 
         try {
+            Instant startList = Instant.now();
             updateResultTable(collection);
+            Instant endList = Instant.now();
+            connectionWithStatusController.getTimeList().setText(Calculations.getDurationInSeconds(startList, endList));
+
             collection.close();
 
         } catch (DfException e) {
