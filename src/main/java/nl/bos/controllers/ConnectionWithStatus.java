@@ -142,6 +142,15 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
         btnDisconnect.setManaged(false);
 
+        resultCount.textProperty().addListener((observableValue, oldValue, newValue) -> {
+            Menu menuLoaderController = (Menu) Controllers.get(Menu.class.getSimpleName());
+            if (Integer.parseInt(newValue) > 0) {
+                menuLoaderController.getMiExportResults().setDisable(false);
+            } else {
+                menuLoaderController.getMiExportResults().setDisable(true);
+            }
+        });
+
         updateNodesBasedOnConnectionStatus();
     }
 

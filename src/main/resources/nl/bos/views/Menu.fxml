@@ -3,17 +3,21 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-            minWidth="-Infinity" prefHeight="825.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+            minWidth="-Infinity" prefHeight="825.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8.0.121"
             fx:controller="nl.bos.controllers.Menu">
     <top>
         <MenuBar fx:id="menubar" disable="true" BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="Tools">
+                <MenuItem mnemonicParsing="false" onAction="#describeObject" text="Describe Object"/>
+                <MenuItem mnemonicParsing="false" onAction="#getAttributes" text="Get Attributes"/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
                 <MenuItem mnemonicParsing="false" onAction="#openAPIScriptWindow" text="Execute API Script"/>
                 <MenuItem mnemonicParsing="false" onAction="#openDQLScriptWindow" text="Execute DQL Script"/>
                 <SeparatorMenuItem mnemonicParsing="false"/>
                 <MenuItem mnemonicParsing="false" onAction="#browseRepository" text="Browse Repository"/>
                 <SeparatorMenuItem mnemonicParsing="false"/>
-                <MenuItem mnemonicParsing="false" onAction="#describeObject" text="Describe Object"/>
+                <MenuItem fx:id="miExportResults" disable="true" mnemonicParsing="false" onAction="#exportResults"
+                          text="Export Results"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Administration">
                 <MenuItem mnemonicParsing="false" onAction="#manageJobs" text="Manage Jobs"/>

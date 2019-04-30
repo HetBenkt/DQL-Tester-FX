@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import nl.bos.Repository;
 import nl.bos.utils.AppAlert;
@@ -45,6 +46,8 @@ public class GetAttributes {
     private TextField txtSearch;
     @FXML
     private CheckBox chkCaseSensitive;
+    @FXML
+    private VBox vboxGetAttributes;
 
     /**
      * @noinspection EmptyMethod
@@ -195,6 +198,8 @@ public class GetAttributes {
             systemAttributes.clear();
             appendTextToStringBuilder(object);
             txaAttributes.setText(String.valueOf(text));
+            Stage getAttributesStage = (Stage) vboxGetAttributes.getScene().getWindow();
+            getAttributesStage.setTitle(String.format("Attributes List - %s (%s)", txtObjectId.getText(), repository.getRepositoryName()));
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             AppAlert.error("Information Dialog", e.getMessage());

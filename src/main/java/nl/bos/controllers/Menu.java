@@ -1,17 +1,27 @@
 package nl.bos.controllers;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import nl.bos.Repository;
+import nl.bos.contextmenu.menuitem.action.MenuItemExportToCsvAction;
 import nl.bos.menu.menuitem.action.*;
 import nl.bos.utils.Controllers;
+
+import java.io.IOException;
 
 public class Menu {
     @FXML
     private MenuBar menubar;
+    private final Repository repository = Repository.getInstance();
 
     private final DescribeObjectAction describeObjectAction;
+    @FXML
+    private MenuItem miExportResults;
 
     public Menu() {
         Controllers.put(this.getClass().getSimpleName(), this);
@@ -21,9 +31,13 @@ public class Menu {
 
     @FXML
     private void initialize() {
-        if (Repository.getInstance().isConnected()) {
+        if (repository.isConnected()) {
             menubar.setDisable(false);
         }
+    }
+
+    MenuItem getMiExportResults() {
+        return miExportResults;
     }
 
     MenuBar getMenubar() {
@@ -65,11 +79,29 @@ public class Menu {
         new ShowCurrentSessionsAction();
     }
 
-    public void openAPIScriptWindow(ActionEvent actionEvent) {
+    @FXML
+    private void openAPIScriptWindow() {
         new OpenAPIScriptWindowAction();
     }
 
-    public void openDQLScriptWindow(ActionEvent actionEvent) {
+    @FXML
+    private void openDQLScriptWindow() {
 
+    }
+
+    @FXML
+    private void getAttributes() throws IOException {
+        Stage getAttributesStage = new Stage();
+        getAttributesStage.setTitle(String.format("Attributes List - %s (%s)", "ID", repository.getRepositoryName()));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributes.fxml"));
+        VBox getAttributesPane = fxmlLoader.load();
+        Scene scene = new Scene(getAttributesPane);
+        getAttributesStage.setScene(scene);
+        getAttributesStage.showAndWait();
+    }
+
+    @FXML
+    private void exportResults() {
+        new MenuItemExportToCsvAction().exportToCSV();
     }
 }

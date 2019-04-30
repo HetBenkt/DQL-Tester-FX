@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 
 public class MenuItemExportToCsvAction implements EventHandler<ActionEvent> {
     private static final Logger LOGGER = Logger.getLogger(MenuItemExportToCsvAction.class.getName());
-    private final TableView result;
+    private TableView result = null;
 
     public MenuItemExportToCsvAction(MenuItem exportToCsv, TableView result) {
         this.result = result;
@@ -26,9 +26,16 @@ public class MenuItemExportToCsvAction implements EventHandler<ActionEvent> {
         exportToCsv.setOnAction(this);
     }
 
+    public MenuItemExportToCsvAction() {
+
+    }
+
     @Override
     public void handle(ActionEvent actionEvent) {
-        LOGGER.info(actionEvent.getSource().toString());
+        exportToCSV();
+    }
+
+    public void exportToCSV() {
         try {
             File tempFile = File.createTempFile("tmp_", ".csv");
             LOGGER.info(tempFile.getPath());
