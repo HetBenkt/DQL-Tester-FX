@@ -23,15 +23,13 @@ public class MenuItemDescribeObjectAction implements EventHandler<ActionEvent> {
 
     public MenuItemDescribeObjectAction(MenuItem describeObject, TableView result) {
         this.result = result;
-
         describeObject.setOnAction(this);
-
-        updateDescribeObjectType();
     }
 
     @Override
     public void handle(ActionEvent actionEvent) {
-        LOGGER.info(actionEvent.getSource().toString());
+        updateDescribeObjectType();
+
         TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
         String name = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
         LOGGER.info(name);

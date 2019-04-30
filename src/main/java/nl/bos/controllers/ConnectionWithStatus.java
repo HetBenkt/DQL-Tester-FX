@@ -106,15 +106,15 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         return timeSort;
     }
 
-    TextField getTimeQuery() {
+    public TextField getTimeQuery() {
         return timeQuery;
     }
 
-    TextField getTimeList() {
+    public TextField getTimeList() {
         return timeList;
     }
 
-    TextField getResultCount() {
+    public TextField getResultCount() {
         return resultCount;
     }
 

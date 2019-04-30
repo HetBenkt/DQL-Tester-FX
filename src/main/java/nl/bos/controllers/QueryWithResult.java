@@ -273,7 +273,7 @@ public class QueryWithResult {
     /**
      * @noinspection unchecked
      */
-    public void updateResultTableWithStringInput(String description, List<String> columnNames) {
+    public int updateResultTableWithStringInput(String description, List<String> columnNames) {
         contextMenuOnResultTable.getMenuItemShowPropertiesAction().setDescription(description);
 
         result.getItems().clear();
@@ -302,6 +302,8 @@ public class QueryWithResult {
         }
         result.getColumns().addAll(columns);
         result.setItems(rows);
+
+        return rowCount;
     }
 
     private int getRowSize(String description) {
