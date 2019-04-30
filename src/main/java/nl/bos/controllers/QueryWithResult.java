@@ -371,12 +371,12 @@ public class QueryWithResult {
 
         try {
             Instant startList = Instant.now();
-            updateResultTable(collection);
+            int rowCount = updateResultTable(collection);
             Instant endList = Instant.now();
             connectionWithStatusController.getTimeList().setText(Calculations.getDurationInSeconds(startList, endList));
+            connectionWithStatusController.getResultCount().setText(String.valueOf(rowCount));
 
             collection.close();
-
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, String.format("Error running query: [%s]", query), e);
         }

@@ -114,6 +114,10 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         return timeList;
     }
 
+    TextField getResultCount() {
+        return resultCount;
+    }
+
     /**
      * @noinspection WeakerAccess
      */
