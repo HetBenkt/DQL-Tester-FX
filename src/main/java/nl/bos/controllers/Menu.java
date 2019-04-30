@@ -80,13 +80,13 @@ public class Menu {
     }
 
     @FXML
-    private void openAPIScriptWindow() {
-        new OpenAPIScriptWindowAction();
+    private void executeAPIScript() {
+        new ExecuteAPIScriptAction();
     }
 
     @FXML
-    private void openDQLScriptWindow() {
-
+    private void executeDQLScript() {
+        new ExecuteDQLScriptAction();
     }
 
     @FXML

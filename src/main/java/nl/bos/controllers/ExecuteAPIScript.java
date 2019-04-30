@@ -3,12 +3,13 @@ package nl.bos.controllers;
 import com.documentum.fc.client.IDfSession;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import nl.bos.Repository;
 
 import java.io.File;
@@ -19,8 +20,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class APIScriptWindowController {
-    private static final Logger LOGGER = Logger.getLogger(APIScriptWindowController.class.getName());
+public class ExecuteAPIScript {
+    private static final Logger LOGGER = Logger.getLogger(ExecuteAPIScript.class.getName());
     private IDfSession session = Repository.getInstance().getSession();
 
     @FXML
@@ -31,8 +32,16 @@ public class APIScriptWindowController {
     private CheckBox ignoreErrors;
     @FXML
     private TextArea apiResultView;
+    @FXML
+    private TextField filepath;
 
-    public void loadAPIScript(ActionEvent actionEvent) {
+    @FXML
+    public void initialize() {
+        apiScriptView.textProperty().addListener((observableValue, oldValue, newValue) -> btnExecute.setDisable(newValue.isEmpty()));
+    }
+
+    @FXML
+    private void loadAPIScript() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select API Script to load");
         File apiFileToLoad = fileChooser.showOpenDialog(null);
@@ -42,6 +51,7 @@ public class APIScriptWindowController {
         }
 
         try {
+            filepath.setText(apiFileToLoad.getPath());
             List<String> apiScriptToLoad = Files.readAllLines(apiFileToLoad.toPath());
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -49,14 +59,14 @@ public class APIScriptWindowController {
 
             apiScriptView.clear();
             apiScriptView.setText(stringBuilder.toString());
-
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
 
     }
 
-    public void executeScript(ActionEvent actionEvent) {
+    @FXML
+    private void executeScript() {
         if (apiScriptView.getText().trim().isEmpty()) {
             return;
         }
@@ -137,5 +147,21 @@ public class APIScriptWindowController {
     private int getCommandType(String command, IDfSession session) throws DfException {
         IDfList apiDescription = session.apiDesc(command);
         return apiDescription.getInt(2);
+    }
+
+    @FXML
+    private void saveAPIScript() {
+
+    }
+
+    @FXML
+    private void clearScript() {
+        apiScriptView.setText("");
+    }
+
+    @FXML
+    private void exit() {
+        Stage stage = (Stage) btnExecute.getScene().getWindow();
+        stage.close();
     }
 }

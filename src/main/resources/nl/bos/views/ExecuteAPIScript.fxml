@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="650.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121"
+      fx:controller="nl.bos.controllers.ExecuteAPIScript">
+    <VBox spacing="5.0">
+        <HBox spacing="5.0">
+            <TextField fx:id="filepath" editable="false" HBox.hgrow="ALWAYS"/>
+            <Button mnemonicParsing="false" onAction="#loadAPIScript" text="Load"/>
+            <Button disable="true" layoutX="452.0" layoutY="10.0" mnemonicParsing="false" onAction="#saveAPIScript"
+                    text="Save"/>
+        </HBox>
+        <TextArea fx:id="apiScriptView" prefHeight="300.0">
+            <font>
+                <Font name="Monospaced Regular" size="13.0"/>
+            </font>
+        </TextArea>
+        <VBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </VBox.margin>
+    </VBox>
+    <VBox spacing="5.0">
+        <TextArea fx:id="apiResultView" editable="false" prefHeight="250.0">
+            <font>
+                <Font name="Monospaced Regular" size="13.0"/>
+            </font>
+            <VBox.margin>
+                <Insets/>
+            </VBox.margin>
+        </TextArea>
+        <CheckBox fx:id="ignoreErrors" mnemonicParsing="false" text="Ignore Errors"/>
+        <VBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0"/>
+        </VBox.margin>
+    </VBox>
+    <HBox spacing="5.0">
+        <Button fx:id="btnClearScript" mnemonicParsing="false" onAction="#clearScript" text="Clear Script"/>
+        <Button fx:id="btnExecute" defaultButton="true" disable="true" layoutX="10.0" layoutY="10.0"
+                mnemonicParsing="false" onAction="#executeScript" text="Execute"/>
+        <Button fx:id="btnExit" cancelButton="true" layoutX="72.0" layoutY="10.0" mnemonicParsing="false"
+                onAction="#exit" text="Exit">
+            <HBox.margin>
+                <Insets left="410.0"/>
+            </HBox.margin>
+        </Button>
+        <VBox.margin>
+            <Insets left="5.0"/>
+        </VBox.margin>
+    </HBox>
+</VBox>
