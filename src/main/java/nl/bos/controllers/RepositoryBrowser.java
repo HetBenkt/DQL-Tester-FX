@@ -3,6 +3,7 @@ package nl.bos.controllers;
 import com.documentum.fc.client.DfACL;
 import com.documentum.fc.client.IDfPersistentObject;
 import com.documentum.fc.common.DfException;
+import com.documentum.fc.common.DfId;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -15,6 +16,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -22,8 +25,10 @@ import javafx.stage.Stage;
 import nl.bos.BrowserTreeItem;
 import nl.bos.Constants;
 import nl.bos.Repository;
+import nl.bos.utils.AppAlert;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,13 +73,21 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
     private CheckBox ckbShowAllCabinets;
     @FXML
     private CheckBox ckbShowAllVersions;
+    @FXML
+    private VBox vbox;
 
     private BrowserTreeItem rootItem;
     private MyTreeNode selected;
     private final ContextMenu rootContextMenu = new ContextMenu();
+    private boolean found = false;
 
     @FXML
     private void initialize() {
+        vbox.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
+            LOGGER.info(String.format("Keycode = %s", keyEvent.getCode()));
+            if (keyEvent.getCode() == KeyCode.F3) showSearchPopup();
+        });
+
         MenuItem miDump = new MenuItem("Get Attributes");
         miDump.setOnAction(this);
         rootContextMenu.getItems().add(miDump);
@@ -101,6 +114,36 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
                 rootContextMenu.hide();
             }
         });
+    }
+
+    private void showSearchPopup() {
+        Optional<String> findTreeItem = AppAlert.confirmationWithPanelAndResponse("Find Tree Item", "Object ID:");
+        if (findTreeItem.isPresent()) {
+            if (repository.isObjectId(findTreeItem.get())) {
+                try {
+                    IDfPersistentObject objectToBeFound = repository.getSession().getObject(new DfId(findTreeItem.get()));
+                    found = false;
+                    searchInChildren(treeView.getRoot(), objectToBeFound);
+                } catch (DfException e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }
+            } else {
+                AppAlert.error("No object ID", "The given input is not a valid object ID");
+            }
+        }
+    }
+
+    private void searchInChildren(TreeItem<BrowserTreeItem> root, IDfPersistentObject objectToBeFound) {
+        for (TreeItem<BrowserTreeItem> child : root.getChildren()) {
+            if (child.getValue().getObject().equals(objectToBeFound)) {
+                LOGGER.info("found it!");
+                treeView.getSelectionModel().select(child);
+                found = true;
+            } else {
+                if (!found)
+                    searchInChildren(child, objectToBeFound);
+            }
+        }
     }
 
 
