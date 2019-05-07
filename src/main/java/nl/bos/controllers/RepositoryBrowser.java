@@ -1,9 +1,12 @@
 package nl.bos.controllers;
 
 import com.documentum.fc.client.DfACL;
+import com.documentum.fc.client.IDfFolder;
 import com.documentum.fc.client.IDfPersistentObject;
+import com.documentum.fc.client.IDfSysObject;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
+import com.documentum.fc.common.IDfId;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -29,6 +32,7 @@ import nl.bos.utils.AppAlert;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -121,9 +125,25 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         if (findTreeItem.isPresent()) {
             if (repository.isObjectId(findTreeItem.get())) {
                 try {
-                    IDfPersistentObject objectToBeFound = repository.getSession().getObject(new DfId(findTreeItem.get()));
-                    found = false;
-                    searchInChildren(treeView.getRoot(), objectToBeFound);
+                    IDfSysObject objectToBeFound = (IDfSysObject) repository.getSession().getObject(new DfId(findTreeItem.get()));
+                    if (objectToBeFound.getHasFolder()) {
+                        IDfId folderId = objectToBeFound.getFolderId(0);
+                        IDfFolder folder = (IDfFolder) repository.getSession().getObject(folderId);
+                        String folderPath = folder.getFolderPath(0);
+                        folderPath = folderPath + "/" + objectToBeFound.getObjectName();
+                        StringTokenizer tokenizer = new StringTokenizer(folderPath, "/");
+                        TreeItem<BrowserTreeItem> root = treeView.getRoot();
+                        while (tokenizer.hasMoreTokens()) {
+                            String currentName = tokenizer.nextToken();
+                            ObservableList<TreeItem<BrowserTreeItem>> children = root.getChildren();
+                            for (TreeItem<BrowserTreeItem> child : children) {
+                                if (child.getValue().getName().equals(currentName)) {
+                                    treeView.getSelectionModel().select(child);
+                                    root = child;
+                                }
+                            }
+                        }
+                    }
                 } catch (DfException e) {
                     LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 }
