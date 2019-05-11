@@ -1,6 +1,5 @@
 package nl.bos.contextmenu.menuitem.action;
 
-import com.documentum.fc.common.DfId;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -43,7 +42,7 @@ public class MenuItemGetAttributesAction implements EventHandler<ActionEvent> {
             Scene scene = new Scene(loginPane);
             getAttributesStage.setScene(scene);
             GetAttributes controller = fxmlLoader.getController();
-            controller.initTextArea(repository.getSession().getObject(new DfId(id)));
+            controller.dumpObject(id);
             getAttributesStage.showAndWait();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);

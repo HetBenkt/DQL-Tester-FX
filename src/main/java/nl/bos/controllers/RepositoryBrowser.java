@@ -5,7 +5,6 @@ import com.documentum.fc.client.IDfFolder;
 import com.documentum.fc.client.IDfPersistentObject;
 import com.documentum.fc.client.IDfSysObject;
 import com.documentum.fc.common.DfException;
-import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfId;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -30,9 +29,9 @@ import nl.bos.Constants;
 import nl.bos.Repository;
 import nl.bos.utils.AppAlert;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -83,91 +82,129 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
     private BrowserTreeItem rootItem;
     private MyTreeNode selected;
     private final ContextMenu rootContextMenu = new ContextMenu();
-    private boolean found = false;
 
     @FXML
     private void initialize() {
-        vbox.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
-            LOGGER.info(String.format("Keycode = %s", keyEvent.getCode()));
-            if (keyEvent.getCode() == KeyCode.F3) showSearchPopup();
-        });
+		vbox.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPressEvent);
 
-        MenuItem miDump = new MenuItem("Get Attributes");
-        miDump.setOnAction(this);
-        rootContextMenu.getItems().add(miDump);
-
-        rootItem = new BrowserTreeItem(null, repository.getRepositoryName(), TYPE_REPOSITORY, "");
-        TreeItem<BrowserTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
-        treeItemBrowser.setExpanded(true);
-        treeView.setRoot(treeItemBrowser);
-        treeView.getSelectionModel().selectedItemProperty().addListener(this);
-        treeView.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent -> {
-            LOGGER.finest(String.format("Click-count: %s", String.valueOf(mouseEvent.getClickCount())));
-            selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
-            if (selected != null && !selected.isExpanded())
-                selected.isFirstTimeChildren = true;
-            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
-                selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
-                //item is selected - this prevents fail when clicking on empty space
-                if (selected != null && !selected.getValue().getType().equals(TYPE_REPOSITORY)) {
-                    //open context contextmenu on current screen position
-                    rootContextMenu.show(treeView, mouseEvent.getScreenX(), mouseEvent.getScreenY());
-                }
-            } else {
-                //any other click cause hiding contextmenu
-                rootContextMenu.hide();
-            }
-        });
+    	initContextMenu();
+    	initBrowserTree();
     }
 
-    private void showSearchPopup() {
-        Optional<String> findTreeItem = AppAlert.confirmationWithPanelAndResponse("Find Tree Item", "Object ID:");
-        if (findTreeItem.isPresent()) {
-            if (repository.isObjectId(findTreeItem.get())) {
-                try {
-                    IDfSysObject objectToBeFound = (IDfSysObject) repository.getSession().getObject(new DfId(findTreeItem.get()));
-                    if (objectToBeFound.getHasFolder()) {
-                        IDfId folderId = objectToBeFound.getFolderId(0);
-                        IDfFolder folder = (IDfFolder) repository.getSession().getObject(folderId);
-                        String folderPath = folder.getFolderPath(0);
-                        folderPath = folderPath + "/" + objectToBeFound.getObjectName();
-                        StringTokenizer tokenizer = new StringTokenizer(folderPath, "/");
-                        TreeItem<BrowserTreeItem> root = treeView.getRoot();
-                        while (tokenizer.hasMoreTokens()) {
-                            String currentName = tokenizer.nextToken();
-                            ObservableList<TreeItem<BrowserTreeItem>> children = root.getChildren();
-                            for (TreeItem<BrowserTreeItem> child : children) {
-                                if (child.getValue().getName().equals(currentName)) {
-                                    treeView.getSelectionModel().select(child);
-                                    root = child;
-                                }
-                            }
-                        }
-                    }
-                } catch (DfException e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
-                }
-            } else {
-                AppAlert.error("No object ID", "The given input is not a valid object ID");
-            }
-        }
+	private void handleKeyPressEvent(KeyEvent keyEvent) {
+		LOGGER.finest(String.format("Keycode = %s", keyEvent.getCode()));
+
+		if (keyEvent.getCode() == KeyCode.F3) {
+			String searchId = showSearchPopup();
+			searchForTreeItem(searchId);
+		}
+	}
+
+	private void initContextMenu() {
+		MenuItem miDump = new MenuItem("Get Attributes");
+		miDump.setOnAction(this);
+		rootContextMenu.getItems().add(miDump);
+	}
+
+	private void initBrowserTree() {
+		rootItem = new BrowserTreeItem(null, repository.getRepositoryName(), TYPE_REPOSITORY, "");
+		TreeItem<BrowserTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
+		treeItemBrowser.setExpanded(true);
+		treeView.setRoot(treeItemBrowser);
+		treeView.getSelectionModel().selectedItemProperty().addListener(this);
+
+		treeView.addEventHandler(MouseEvent.MOUSE_RELEASED, this::handleContextMenu);
+	}
+
+	private void handleContextMenu(MouseEvent mouseEvent) {
+		LOGGER.finest(String.format("Click-count: %s", String.valueOf(mouseEvent.getClickCount())));
+
+		selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
+
+		if (selected != null && !selected.isExpanded()) {
+			selected.isFirstTimeChildren = true;
+		}
+
+		if (mouseEvent.getButton() != MouseButton.SECONDARY) {
+			rootContextMenu.hide();
+			return;
+		}
+
+		selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
+		//item is selected - this prevents fail when clicking on empty space
+		if (selected != null && !selected.getValue().getType().equals(TYPE_REPOSITORY)) {
+			//open context contextmenu on current screen position
+			rootContextMenu.show(treeView, mouseEvent.getScreenX(), mouseEvent.getScreenY());
+		}
     }
 
-    private void searchInChildren(TreeItem<BrowserTreeItem> root, IDfPersistentObject objectToBeFound) {
-        for (TreeItem<BrowserTreeItem> child : root.getChildren()) {
-            if (child.getValue().getObject().equals(objectToBeFound)) {
-                LOGGER.info("found it!");
-                treeView.getSelectionModel().select(child);
-                found = true;
-            } else {
-                if (!found)
-                    searchInChildren(child, objectToBeFound);
-            }
-        }
-    }
+	private String showSearchPopup() {
+		Optional<String> findTreeItem = AppAlert.confirmationWithPanelAndResponse("Find Tree Item", "Object ID:");
+		return findTreeItem.orElse(null);
+	}
+
+	private void searchForTreeItem(String searchId) {
+		if (!repository.isObjectId(searchId)) {
+			AppAlert.error("No object ID", "The given input is not a valid object ID");
+			return;
+		}
+
+		try {
+			IDfSysObject objectToBeFound = (IDfSysObject) repository.getObjectById(searchId);
+
+			if (objectToBeFound == null) {
+				AppAlert.error("No object found", "No object found for the given object ID");
+				return;
+			}
+
+			if (!objectToBeFound.getHasFolder()) {
+				return;
+			}
+
+			List<IDfId> ancestorIds = getAncestorList(objectToBeFound);
+
+			TreeItem<BrowserTreeItem> root = treeView.getRoot();
+
+			while (!ancestorIds.isEmpty()) {
+				int ancestorCount = ancestorIds.size();
+				ObservableList<TreeItem<BrowserTreeItem>> children = root.getChildren();
+
+				for (TreeItem<BrowserTreeItem> child : children) {
+					IDfId childId = child.getValue().getObject().getObjectId();
+
+					if (ancestorIds.contains(childId)) {
+						treeView.getSelectionModel().select(child);
+						treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
+						root = child;
+						ancestorIds.remove(childId);
+					}
+				}
+
+				if (ancestorCount == ancestorIds.size()) {
+					LOGGER.warning("Could not find full path in browser tree!");
+					break;
+				}
+			}
+
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+
+	private List<IDfId> getAncestorList(IDfSysObject objectToBeFound) throws DfException {
+		List<IDfId> ancestorIds = new ArrayList<>();
+		ancestorIds.add(objectToBeFound.getObjectId());
+
+		IDfFolder folderToBeFound = (IDfFolder) repository.getObjectById(objectToBeFound.getFolderId(0).getId());
+		for (int i = 0; i < folderToBeFound.getValueCount("i_ancestor_id"); i++) {
+			ancestorIds.add(folderToBeFound.getRepeatingId("i_ancestor_id", i));
+		}
+
+		return ancestorIds;
+	}
 
 
-    private TreeItem<BrowserTreeItem> buildTreeItemBrowser(BrowserTreeItem treeItem) {
+	private TreeItem<BrowserTreeItem> buildTreeItemBrowser(BrowserTreeItem treeItem) {
         return createNode(treeItem);
     }
 
@@ -266,16 +303,21 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
     @Override
     public void handle(ActionEvent event) {
         try {
-            LOGGER.info(selected.getValue().getObject().getObjectId().getId());
+        	String selectedId = selected.getValue().getObject().getObjectId().getId();
+            LOGGER.info(selectedId);
+
             Stage dumpAttributes = new Stage();
-            dumpAttributes.setTitle(String.format("Attributes List - %s (%s)", selected.getValue().getObject().getObjectId().getId(), repository.getRepositoryName()));
+            dumpAttributes.setTitle(String.format("Attributes List - %s (%s)", selectedId, repository.getRepositoryName()));
+
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributes.fxml"));
             VBox loginPane = fxmlLoader.load();
             Scene scene = new Scene(loginPane);
             dumpAttributes.setScene(scene);
+
             GetAttributes controller = fxmlLoader.getController();
-            controller.initTextArea(selected.getValue().getObject());
+            controller.dumpObject(selectedId);
             dumpAttributes.showAndWait();
+
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
