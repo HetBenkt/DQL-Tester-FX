@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import nl.bos.AttributeTableColumn;
 import nl.bos.Repository;
+import nl.bos.beans.HistoryItem;
 import nl.bos.contextmenu.ContextMenuOnResultTable;
 import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
@@ -33,7 +34,6 @@ import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,7 +52,7 @@ public class QueryWithResult {
     private String[] parsedDescription;
 
     @FXML
-    private ComboBox<String> historyStatements;
+    private ComboBox<HistoryItem> historyStatements;
     @FXML
     private VBox queryWithResultBox;
     @FXML
@@ -62,7 +62,7 @@ public class QueryWithResult {
 
     private Instant start;
 
-    ComboBox<String> getHistoryStatements() {
+    ComboBox<HistoryItem> getHistoryStatements() {
         return historyStatements;
     }
 
@@ -135,37 +135,62 @@ public class QueryWithResult {
     }
 
     private void loadHistory() {
+        String history = convertFileToString();
+        List<HistoryItem> statements = makeListFrom(history);
+        setHistoryItems(statements);
+        addToolTipToHistoryItems();
+    }
+
+    private String convertFileToString() {
+        String history = null;
         try {
-            String history = new String(Files.readAllBytes(Paths.get(HISTORY_JSON)), StandardCharsets.UTF_8);
-            jsonObject = new JSONObject(history);
-
-            LOGGER.info(jsonObject.toString());
-
-            JSONArray msg = (JSONArray) jsonObject.get(QUERIES);
-            Iterator<Object> iterator = msg.iterator();
-            List<String> statements = new ArrayList<>();
-            while (iterator.hasNext()) {
-                statements.add((String) iterator.next());
-            }
-            ObservableList<String> value = FXCollections.observableList(statements);
-            historyStatements.setItems(value);
-            Callback<ListView<String>, ListCell<String>> factory = lv -> new ListCell<>() {
-
-
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (item != null) {
-                        setText(item.substring(0, Math.min(item.length(), 100)).replaceAll("\n", " "));
-                        setTooltip(new Tooltip(item));
-                    }
-                }
-
-            };
-            historyStatements.setCellFactory(factory);
+            history = new String(Files.readAllBytes(Paths.get(HISTORY_JSON)), StandardCharsets.UTF_8);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
+        return history;
+    }
+
+    private List<HistoryItem> makeListFrom(String history) {
+        JSONArray historyQueries = (JSONArray) new JSONObject(history).get(QUERIES);
+
+        List<HistoryItem> statements = new ArrayList<>();
+        for (int i = 0; i < historyQueries.length(); i++) {
+            statements.add(histroryItemFromJsonObject(historyQueries.getJSONObject(i)));
+        }
+
+        return statements;
+    }
+
+    private void setHistoryItems(List<HistoryItem> statements) {
+        ObservableList<HistoryItem> value = FXCollections.observableList(statements);
+        historyStatements.setItems(value);
+    }
+
+    private void addToolTipToHistoryItems() {
+        Callback<ListView<HistoryItem>, ListCell<HistoryItem>> factory = lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(HistoryItem item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null) {
+                    setText(item.getQuery().substring(0, Math.min(item.getQuery().length(), 100)).replaceAll("\n", " "));
+                    setTooltip(new Tooltip(item.getQuery()));
+                }
+            }
+        };
+        historyStatements.setCellFactory(factory);
+    }
+
+    private HistoryItem histroryItemFromJsonObject(JSONObject jsonObject) {
+        String query = jsonObject.getString("query");
+        String category = jsonObject.getString("category");
+        boolean isFavorite = jsonObject.getBoolean("favorite");
+
+        HistoryItem historyItem = new HistoryItem(query);
+        historyItem.setCategory(category);
+        historyItem.setFavorite(isFavorite);
+
+        return historyItem;
     }
 
     private boolean isHistoryFileCreated() {
@@ -190,7 +215,7 @@ public class QueryWithResult {
         int selectedIndex = historyStatements.getSelectionModel().getSelectedIndex();
 
         if (historyStatements.getItems().remove(selectedItem)) {
-            ObservableList<String> items = historyStatements.getItems();
+            ObservableList<HistoryItem> items = historyStatements.getItems();
             try {
                 String history = new String(Files.readAllBytes(Paths.get(HISTORY_JSON)), StandardCharsets.UTF_8);
                 jsonObject = new JSONObject(history);

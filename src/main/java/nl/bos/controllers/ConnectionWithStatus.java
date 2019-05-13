@@ -16,6 +16,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import nl.bos.Repository;
+import nl.bos.beans.HistoryItem;
 import nl.bos.utils.AppAlert;
 import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
@@ -294,16 +295,17 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
 
-            ComboBox<String> cmbHistory = queryWithResultController.getHistoryStatements();
-            ObservableList<String> items = cmbHistory.getItems();
+            ComboBox<HistoryItem> cmbHistory = queryWithResultController.getHistoryStatements();
+            ObservableList<HistoryItem> items = cmbHistory.getItems();
             if (statementNotExists(items, statement)) {
-                items.add(0, statement);
-                cmbHistory.setValue(statement);
+                HistoryItem historyItem = new HistoryItem(statement);
+                items.add(0, historyItem);
+                cmbHistory.setValue(historyItem);
                 JSONArray queries = (JSONArray) jsonObject.get("queries");
                 if (queries.length() > 0) {
                     queries.put(queries.get(0));
                 }
-                queries.put(0, statement);
+                queries.put(0, new JSONObject(historyItem));
                 try (FileWriter file = new FileWriter(HISTORY_JSON)) {
                     file.write(jsonObject.toString());
                     file.flush();
@@ -315,23 +317,22 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         }
     }
 
-    private boolean statementNotExists(ObservableList items, String statement) {
-        for (Object item : items) {
-            String historyStatement = (String) item;
-            if (historyStatement.equalsIgnoreCase(statement))
+    private boolean statementNotExists(ObservableList<HistoryItem> items, String statement) {
+        for (HistoryItem item : items) {
+            if (item.getQuery().equalsIgnoreCase(statement))
                 return false;
         }
         return true;
     }
 
     @FXML
-    private void handleClearQuery(ActionEvent actionEvent) {
+    private void handleClearQuery() {
         QueryWithResult queryWithResultController = (QueryWithResult) Controllers.get(QueryWithResult.class.getSimpleName());
         queryWithResultController.getStatement().clear();
     }
 
     @FXML
-    private void handleDisconnect(ActionEvent actionEvent) {
+    private void handleDisconnect() {
         Login loginController = fxmlLoader.getController();
         loginController.initialize();
         loginStage.showAndWait();
