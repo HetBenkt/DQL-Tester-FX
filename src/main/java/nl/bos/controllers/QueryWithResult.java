@@ -114,7 +114,7 @@ public class QueryWithResult {
         loadConnectionWithStatusFxml();
 
         if (historyFileReady()) {
-            loadHistory();
+            reloadHistory();
         }
 
         historyStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, historyStatements));
@@ -149,7 +149,7 @@ public class QueryWithResult {
         }
     }
 
-    private void loadHistory() {
+    private void reloadHistory() {
         String history = convertFileToString();
         List<HistoryItem> statements = makeListFrom(history);
         setHistoryItems(statements);
@@ -255,13 +255,9 @@ public class QueryWithResult {
             if (queries.length() > 0) {
                 historyStatements.setValue(historyStatements.getItems().get(0));
             }
-            try (FileWriter file = new FileWriter(HISTORY_JSON)) {
-                file.write(jsonObject.toString());
-                file.flush();
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            }
-            loadHistory();
+
+            writeHistoryToFile();
+            reloadHistory();
         }
     }
 
@@ -270,29 +266,11 @@ public class QueryWithResult {
         HistoryItem selectedItem = historyStatements.getSelectionModel().getSelectedItem();
 
         if (selectedItem != null) {
-
             selectedItem.setFavorite(true);
 
-            List<HistoryItem> historyItems = makeListFrom(jsonObject.toString());
-            int selectedIndex = 0;
-            for (HistoryItem historyItem : historyItems) {
-                if (historyItem.getQuery().equals(selectedItem.getQuery())) {
-                    break;
-                }
-                selectedIndex++;
-            }
-
-            JSONArray queries = (JSONArray) jsonObject.get("queries");
-            queries.put(selectedIndex, new JSONObject(selectedItem));
-
-            try (FileWriter file = new FileWriter(HISTORY_JSON)) {
-                file.write(jsonObject.toString());
-                file.flush();
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            }
-
-            loadHistory();
+            updateJSONData(selectedItem);
+            writeHistoryToFile();
+            reloadHistory();
         }
     }
 
@@ -303,26 +281,32 @@ public class QueryWithResult {
         if (selectedItem != null) {
             selectedItem.setFavorite(false);
 
-            List<HistoryItem> historyItems = makeListFrom(jsonObject.toString());
-            int selectedIndex = 0;
-            for (HistoryItem historyItem : historyItems) {
-                if (historyItem.getQuery().equals(selectedItem.getQuery())) {
-                    break;
-                }
-                selectedIndex++;
+            updateJSONData(selectedItem);
+            writeHistoryToFile();
+            reloadHistory();
+        }
+    }
+
+    private void updateJSONData(HistoryItem selectedItem) {
+        List<HistoryItem> historyItems = makeListFrom(jsonObject.toString());
+        int selectedIndex = 0;
+        for (HistoryItem historyItem : historyItems) {
+            if (historyItem.getQuery().equals(selectedItem.getQuery())) {
+                break;
             }
+            selectedIndex++;
+        }
 
-            JSONArray queries = (JSONArray) jsonObject.get("queries");
-            queries.put(selectedIndex, new JSONObject(selectedItem));
+        JSONArray queries = (JSONArray) jsonObject.get("queries");
+        queries.put(selectedIndex, new JSONObject(selectedItem));
+    }
 
-            try (FileWriter file = new FileWriter(HISTORY_JSON)) {
-                file.write(jsonObject.toString());
-                file.flush();
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            }
-
-            loadHistory();
+    private void writeHistoryToFile() {
+        try (FileWriter file = new FileWriter(HISTORY_JSON)) {
+            file.write(jsonObject.toString());
+            file.flush();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
