@@ -11,6 +11,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -37,6 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import static nl.bos.Constants.HISTORY_JSON;
 import static nl.bos.Constants.QUERIES;
@@ -54,11 +56,19 @@ public class QueryWithResult {
     @FXML
     private ComboBox<HistoryItem> historyStatements;
     @FXML
+    private ComboBox<HistoryItem> favoriteStatements;
+    @FXML
     private VBox queryWithResultBox;
     @FXML
     private TextArea statement;
     @FXML
     private TableView result;
+    @FXML
+    private ImageView btnDeleteHistoryItem;
+    @FXML
+    private ImageView btnSaveHistoryItem;
+    @FXML
+    private ImageView btnDeleteFavoriteItem;
 
     private Instant start;
 
@@ -90,6 +100,10 @@ public class QueryWithResult {
     private void initialize() {
         Controllers.put(this.getClass().getSimpleName(), this);
 
+        Tooltip.install(btnDeleteHistoryItem, new Tooltip("Delete from history"));
+        Tooltip.install(btnSaveHistoryItem, new Tooltip("Save to favorites"));
+        Tooltip.install(btnDeleteFavoriteItem, new Tooltip("Delete from favorites"));
+
         contextMenuOnResultTable = new ContextMenuOnResultTable(result);
         result.getSelectionModel().setCellSelectionEnabled(true);
         result.addEventHandler(MouseEvent.MOUSE_CLICKED, contextMenuOnResultTable::onRightMouseClick);
@@ -103,7 +117,8 @@ public class QueryWithResult {
             loadHistory();
         }
 
-        historyStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onHistoryStatementsSelection(newValue));
+        historyStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, historyStatements));
+        favoriteStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, favoriteStatements));
     }
 
     private boolean historyFileReady() {
@@ -115,11 +130,11 @@ public class QueryWithResult {
         }
     }
 
-    private void onHistoryStatementsSelection(Number newValue) {
+    private void onStatementsSelection(Number newValue, ComboBox<HistoryItem> statements) {
         if (newValue.intValue() != -1) {
-            String selectedHistoryItem = String.valueOf(historyStatements.getItems().get((Integer) newValue));
-            LOGGER.info(selectedHistoryItem);
-            statement.setText(selectedHistoryItem);
+            String selectedItem = String.valueOf(statements.getItems().get((Integer) newValue));
+            LOGGER.info(selectedItem);
+            statement.setText(selectedItem);
         } else
             statement.setText("");
     }
@@ -138,13 +153,16 @@ public class QueryWithResult {
         String history = convertFileToString();
         List<HistoryItem> statements = makeListFrom(history);
         setHistoryItems(statements);
-        addToolTipToHistoryItems();
+        setFavoriteItems(statements);
+        addToolTipToItems(historyStatements);
+        addToolTipToItems(favoriteStatements);
     }
 
     private String convertFileToString() {
         String history = null;
         try {
             history = new String(Files.readAllBytes(Paths.get(HISTORY_JSON)), StandardCharsets.UTF_8);
+            jsonObject = new JSONObject(history);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -167,7 +185,16 @@ public class QueryWithResult {
         historyStatements.setItems(value);
     }
 
-    private void addToolTipToHistoryItems() {
+    private void setFavoriteItems(List<HistoryItem> statements) {
+        List<HistoryItem> result = statements.stream()
+                .filter(HistoryItem::isFavorite)
+                .collect(Collectors.toList());
+        ObservableList<HistoryItem> value = FXCollections.observableList(result);
+        favoriteStatements.setItems(value);
+    }
+
+
+    private void addToolTipToItems(ComboBox<HistoryItem> statements) {
         Callback<ListView<HistoryItem>, ListCell<HistoryItem>> factory = lv -> new ListCell<>() {
             @Override
             protected void updateItem(HistoryItem item, boolean empty) {
@@ -178,7 +205,7 @@ public class QueryWithResult {
                 }
             }
         };
-        historyStatements.setCellFactory(factory);
+        statements.setCellFactory(factory);
     }
 
     private HistoryItem histroryItemFromJsonObject(JSONObject jsonObject) {
@@ -210,30 +237,92 @@ public class QueryWithResult {
     }
 
     @FXML
-    private void handleDeleteHistoryItem(MouseEvent mouseEvent) {
-        Object selectedItem = historyStatements.getSelectionModel().getSelectedItem();
-        int selectedIndex = historyStatements.getSelectionModel().getSelectedIndex();
+    private void handleDeleteHistoryItem() {
+        HistoryItem selectedItem = historyStatements.getSelectionModel().getSelectedItem();
 
         if (historyStatements.getItems().remove(selectedItem)) {
-            ObservableList<HistoryItem> items = historyStatements.getItems();
-            try {
-                String history = new String(Files.readAllBytes(Paths.get(HISTORY_JSON)), StandardCharsets.UTF_8);
-                jsonObject = new JSONObject(history);
-
-                JSONArray queries = (JSONArray) jsonObject.get(QUERIES);
-                queries.remove(selectedIndex);
-                if (queries.length() > 0)
-                    historyStatements.setValue(historyStatements.getItems().get(0));
-                try (FileWriter file = new FileWriter(HISTORY_JSON)) {
-                    file.write(jsonObject.toString());
-                    file.flush();
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            List<HistoryItem> historyItems = makeListFrom(jsonObject.toString());
+            int selectedIndex = 0;
+            for (HistoryItem historyItem : historyItems) {
+                if (historyItem.getQuery().equals(selectedItem.getQuery())) {
+                    break;
                 }
+                selectedIndex++;
+            }
+
+            JSONArray queries = (JSONArray) jsonObject.get(QUERIES);
+            queries.remove(selectedIndex);
+            if (queries.length() > 0) {
+                historyStatements.setValue(historyStatements.getItems().get(0));
+            }
+            try (FileWriter file = new FileWriter(HISTORY_JSON)) {
+                file.write(jsonObject.toString());
+                file.flush();
             } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
-            historyStatements.setItems(items);
+            loadHistory();
+        }
+    }
+
+    @FXML
+    private void handleSaveHistoryItem() {
+        HistoryItem selectedItem = historyStatements.getSelectionModel().getSelectedItem();
+
+        if (selectedItem != null) {
+
+            selectedItem.setFavorite(true);
+
+            List<HistoryItem> historyItems = makeListFrom(jsonObject.toString());
+            int selectedIndex = 0;
+            for (HistoryItem historyItem : historyItems) {
+                if (historyItem.getQuery().equals(selectedItem.getQuery())) {
+                    break;
+                }
+                selectedIndex++;
+            }
+
+            JSONArray queries = (JSONArray) jsonObject.get("queries");
+            queries.put(selectedIndex, new JSONObject(selectedItem));
+
+            try (FileWriter file = new FileWriter(HISTORY_JSON)) {
+                file.write(jsonObject.toString());
+                file.flush();
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
+
+            loadHistory();
+        }
+    }
+
+    @FXML
+    private void handleDeleteFavoriteItem() {
+        HistoryItem selectedItem = favoriteStatements.getSelectionModel().getSelectedItem();
+
+        if (selectedItem != null) {
+            selectedItem.setFavorite(false);
+
+            List<HistoryItem> historyItems = makeListFrom(jsonObject.toString());
+            int selectedIndex = 0;
+            for (HistoryItem historyItem : historyItems) {
+                if (historyItem.getQuery().equals(selectedItem.getQuery())) {
+                    break;
+                }
+                selectedIndex++;
+            }
+
+            JSONArray queries = (JSONArray) jsonObject.get("queries");
+            queries.put(selectedIndex, new JSONObject(selectedItem));
+
+            try (FileWriter file = new FileWriter(HISTORY_JSON)) {
+                file.write(jsonObject.toString());
+                file.flush();
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
+
+            loadHistory();
         }
     }
 

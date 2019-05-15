@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<VBox fx:id="queryWithResultBox" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nl.bos.controllers.QueryWithResult">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="queryWithResultBox" BorderPane.alignment="CENTER"
+      xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.QueryWithResult">
     <SplitPane dividerPositions="0.6" orientation="VERTICAL" VBox.vgrow="ALWAYS">
         <VBox>
             <padding>
@@ -33,12 +26,41 @@
             </font></TextArea>
             <Label text="DQL/SQL History" />
             <HBox>
-                <ComboBox fx:id="historyStatements" prefHeight="25.0" />
-                <ImageView id="btnDeleteHistoryItem" fitHeight="24.0" fitWidth="24.0" onMouseClicked="#handleDeleteHistoryItem" pickOnBounds="true" preserveRatio="true">
+                <ComboBox fx:id="historyStatements"/>
+                <ImageView fx:id="btnDeleteHistoryItem" fitHeight="24.0" fitWidth="24.0"
+                           onMouseClicked="#handleDeleteHistoryItem" pickOnBounds="true" preserveRatio="true">
                     <HBox.margin>
                         <Insets left="5.0" />
                     </HBox.margin>
                     <Image url="@../icons/delete.gif" />
+                </ImageView>
+                <ImageView fx:id="btnSaveHistoryItem" fitHeight="24.0" fitWidth="24.0" layoutX="65.0" layoutY="10.0"
+                           onMouseClicked="#handleSaveHistoryItem" pickOnBounds="true" preserveRatio="true">
+                    <HBox.margin>
+                        <Insets left="5.0"/>
+                    </HBox.margin>
+                    <Image url="@../icons/save.gif"/>
+                </ImageView>
+            </HBox>
+            <Label layoutX="15.0" layoutY="206.0" text="DQL/SQL Favorites">
+                <VBox.margin>
+                    <Insets top="5.0"/>
+                </VBox.margin>
+            </Label>
+            <HBox layoutX="15.0" layoutY="241.0">
+                <opaqueInsets>
+                    <Insets/>
+                </opaqueInsets>
+                <VBox.margin>
+                    <Insets/>
+                </VBox.margin>
+                <ComboBox fx:id="favoriteStatements"/>
+                <ImageView fx:id="btnDeleteFavoriteItem" fitHeight="24.0" fitWidth="24.0"
+                           onMouseClicked="#handleDeleteFavoriteItem" pickOnBounds="true" preserveRatio="true">
+                    <HBox.margin>
+                        <Insets left="5.0"/>
+                    </HBox.margin>
+                    <Image url="@../icons/delete.gif"/>
                 </ImageView>
             </HBox>
         </VBox>
