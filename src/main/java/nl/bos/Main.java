@@ -45,8 +45,10 @@ public class Main extends Application {
         }
 
         primaryStage.setTitle(APP_TITLE);
-
+        primaryStage.sizeToScene();
         primaryStage.show();
+        primaryStage.setMinWidth(primaryStage.getWidth());
+        primaryStage.setMinHeight(primaryStage.getHeight());
         primaryStage.toFront();
     }
 
