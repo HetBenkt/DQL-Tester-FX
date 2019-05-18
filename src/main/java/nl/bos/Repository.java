@@ -27,6 +27,7 @@ public class Repository {
     private String userName;
     private String passkey;
     private String domain;
+    private String secureMode;
     private final IDfClientX clientX;
     private IDfClient client = null;
 
@@ -86,10 +87,33 @@ public class Repository {
     }
 
     public void setCredentials(String repositoryName, String userName, String passkey, String domain) {
+        setCredentials(repositoryName, userName, passkey, domain, "default");
+    }
+
+    public void setCredentials(String repositoryName, String userName, String passkey, String domain, String secureMode) {
         this.repositoryName = repositoryName;
         this.userName = userName;
         this.passkey = passkey;
         this.domain = domain;
+        switch (secureMode == null ? "" : secureMode) {
+            case "default":
+                this.secureMode = null;
+                break;
+            case "native":
+                this.secureMode = IDfLoginInfo.SECURITY_MODE_NATIVE;
+                break;
+            case "secure":
+                this.secureMode = IDfLoginInfo.SECURITY_MODE_SECURE;
+                break;
+            case "try_native_first":
+                this.secureMode = IDfLoginInfo.SECURITY_MODE_TRY_NATIVE_FIRST;
+                break;
+            case "try_secure_first":
+                this.secureMode = IDfLoginInfo.SECURITY_MODE_TRY_SECURE_FIRST;
+                break;
+            default:
+                this.secureMode = null;
+        }
     }
 
     public IDfTypedObject obtainServerMap(String selectedRepository) {
@@ -112,7 +136,6 @@ public class Repository {
     public void createSession() {
         try {
             session = sessionManager.getSession(repositoryName);
-
         } catch (DfServiceException e) {
             LOGGER.finest(e.getMessage());
             errorMessage = e.getMessage();
@@ -140,6 +163,10 @@ public class Repository {
             loginInfoObj.setUser(userName);
             loginInfoObj.setPassword(passkey);
             loginInfoObj.setDomain(domain);
+
+            if (secureMode != null) {
+                loginInfoObj.setSecurityMode(secureMode);
+            }
 
             sessionManager.setIdentity(repositoryName, loginInfoObj);
 
@@ -192,6 +219,7 @@ public class Repository {
 				collection.close();
 
 			} catch (DfException ignored) {
+			    //ignored
 			}
 		}
 
