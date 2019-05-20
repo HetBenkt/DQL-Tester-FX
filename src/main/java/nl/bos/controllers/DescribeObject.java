@@ -2,6 +2,7 @@ package nl.bos.controllers;
 
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
+import com.documentum.fc.common.IDfId;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
@@ -13,6 +14,8 @@ import javafx.stage.WindowEvent;
 import nl.bos.DescribeObjectTreeItem;
 import nl.bos.Repository;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,18 +60,40 @@ public class DescribeObject {
         DescribeObjectTreeItem parent = new DescribeObjectTreeItem("Types");
 
         try {
-            IDfCollection types = repository.query("select name from dm_type order by 1");
+            Map<IDfId, DescribeObjectTreeItem> typeById = new HashMap<>();
+            Map<IDfId, IDfId> superTypes = new HashMap<>();
+
+            IDfCollection types = repository.query("select a.r_object_id, a.name, b.r_object_id as \"super_id\" from dm_type a, dm_type b where a.super_name = b.name union select r_object_id, name, '' as \"super_id\" from dm_type where super_name is nullstring order by 2 asc");
             while (types.next()) {
+                IDfId typeID = types.getId("r_object_id");
+                IDfId superID = types.getId("super_id");
                 DescribeObjectTreeItem item = new DescribeObjectTreeItem(types.getString("name"), TYPE);
                 items.add(item);
-                //noinspection unchecked
-                parent.getChildren().add(item);
+
+                typeById.put(typeID, item);
+                superTypes.put(typeID, superID);
             }
             types.close();
+
+            for (Map.Entry<IDfId, DescribeObjectTreeItem> entry : typeById.entrySet()) {
+                IDfId key = entry.getKey();
+                IDfId superType = superTypes.get(key);
+                if (superType.equals(key)) {
+                    parent.getChildren().add(entry.getValue());
+                } else {
+                    DescribeObjectTreeItem parentItem = typeById.get(superType);
+                    if (parentItem == null) {
+                        parent.getChildren().add(entry.getValue());
+                    } else {
+                        parentItem.getChildren().add(entry.getValue());
+                    }
+                }
+            }
+
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-
+        parent.sort();
         return parent;
     }
 

@@ -1,59 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity" prefHeight="450.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8.0.121"
-      fx:controller="nl.bos.controllers.Login">
+<VBox alignment="BOTTOM_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="350.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nl.bos.controllers.Login">
     <padding>
-        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
     </padding>
     <VBox spacing="5.0">
         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
         </padding>
         <VBox.margin>
-            <Insets bottom="20.0"/>
+            <Insets />
         </VBox.margin>
-        <Label text="Repository"/>
-        <ChoiceBox fx:id="chbRepository" maxWidth="1.7976931348623157E308"/>
-        <Label text="User Name"/>
-        <TextField fx:id="txtUsername" maxWidth="1.7976931348623157E308" onKeyReleased="#handleConnectButton"/>
-        <Label text="Password"/>
-        <PasswordField fx:id="txtPassword" maxHeight="1.7976931348623157E308"
-                       onKeyReleased="#handleConnectButton"/>
-        <Label text="Domain"/>
-        <TextField fx:id="txtDomain" maxHeight="1.7976931348623157E308"/>
-        <CheckBox fx:id="chkUseWindowsLogin" mnemonicParsing="false" text="Use Windows Login"/>
-        <CheckBox fx:id="chkSaveLoginData" mnemonicParsing="false" text="Save Login Data"/>
-        <HBox spacing="5.0">
-            <Button fx:id="btnLogin" defaultButton="true" disable="true" mnemonicParsing="false"
-                    onAction="#handleLogin" text="Connect"/>
-            <Button fx:id="btnLogout" defaultButton="true" mnemonicParsing="false"
-                    onAction="#handleLogout" text="Disconnect" visible="false"/>
-            <Button id="btnCancel" cancelButton="true" mnemonicParsing="false" onAction="#handleCancel"
-                    text="Cancel"/>
-        </HBox>
+        <Label text="Repository" />
+        <ChoiceBox fx:id="chbRepository" maxWidth="1.7976931348623157E308" />
+        <Label text="User Name" />
+        <TextField fx:id="txtUsername" maxWidth="1.7976931348623157E308" onKeyReleased="#handleConnectButton">
+         <tooltip>
+            <Tooltip fx:id="ttUsername" text="Empty Tooltip" />
+         </tooltip></TextField>
+        <Label text="Password" />
+        <PasswordField fx:id="txtPassword" maxHeight="1.7976931348623157E308" onKeyReleased="#handleConnectButton">
+         <tooltip>
+            <Tooltip fx:id="ttPassword" text="Empty Tooltip" />
+         </tooltip></PasswordField>
+        <Label text="Domain" />
+        <TextField fx:id="txtDomain" maxHeight="1.7976931348623157E308">
+         <tooltip>
+            <Tooltip fx:id="ttDomain" text="Empty Tooltip" />
+         </tooltip></TextField>
+      <Label text="Secure mode" />
+      <ChoiceBox fx:id="chbSecureMode" maxWidth="1.7976931348623157E308">
+         <tooltip>
+            <Tooltip fx:id="ttSecureMode" text="Empty Tooltip" />
+         </tooltip></ChoiceBox>
+        <CheckBox fx:id="chkUseWindowsLogin" mnemonicParsing="false" text="Use Windows Login" />
+        <CheckBox fx:id="chkSaveLoginData" mnemonicParsing="false" text="Save Login Data" />
+      <GridPane>
+        <columnConstraints>
+          <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="ALWAYS" maxWidth="-Infinity" minWidth="1.0" prefWidth="20.0" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="TOP" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+               <Button fx:id="btnLogin" defaultButton="true" disable="true" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleLogin" prefWidth="80.0" text="Connect" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" />
+               <Button fx:id="btnLogout" defaultButton="true" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleLogout" prefWidth="80.0" text="Disconnect" visible="false" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" />
+               <Button id="btnCancel" cancelButton="true" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleCancel" prefWidth="80.0" text="Cancel" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" />
+            <Label text="Info" GridPane.columnSpan="2147483647" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.valignment="BOTTOM" />
+              <Button id="btnServerMap" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleServerMap" prefWidth="145.0" text="Server Map" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
+              <Button id="btnConnectionBrokerMap" minWidth="-Infinity" mnemonicParsing="false" onAction="#handleConnectionBrokerMap" prefWidth="145.0" text="Connection Broker Map" GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" />
+         </children>
+      </GridPane>
     </VBox>
-    <Label text="Info">
-        <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-        </padding>
-    </Label>
-    <HBox spacing="5.0">
-        <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-        </padding>
-        <VBox.margin>
-            <Insets bottom="20.0"/>
-        </VBox.margin>
-        <Button id="btnServerMap" mnemonicParsing="false" onAction="#handleServerMap" text="Server Map"/>
-        <Button id="btnConnectionBrokerMap" mnemonicParsing="false" onAction="#handleConnectionBrokerMap"
-                text="Connection Broker Map"/>
-    </HBox>
-    <HBox spacing="5.0">
-        <Label fx:id="lblServer" text="&lt;server&gt;"/>
-        <Label fx:id="lblVersion" text="&lt;version&gt;"/>
-    </HBox>
+   <GridPane>
+     <columnConstraints>
+       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+     </columnConstraints>
+     <rowConstraints>
+       <RowConstraints fillHeight="false" maxHeight="-Infinity" minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
+       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+     </rowConstraints>
+      <children>
+           <Label fx:id="lblServer" text="&lt;server&gt;" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="BOTTOM" />
+           <Label fx:id="lblVersion" text="&lt;version&gt;" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.valignment="BOTTOM" />
+      </children>
+   </GridPane>
 </VBox>

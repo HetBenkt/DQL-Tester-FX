@@ -42,9 +42,19 @@ public class Login {
     @FXML
     private TextField txtUsername;
     @FXML
+    private Tooltip ttUsername;
+    @FXML
     private PasswordField txtPassword;
     @FXML
+    private Tooltip ttPassword;
+    @FXML
     private TextField txtDomain;
+    @FXML
+    private Tooltip ttDomain;
+    @FXML
+    private ChoiceBox<String> chbSecureMode;
+    @FXML
+    private Tooltip ttSecureMode;
     @FXML
     private CheckBox chkSaveLoginData;
     @FXML
@@ -54,8 +64,19 @@ public class Login {
     @FXML
     void initialize() {
         try {
+
+            ObservableList<String> secureModes = FXCollections.observableArrayList();
+            secureModes.addAll("default","native","secure","try_native_first","try_secure_first");
+            chbSecureMode.setItems(secureModes);
+            chbSecureMode.setValue(chbSecureMode.getItems().get(0));
+
             setFieldsConnect(repository.isConnected());
             lblVersion.setText(getProjectVersion());
+
+            ttUsername.setText("Enter a user name");
+            ttPassword.setText("Enter the user password");
+            ttDomain.setText("Enter the user OS domain");
+            ttSecureMode.setText("Defines whether to establish a secure or native (insecure) connection.\nDefault uses the settings from dfc.properties or the Server Config Object.");
 
             if (repository.getClient() != null) {
                 IDfDocbaseMap repositoryMap = repository.obtainRepositoryMap();
@@ -75,6 +96,7 @@ public class Login {
 
                 chbRepository.setItems(repositories);
                 chbRepository.setValue(chbRepository.getItems().get(0));
+
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -92,6 +114,7 @@ public class Login {
         txtUsername.setDisable(connected);
         txtPassword.setDisable(connected);
         txtDomain.setDisable(connected);
+        chbSecureMode.setDisable(connected);
         chkSaveLoginData.setDisable(connected);
         chkUseWindowsLogin.setDisable(connected);
     }
@@ -119,8 +142,9 @@ public class Login {
     private void handleLogin(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
         String selectedRepository = chbRepository.getValue();
+        String selectedSecureMode = chbSecureMode.getValue();
         lblServer.setText(String.format("Connection to '%s'", selectedRepository));
-        repository.setCredentials(selectedRepository, txtUsername.getText(), txtPassword.getText(), txtDomain.getText());
+        repository.setCredentials(selectedRepository, txtUsername.getText(), txtPassword.getText(), txtDomain.getText(), selectedSecureMode);
         repository.createSessionManager();
         repository.createSession();
 
