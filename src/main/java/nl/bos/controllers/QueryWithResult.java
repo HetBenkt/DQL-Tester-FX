@@ -22,16 +22,15 @@ import nl.bos.beans.HistoryItem;
 import nl.bos.contextmenu.ContextMenuOnResultTable;
 import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
+import nl.bos.utils.Resources;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,6 +89,10 @@ public class QueryWithResult {
 
     public Instant getStart() {
         return start;
+    }
+
+    public TableView getResult() {
+        return result;
     }
 
     public void cleanStart() {
@@ -225,15 +228,7 @@ public class QueryWithResult {
         jsonObject = new JSONObject();
         jsonObject.put(QUERIES, list);
 
-        try (FileWriter file = new FileWriter(HISTORY_JSON)) {
-            file.write(jsonObject.toString());
-            file.flush();
-            LOGGER.info(MessageFormat.format("New {0} file is created", HISTORY_JSON));
-            return true;
-        } catch (IOException ioe) {
-            LOGGER.log(Level.SEVERE, ioe.getMessage(), ioe);
-        }
-        return false;
+        return Resources.writeJsonDataToJsonHistoryFile(jsonObject);
     }
 
     @FXML
@@ -256,8 +251,8 @@ public class QueryWithResult {
                 historyStatements.setValue(historyStatements.getItems().get(0));
             }
 
-            writeHistoryToFile();
-            reloadHistory();
+            if (Resources.writeJsonDataToJsonHistoryFile(jsonObject))
+                reloadHistory();
         }
     }
 
@@ -269,8 +264,8 @@ public class QueryWithResult {
             selectedItem.setFavorite(true);
 
             updateJSONData(selectedItem);
-            writeHistoryToFile();
-            reloadHistory();
+            if (Resources.writeJsonDataToJsonHistoryFile(jsonObject))
+                reloadHistory();
         }
     }
 
@@ -282,8 +277,8 @@ public class QueryWithResult {
             selectedItem.setFavorite(false);
 
             updateJSONData(selectedItem);
-            writeHistoryToFile();
-            reloadHistory();
+            if (Resources.writeJsonDataToJsonHistoryFile(jsonObject))
+                reloadHistory();
         }
     }
 
@@ -299,15 +294,6 @@ public class QueryWithResult {
 
         JSONArray queries = (JSONArray) jsonObject.get("queries");
         queries.put(selectedIndex, new JSONObject(selectedItem));
-    }
-
-    private void writeHistoryToFile() {
-        try (FileWriter file = new FileWriter(HISTORY_JSON)) {
-            file.write(jsonObject.toString());
-            file.flush();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
     }
 
     /**

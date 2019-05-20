@@ -102,6 +102,7 @@ public class Menu {
 
     @FXML
     private void exportResults() {
-        new MenuItemExportToCsvAction().exportToCSV();
+        QueryWithResult queryWithResult = (QueryWithResult) Controllers.get(QueryWithResult.class.getSimpleName());
+        new MenuItemExportToCsvAction(miExportResults, queryWithResult.getResult()).handle(null);
     }
 }
