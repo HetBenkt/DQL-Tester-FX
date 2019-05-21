@@ -7,7 +7,7 @@ import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,11 +31,11 @@ public class Resources {
     }
 
 
-    public static File createTempCSV() {
+    public static File createTempFile(String prefix, String suffic) {
         File result = null;
 
         try {
-            result = File.createTempFile("tmp_", ".csv");
+            result = File.createTempFile(prefix, suffic);
             LOGGER.info(result.getPath());
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -44,8 +44,8 @@ public class Resources {
         return result;
     }
 
-    public static File exportToCSV(File tempFile, String tableResult) {
-        try (InputStream tableResultContent = new ByteArrayInputStream(tableResult.getBytes(Charset.forName("UTF-8")));
+    public static File exportStringToFile(File tempFile, String tableResult) {
+        try (InputStream tableResultContent = new ByteArrayInputStream(tableResult.getBytes(StandardCharsets.UTF_8));
              ReadableByteChannel readableByteChannel = Channels.newChannel(tableResultContent);
              FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
              FileChannel fileChannel = fileOutputStream.getChannel()
@@ -56,6 +56,14 @@ public class Resources {
         }
 
         return tempFile;
+    }
+
+    public static File exportStreamToFile(File tempFile, ByteArrayInputStream jobLogContent) {
+        int n = jobLogContent.available();
+        byte[] bytes = new byte[n];
+        String tableResult = new String(bytes, StandardCharsets.UTF_8);
+
+        return exportStringToFile(tempFile, tableResult);
     }
 
     public static void openCSV(File tempFile) {
