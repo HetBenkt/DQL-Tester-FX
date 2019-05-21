@@ -1,16 +1,14 @@
 package nl.bos;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import nl.bos.utils.Resources;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
@@ -29,20 +27,16 @@ public class Main extends Application {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
         tryDevModeConnection();
 
-        try {
-            BorderPane rootPane = new FXMLLoader(getClass().getResource("/nl/bos/views/Menu.fxml")).load();
-            VBox bodyLayout = new FXMLLoader(getClass().getResource("/nl/bos/views/QueryWithResult.fxml")).load();
+        Resources resources = new Resources();
+        BorderPane rootPane = (BorderPane) resources.loadFXML("/nl/bos/views/Menu.fxml");
+        VBox bodyLayout = (VBox) resources.loadFXML("/nl/bos/views/QueryWithResult.fxml");
 
-            rootPane.setCenter(bodyLayout);
+        rootPane.setCenter(bodyLayout);
 
-            Image image = new Image(getClass().getClassLoader().getResourceAsStream("nl/bos/icons/logo_16.gif"));
+        Image image = new Image(resources.getResourceStream("nl/bos/icons/logo_16.gif"));
 
-            primaryStage.setScene(new Scene(rootPane));
-            primaryStage.getIcons().add(image);
-
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
+        primaryStage.setScene(new Scene(rootPane));
+        primaryStage.getIcons().add(image);
 
         primaryStage.setTitle(APP_TITLE);
         primaryStage.sizeToScene();

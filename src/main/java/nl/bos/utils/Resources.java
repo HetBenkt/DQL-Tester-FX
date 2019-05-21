@@ -1,5 +1,7 @@
 package nl.bos.utils;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.Pane;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -15,6 +17,12 @@ import static nl.bos.Constants.HISTORY_JSON;
 
 public class Resources {
     private static final Logger LOGGER = Logger.getLogger(Resources.class.getName());
+
+    private FXMLLoader fxmlLoader;
+
+    public FXMLLoader getFxmlLoader() {
+        return fxmlLoader;
+    }
 
     public static boolean writeJsonDataToJsonHistoryFile(JSONObject jsonObject) {
         boolean result = false;
@@ -75,5 +83,20 @@ public class Resources {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
         }
+    }
+
+    public InputStream getResourceStream(String name) {
+        return getClass().getClassLoader().getResourceAsStream(name);
+    }
+
+    public Pane loadFXML(String fxml) {
+        fxmlLoader = new FXMLLoader(getClass().getResource(fxml));
+        Pane pane = null;
+        try {
+            pane = fxmlLoader.load();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return pane;
     }
 }

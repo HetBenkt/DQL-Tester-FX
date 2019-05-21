@@ -1,7 +1,6 @@
 package nl.bos.controllers;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -11,8 +10,7 @@ import nl.bos.Repository;
 import nl.bos.contextmenu.menuitem.action.MenuItemExportToCsvAction;
 import nl.bos.menu.menuitem.action.*;
 import nl.bos.utils.Controllers;
-
-import java.io.IOException;
+import nl.bos.utils.Resources;
 
 public class Menu {
     @FXML
@@ -90,11 +88,11 @@ public class Menu {
     }
 
     @FXML
-    private void getAttributes() throws IOException {
+    private void getAttributes() {
         Stage getAttributesStage = new Stage();
         getAttributesStage.setTitle(String.format("Attributes List - %s (%s)", "ID", repository.getRepositoryName()));
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributes.fxml"));
-        VBox getAttributesPane = fxmlLoader.load();
+        Resources resources = new Resources();
+        VBox getAttributesPane = (VBox) resources.loadFXML("/nl/bos/views/GetAttributes.fxml");
         Scene scene = new Scene(getAttributesPane);
         getAttributesStage.setScene(scene);
         getAttributesStage.showAndWait();

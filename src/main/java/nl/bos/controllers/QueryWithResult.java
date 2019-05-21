@@ -143,13 +143,10 @@ public class QueryWithResult {
     }
 
     private void loadConnectionWithStatusFxml() {
-        try {
-            connectionWithStatusFxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/ConnectionWithStatus.fxml"));
-            BorderPane connectionWithStatus = connectionWithStatusFxmlLoader.load();
-            queryWithResultBox.getChildren().add(connectionWithStatus);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
+        Resources resources = new Resources();
+        BorderPane connectionWithStatus = (BorderPane) resources.loadFXML("/nl/bos/views/ConnectionWithStatus.fxml");
+        connectionWithStatusFxmlLoader = resources.getFxmlLoader();
+        queryWithResultBox.getChildren().add(connectionWithStatus);
     }
 
     private void reloadHistory() {

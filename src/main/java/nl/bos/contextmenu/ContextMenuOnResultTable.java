@@ -138,7 +138,7 @@ public class ContextMenuOnResultTable {
             TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
             Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
 
-            return !repository.isObjectId(String.valueOf(cellData));
+            return repository.isObjectId(String.valueOf(cellData));
         }
     }
 

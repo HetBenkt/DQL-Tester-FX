@@ -86,7 +86,7 @@ public class Repository {
         return repositoryMap;
     }
 
-    public void setCredentials(String repositoryName, String userName, String passkey, String domain) {
+    void setCredentials(String repositoryName, String userName, String passkey, String domain) {
         setCredentials(repositoryName, userName, passkey, domain, "default");
     }
 
@@ -230,7 +230,7 @@ public class Repository {
         String regex = "^[0-9a-f]{16}$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(id);
-        return matcher.find();
+        return !matcher.find();
     }
 
     public boolean isConnected() {
@@ -240,4 +240,14 @@ public class Repository {
 	public IDfPersistentObject getObjectById(String objectId) throws DfException {
 		return session.getObject(new DfId(objectId));
 	}
+
+    public String getIdFromObject(IDfPersistentObject object) {
+        String result = "";
+        try {
+            result = object.getObjectId().getId();
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return result;
+    }
 }

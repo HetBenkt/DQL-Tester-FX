@@ -142,7 +142,7 @@ public class GetAttributes {
     private void handleDump(ActionEvent actionEvent) {
     	String dumpId = txtObjectId.getText();
 
-    	if (!repository.isObjectId(dumpId)) {
+		if (repository.isObjectId(dumpId)) {
     		AppAlert.warning("Invalid object ID", String.format("The given object ID is not valid: %s", dumpId));
     		return;
 		}

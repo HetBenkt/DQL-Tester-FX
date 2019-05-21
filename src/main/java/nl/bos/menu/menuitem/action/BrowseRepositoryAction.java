@@ -1,14 +1,12 @@
 package nl.bos.menu.menuitem.action;
 
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import nl.bos.Repository;
+import nl.bos.utils.Resources;
 
-import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class BrowseRepositoryAction {
@@ -19,13 +17,10 @@ public class BrowseRepositoryAction {
         browseRepositoryStage.initModality(Modality.APPLICATION_MODAL);
         Repository repository = Repository.getInstance();
         browseRepositoryStage.setTitle(String.format("Repository Browser - %s (%s)", repository.getRepositoryName(), repository.getUserName()));
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/RepositoryBrowser.fxml"));
-        try {
-            VBox repositoryBrowser = fxmlLoader.load();
-            browseRepositoryStage.setScene(new Scene(repositoryBrowser));
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
+
+        Resources resources = new Resources();
+        VBox repositoryBrowser = (VBox) resources.loadFXML("/nl/bos/views/RepositoryBrowser.fxml");
+        browseRepositoryStage.setScene(new Scene(repositoryBrowser));
         browseRepositoryStage.showAndWait();
     }
 }

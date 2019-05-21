@@ -20,6 +20,7 @@ import nl.bos.beans.HistoryItem;
 import nl.bos.utils.AppAlert;
 import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
+import nl.bos.utils.Resources;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -41,6 +42,8 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
 
     private static final Stage loginStage = new Stage();
     private final FXMLLoader fxmlLoader;
+
+    private Resources resources = new Resources();
 
     @FXML
     private Label lblStatus;
@@ -127,15 +130,12 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
 
         loginStage.initModality(Modality.APPLICATION_MODAL);
         loginStage.setTitle("Documentum Login");
-        fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/Login.fxml"));
 
-        try {
-            VBox loginPane = fxmlLoader.load();
-            loginStage.setScene(new Scene(loginPane));
-            loginStage.setOnCloseRequest(this);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
+
+        VBox loginPane = (VBox) resources.loadFXML("/nl/bos/views/Login.fxml");
+        fxmlLoader = resources.getFxmlLoader();
+        loginStage.setScene(new Scene(loginPane));
+        loginStage.setOnCloseRequest(this);
     }
 
     @FXML
