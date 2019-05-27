@@ -1,5 +1,6 @@
 package nl.bos.controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
@@ -103,4 +104,8 @@ public class Menu {
         QueryWithResult queryWithResult = (QueryWithResult) Controllers.get(QueryWithResult.class.getSimpleName());
         new MenuItemExportToCsvAction(miExportResults, queryWithResult.getResult()).handle(null);
     }
+
+	public void manageUsers(ActionEvent actionEvent) {
+		new ManageUsersAction();
+	}
 }

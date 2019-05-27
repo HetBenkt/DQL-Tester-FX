@@ -9,6 +9,8 @@ import com.documentum.fc.common.IDfLoginInfo;
 import nl.bos.utils.AppAlert;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -250,4 +252,77 @@ public class Repository {
         }
         return result;
     }
+
+	public List<String> getFilteredUserList(String userFilter) {
+    	String query = String.format("SELECT user_name FROM dm_user WHERE r_is_group = false AND user_name LIKE '%s%%' ORDER BY 1 ASC", userFilter);
+    	return getSingleAttributeList(query, "user_name");
+	}
+
+	public List<String> getFilteredUserList(String userFilter, String groupFilter) {
+    	String query = String.format("SELECT DISTINCT u.user_name FROM dm_user u, dm_group g WHERE u.r_is_group = false AND u.user_name LIKE '%s%%' AND ANY g.users_names = u.user_name ORDER BY 1 ASC", userFilter, groupFilter);
+		return getSingleAttributeList(query, "user_name");
+	}
+
+	public IDfUser getUserByName(String userName) throws DfException {
+		return session.getUser(userName);
+	}
+
+	public String getDocbaseOwner() {
+		IDfCollection collection = null;
+
+		try {
+			collection = query("SELECT owner_name FROM dm_docbase_config");
+			collection.next();
+			return collection.getString("owner_name");
+
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+
+		} finally {
+			try {
+				assert collection != null;
+				collection.close();
+
+			} catch (DfException ignored) {
+			}
+		}
+
+		return null;
+	}
+
+	public List<String> getAliasSets() {
+		return getSingleAttributeList("SELECT object_name FROM dm_alias_set ORDER BY 1 ASC", "object_name");
+	}
+
+	public List<String> getFilteredGroupList(String groupFilter) {
+		String query = String.format("SELECT group_name FROM dm_group WHERE group_name LIKE '%s%%' ORDER BY 1 ASC", groupFilter);
+		return getSingleAttributeList(query, "group_name");
+	}
+
+	private List<String> getSingleAttributeList(String query, String attributeName) {
+		List<String> result = new ArrayList<>();
+
+		IDfCollection collection = null;
+
+		try {
+			collection = query(query);
+
+			while (collection.next()) {
+				result.add(collection.getString(attributeName));
+			}
+
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+
+		} finally {
+			try {
+				assert collection != null;
+				collection.close();
+
+			} catch (DfException ignored) {
+			}
+		}
+
+		return result;
+	}
 }
