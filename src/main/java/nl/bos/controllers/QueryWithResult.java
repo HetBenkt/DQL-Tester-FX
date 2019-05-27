@@ -26,11 +26,7 @@ import nl.bos.utils.Resources;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +35,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static nl.bos.Constants.HISTORY_JSON;
 import static nl.bos.Constants.QUERIES;
 
 public class QueryWithResult {
@@ -116,21 +111,11 @@ public class QueryWithResult {
         });
         loadConnectionWithStatusFxml();
 
-        if (historyFileReady()) {
-            reloadHistory();
-        }
+        Resources.initHistoryFile();
+        reloadHistory();
 
         historyStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, historyStatements));
         favoriteStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, favoriteStatements));
-    }
-
-    private boolean historyFileReady() {
-        File historyFile = new File(HISTORY_JSON);
-        if (historyFile.exists()) {
-            return true;
-        } else {
-            return isHistoryFileCreated();
-        }
     }
 
     private void onStatementsSelection(Number newValue, ComboBox<HistoryItem> statements) {
@@ -159,13 +144,8 @@ public class QueryWithResult {
     }
 
     private String convertFileToString() {
-        String history = null;
-        try {
-            history = new String(Files.readAllBytes(Paths.get(HISTORY_JSON)), StandardCharsets.UTF_8);
-            jsonObject = new JSONObject(history);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
+        String history = new String(Resources.readHistoryJsonBytes(), StandardCharsets.UTF_8);
+        jsonObject = new JSONObject(history);
         return history;
     }
 
@@ -220,14 +200,6 @@ public class QueryWithResult {
         return historyItem;
     }
 
-    private boolean isHistoryFileCreated() {
-        JSONArray list = new JSONArray();
-        jsonObject = new JSONObject();
-        jsonObject.put(QUERIES, list);
-
-        return Resources.writeJsonDataToJsonHistoryFile(jsonObject);
-    }
-
     @FXML
     private void handleDeleteHistoryItem() {
         HistoryItem selectedItem = historyStatements.getSelectionModel().getSelectedItem();
@@ -248,8 +220,8 @@ public class QueryWithResult {
                 historyStatements.setValue(historyStatements.getItems().get(0));
             }
 
-            if (Resources.writeJsonDataToJsonHistoryFile(jsonObject))
-                reloadHistory();
+            Resources.writeJsonDataToJsonHistoryFile(jsonObject);
+            reloadHistory();
         }
     }
 
@@ -261,8 +233,8 @@ public class QueryWithResult {
             selectedItem.setFavorite(true);
 
             updateJSONData(selectedItem);
-            if (Resources.writeJsonDataToJsonHistoryFile(jsonObject))
-                reloadHistory();
+            Resources.writeJsonDataToJsonHistoryFile(jsonObject);
+            reloadHistory();
         }
     }
 
@@ -274,8 +246,8 @@ public class QueryWithResult {
             selectedItem.setFavorite(false);
 
             updateJSONData(selectedItem);
-            if (Resources.writeJsonDataToJsonHistoryFile(jsonObject))
-                reloadHistory();
+            Resources.writeJsonDataToJsonHistoryFile(jsonObject);
+            reloadHistory();
         }
     }
 

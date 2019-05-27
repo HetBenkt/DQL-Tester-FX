@@ -25,9 +25,11 @@ public class MenuItemExportToCsvAction implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent actionEvent) {
         File tempFile = Resources.createTempFile("_tmp", ".csv");
-        Resources.exportStringToFile(tempFile, convertTableResultsToString());
-        if (Desktop.isDesktopSupported()) {
-            Resources.openCSV(tempFile);
+        if (tempFile != null) {
+            Resources.exportStringToFile(tempFile, convertTableResultsToString());
+            if (Desktop.isDesktopSupported()) {
+                Resources.openCSV(tempFile);
+            }
         }
     }
 

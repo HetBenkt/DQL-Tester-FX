@@ -2,6 +2,8 @@ package nl.bos.utils;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -10,46 +12,97 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.HISTORY_JSON;
+import static nl.bos.Constants.QUERIES;
 
 public class Resources {
     private static final Logger LOGGER = Logger.getLogger(Resources.class.getName());
 
     private FXMLLoader fxmlLoader;
 
-    public FXMLLoader getFxmlLoader() {
-        return fxmlLoader;
+    public static File createFileFromFileChooser(String title) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle(title);
+        return fileChooser.showOpenDialog(null);
     }
 
-    public static boolean writeJsonDataToJsonHistoryFile(JSONObject jsonObject) {
-        boolean result = false;
+    public static List<String> readLines(File file) {
+        try {
+            return Files.readAllLines(file.toPath());
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return new ArrayList<>();
+    }
+
+    public static void initHistoryFile() {
+        File historyFile = new File(HISTORY_JSON);
+        try {
+            if (historyFile.createNewFile()) {
+                writePreparedJsonDataToFile();
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    private static void writePreparedJsonDataToFile() {
+        JSONArray list = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(QUERIES, list);
+
+        writeJsonDataToJsonHistoryFile(jsonObject);
+    }
+
+    public static byte[] readHistoryJsonBytes() {
+        try {
+            return Files.readAllBytes(Paths.get(HISTORY_JSON));
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return new byte[0];
+    }
+
+    public static void writeJsonDataToJsonHistoryFile(JSONObject jsonObject) {
 
         try (FileWriter file = new FileWriter(HISTORY_JSON)) {
             file.write(jsonObject.toString());
             file.flush();
-            result = true;
         } catch (IOException ioe) {
             LOGGER.log(Level.SEVERE, ioe.getMessage(), ioe);
         }
-
-        return result;
     }
 
-
     public static File createTempFile(String prefix, String suffic) {
-        File result = null;
-
         try {
-            result = File.createTempFile(prefix, suffic);
-            LOGGER.info(result.getPath());
+            return File.createTempFile(prefix, suffic);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
+        return null;
+    }
 
-        return result;
+    public FXMLLoader getFxmlLoader() {
+        return fxmlLoader;
+    }
+
+    public String getProjectVersion() {
+        try {
+            final Properties properties = new Properties();
+            properties.load(getClass().getClassLoader().getResourceAsStream("project.properties"));
+            return properties.getProperty("version");
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return "";
     }
 
     public static File exportStringToFile(File tempFile, String tableResult) {

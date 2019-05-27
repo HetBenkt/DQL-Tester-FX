@@ -24,16 +24,12 @@ import nl.bos.utils.Resources;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static nl.bos.Constants.HISTORY_JSON;
 
 public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private static final Logger LOGGER = Logger.getLogger(ConnectionWithStatus.class.getName());
@@ -306,12 +302,8 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
                     queries.put(queries.get(0));
                 }
                 queries.put(0, new JSONObject(historyItem));
-                try (FileWriter file = new FileWriter(HISTORY_JSON)) {
-                    file.write(jsonObject.toString());
-                    file.flush();
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
-                }
+
+                Resources.writeJsonDataToJsonHistoryFile(jsonObject);
                 cmbHistory.setItems(items);
             }
         }

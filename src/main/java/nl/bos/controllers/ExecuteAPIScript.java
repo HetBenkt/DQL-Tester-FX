@@ -8,13 +8,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import nl.bos.Repository;
+import nl.bos.utils.Resources;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -42,27 +40,22 @@ public class ExecuteAPIScript {
 
     @FXML
     private void loadAPIScript() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select API Script to load");
-        File apiFileToLoad = fileChooser.showOpenDialog(null);
+        File apiFileToLoad = Resources.createFileFromFileChooser("Select API Script to load");
 
         if (apiFileToLoad == null || !apiFileToLoad.exists() || !apiFileToLoad.canRead()) {
             return;
         }
 
-        try {
-            filepath.setText(apiFileToLoad.getPath());
-            List<String> apiScriptToLoad = Files.readAllLines(apiFileToLoad.toPath());
+        filepath.setText(apiFileToLoad.getPath());
+        List<String> apiScriptToLoad = Resources.readLines(apiFileToLoad);
 
+        if (!apiScriptToLoad.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
             apiScriptToLoad.forEach(x -> stringBuilder.append(x.trim()).append("\r\n"));
 
             apiScriptView.clear();
             apiScriptView.setText(stringBuilder.toString());
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-
     }
 
     @FXML

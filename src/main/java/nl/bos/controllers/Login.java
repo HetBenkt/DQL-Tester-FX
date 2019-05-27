@@ -17,10 +17,9 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import nl.bos.Repository;
 import nl.bos.utils.AppAlert;
+import nl.bos.utils.Resources;
 
-import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,7 +58,6 @@ public class Login {
     private CheckBox chkSaveLoginData;
     @FXML
     private CheckBox chkUseWindowsLogin;
-    private String projectVersion = null;
 
     @FXML
     void initialize() {
@@ -71,7 +69,7 @@ public class Login {
             chbSecureMode.setValue(chbSecureMode.getItems().get(0));
 
             setFieldsConnect(repository.isConnected());
-            lblVersion.setText(getProjectVersion());
+            lblVersion.setText(new Resources().getProjectVersion());
 
             ttUsername.setText("Enter a user name");
             ttPassword.setText("Enter the user password");
@@ -119,24 +117,7 @@ public class Login {
         chkUseWindowsLogin.setDisable(connected);
     }
 
-    private String getProjectVersion() {
-        if (projectVersion == null) {
-            readProjectVersionFromFile();
-        }
 
-        return projectVersion;
-    }
-
-    private void readProjectVersionFromFile() {
-        try {
-            final Properties properties = new Properties();
-            properties.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
-            projectVersion = properties.getProperty("version");
-
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-    }
 
     @FXML
     private void handleLogin(ActionEvent actionEvent) {

@@ -496,9 +496,11 @@ public class JobEditor {
                 IDfDocument jobLog = (IDfDocument) repository.getSession().getObject(new DfId(query.getString(ATTR_R_OBJECT_ID)));
                 ByteArrayInputStream jobLogContent = jobLog.getContent();
                 File tempFile = Resources.createTempFile("_tmp", ".txt");
-                Resources.exportStreamToFile(tempFile, jobLogContent);
-                if (Desktop.isDesktopSupported()) {
-                    Resources.openCSV(tempFile);
+                if (tempFile != null) {
+                    Resources.exportStreamToFile(tempFile, jobLogContent);
+                    if (Desktop.isDesktopSupported()) {
+                        Resources.openCSV(tempFile);
+                    }
                 }
             }
         } catch (DfException e) {
