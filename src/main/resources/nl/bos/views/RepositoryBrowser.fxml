@@ -3,8 +3,8 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity" prefHeight="850.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.121"
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="vbox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+      minWidth="-Infinity" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121"
       fx:controller="nl.bos.controllers.RepositoryBrowser">
     <TreeView fx:id="treeView"/>
     <HBox spacing="10.0">

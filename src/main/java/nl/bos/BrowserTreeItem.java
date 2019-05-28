@@ -27,7 +27,7 @@ public class BrowserTreeItem extends TreeItem<String> {
         this.object = object;
         this.name = name;
         this.type = type;
-        this.path = path;
+        this.path = path.replace("'", "''");
     }
 
     @Override

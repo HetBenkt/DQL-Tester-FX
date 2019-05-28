@@ -25,7 +25,7 @@ public class GetLastSQLAction {
             textArea.setEditable(false);
             textArea.setWrapText(true);
             gridPane.add(textArea, 0, 0);
-            AppAlert.informationWithPanel("", gridPane);
+            AppAlert.informationWithPanel("Last executed SQL", gridPane);
 
             lastSql.close();
         } catch (DfException e) {

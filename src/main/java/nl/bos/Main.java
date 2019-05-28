@@ -1,21 +1,14 @@
 package nl.bos;
 
-import com.documentum.fc.common.DfException;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import nl.bos.controllers.ConnectionWithStatus;
-import nl.bos.controllers.Menu;
-import nl.bos.controllers.QueryWithResult;
+import nl.bos.utils.Resources;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
@@ -24,8 +17,6 @@ public class Main extends Application {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     private final Repository repository = Repository.getInstance();
-
-    private boolean devModeEnabled = false;
 
     public static void main(String[] args) {
         launch(args);
@@ -36,45 +27,23 @@ public class Main extends Application {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
         tryDevModeConnection();
 
-        try {
-            FXMLLoader rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/Menu.fxml"));
-            BorderPane rootPane = rootPaneLoader.load();
-            Menu menuLoaderController = rootPaneLoader.getController();
-            FXMLLoader bodyPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/QueryWithResult.fxml"));
-            VBox bodyLayout = bodyPaneLoader.load();
+        Resources resources = new Resources();
+        BorderPane rootPane = (BorderPane) resources.loadFXML("/nl/bos/views/Menu.fxml");
+        VBox bodyLayout = (VBox) resources.loadFXML("/nl/bos/views/QueryWithResult.fxml");
 
-            if (devModeEnabled) {
-                QueryWithResult queryWithResultController = bodyPaneLoader.getController();
-                ConnectionWithStatus connectionWithStatusController = queryWithResultController.getConnectionWithStatusFxmlLoader().getController();
-                connectionWithStatusController.getBtnReadQuery().setDisable(false);
-                connectionWithStatusController.getBtnFlushCache().setDisable(false);
+        rootPane.setCenter(bodyLayout);
 
-                Button btnDisconnect = connectionWithStatusController.getBtnDisconnect();
-                btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
-                btnDisconnect.setManaged(true);
+        Image image = new Image(resources.getResourceStream("nl/bos/icons/logo_16.gif"));
 
-                Button btnConnect = connectionWithStatusController.getBtnConnect();
-                btnConnect.managedProperty().bindBidirectional(btnConnect.visibleProperty());
-                btnConnect.setManaged(false);
+        primaryStage.setScene(new Scene(rootPane));
+        primaryStage.getIcons().add(image);
 
-                menuLoaderController.getMenubar().setDisable(false);
-
-                connectionWithStatusController.updateNodes(repository.getSession());
-            }
-
-            rootPane.setCenter(bodyLayout);
-
-            Image image = new Image(getClass().getClassLoader().getResourceAsStream("nl/bos/icons/logo_16.gif"));
-            primaryStage.getIcons().add(image);
-            primaryStage.setTitle(APP_TITLE);
-            primaryStage.setScene(new Scene(rootPane));
-
-            primaryStage.show();
-            primaryStage.toFront();
-
-        } catch (IOException | DfException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
+        primaryStage.setTitle(APP_TITLE);
+        primaryStage.sizeToScene();
+        primaryStage.show();
+        primaryStage.setMinWidth(primaryStage.getWidth());
+        primaryStage.setMinHeight(primaryStage.getHeight());
+        primaryStage.toFront();
     }
 
     private void shutdown() {
@@ -101,7 +70,6 @@ public class Main extends Application {
 
         if (repository.isConnected()) {
             LOGGER.info(MSG_DEV_CONNECTION_CREATED);
-            devModeEnabled = true;
 
         } else {
             LOGGER.info(MSG_USE_CONNECT_BUTTON);

@@ -1,9 +1,7 @@
 package nl.bos.contextmenu.menuitem.action;
 
-import com.documentum.fc.common.DfId;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TablePosition;
@@ -12,8 +10,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import nl.bos.Repository;
 import nl.bos.controllers.GetAttributes;
+import nl.bos.utils.Resources;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MenuItemGetAttributesAction implements EventHandler<ActionEvent> {
@@ -33,20 +31,16 @@ public class MenuItemGetAttributesAction implements EventHandler<ActionEvent> {
 
         TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
         String id = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
+        LOGGER.info(id);
 
-        try {
-            LOGGER.info(id);
-            Stage getAttributesStage = new Stage();
-            getAttributesStage.setTitle(String.format("Attributes List - %s (%s)", id, repository.getRepositoryName()));
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/GetAttributes.fxml"));
-            VBox loginPane = fxmlLoader.load();
-            Scene scene = new Scene(loginPane);
-            getAttributesStage.setScene(scene);
-            GetAttributes controller = fxmlLoader.getController();
-            controller.initTextArea(repository.getSession().getObject(new DfId(id)));
-            getAttributesStage.showAndWait();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
+        Stage getAttributesStage = new Stage();
+        getAttributesStage.setTitle(String.format("Attributes List - %s (%s)", id, repository.getRepositoryName()));
+        Resources resources = new Resources();
+        VBox loginPane = (VBox) resources.loadFXML("/nl/bos/views/GetAttributes.fxml");
+        Scene scene = new Scene(loginPane);
+        getAttributesStage.setScene(scene);
+        GetAttributes controller = resources.getFxmlLoader().getController();
+        controller.dumpObject(id);
+        getAttributesStage.showAndWait();
     }
 }

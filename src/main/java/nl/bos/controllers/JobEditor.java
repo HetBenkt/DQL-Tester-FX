@@ -24,15 +24,11 @@ import nl.bos.DateTimePicker;
 import nl.bos.JobMonitor;
 import nl.bos.JobObject;
 import nl.bos.Repository;
+import nl.bos.utils.Resources;
 
 import java.awt.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
@@ -389,7 +385,7 @@ public class JobEditor {
     }
 
     @FXML
-    private void handleRefresh(ActionEvent actionEvent) {
+    private void handleRefresh() {
         ObservableList<JobObject> jobIds = FXCollections.observableArrayList();
         try {
             IDfCollection collection;
@@ -409,7 +405,7 @@ public class JobEditor {
     }
 
     @FXML
-    private void handleWatchJob(ActionEvent actionEvent) {
+    private void handleWatchJob() {
         if (cbWatchJob.isSelected()) {
             btnViewLog.setDisable(true);
             vbFields.setDisable(true);
@@ -472,7 +468,7 @@ public class JobEditor {
     }
 
     @FXML
-    private void handleUpdate(ActionEvent actionEvent) {
+    private void handleUpdate() {
         String updateList = currentJob.getUpdateList();
         repository.query(String.format("update dm_job object %s where r_object_id = '%s'", updateList, currentJob.getObjectId()));
         btnUpdate.setDisable(true);
@@ -492,35 +488,22 @@ public class JobEditor {
     }
 
     @FXML
-    private void handleViewLog(ActionEvent actionEvent) {
+    private void handleViewLog() {
         try {
             IDfCollection query = repository.query(String.format("select r_object_id, object_name from dm_document where folder('/Temp/Jobs/%s') order by r_creation_date desc enable(return_top 1)", currentJob.getObjectName()));
             while (query.next()) {
                 LOGGER.info(query.getString(ATTR_R_OBJECT_ID));
                 IDfDocument jobLog = (IDfDocument) repository.getSession().getObject(new DfId(query.getString(ATTR_R_OBJECT_ID)));
                 ByteArrayInputStream jobLogContent = jobLog.getContent();
-
-                File tempFile = File.createTempFile("tmp_", ".txt");
-                LOGGER.info(tempFile.getPath());
-                ReadableByteChannel readableByteChannel = Channels.newChannel(jobLogContent);
-                FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-                FileChannel fileChannel = fileOutputStream.getChannel();
-                fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-
-                jobLogContent.close();
-                readableByteChannel.close();
-                fileChannel.close();
-
-                if (!Desktop.isDesktopSupported()) {
-                    LOGGER.warning("Desktop is not supported");
-                    return;
+                File tempFile = Resources.createTempFile("_tmp", ".txt");
+                if (tempFile != null) {
+                    Resources.exportStreamToFile(tempFile, jobLogContent);
+                    if (Desktop.isDesktopSupported()) {
+                        Resources.openCSV(tempFile);
+                    }
                 }
-
-                Desktop desktop = Desktop.getDesktop();
-                if (tempFile.exists())
-                    desktop.open(tempFile);
             }
-        } catch (DfException | IOException e) {
+        } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
     }

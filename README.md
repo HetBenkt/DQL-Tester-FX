@@ -1,3 +1,5 @@
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=HetBenkt_DQL-Tester-FX)](https://sonarcloud.io/dashboard?id=HetBenkt_DQL-Tester-FX)
+
 # DQL Tester FX
 #### With new technologies, new tools will be created!
 This slogan made me start this project where we want to create a new version of the good old 'DQL Tester' tool.

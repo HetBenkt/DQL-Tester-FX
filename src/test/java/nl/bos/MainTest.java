@@ -1,12 +1,12 @@
 package nl.bos;
 
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import nl.bos.utils.Resources;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Assert;
@@ -81,11 +81,10 @@ public class MainTest extends ApplicationTest {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        FXMLLoader rootPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/Menu.fxml"));
-        BorderPane rootPane = rootPaneLoader.load();
-        FXMLLoader bodyPaneLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/QueryWithResult.fxml"));
-        VBox bodyLayout = bodyPaneLoader.load();
+    public void start(Stage primaryStage) {
+        Resources resources = new Resources();
+        BorderPane rootPane = (BorderPane) resources.loadFXML("/nl/bos/views/Menu.fxml");
+        VBox bodyLayout = (VBox) resources.loadFXML("/nl/bos/views/QueryWithResult.fxml");
 
         rootPane.setCenter(bodyLayout);
 

@@ -1,41 +1,35 @@
 package nl.bos.controllers;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.client.IDfSession;
 import com.documentum.fc.client.IDfUser;
 import com.documentum.fc.common.DfException;
-
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import nl.bos.Repository;
+import nl.bos.beans.HistoryItem;
 import nl.bos.utils.AppAlert;
+import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
+import nl.bos.utils.Resources;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import static nl.bos.Constants.HISTORY_JSON;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private static final Logger LOGGER = Logger.getLogger(ConnectionWithStatus.class.getName());
@@ -44,6 +38,8 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
 
     private static final Stage loginStage = new Stage();
     private final FXMLLoader fxmlLoader;
+
+    private Resources resources = new Resources();
 
     @FXML
     private Label lblStatus;
@@ -77,6 +73,14 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private Tooltip ttPrivileges;
     @FXML
     private Tooltip ttServerVersion;
+    @FXML
+    private TextField resultCount;
+    @FXML
+    private TextField timeQuery;
+    @FXML
+    private TextField timeList;
+    @FXML
+    private TextField timeSort;
 
     static Stage getLoginStage() {
         return loginStage;
@@ -98,6 +102,22 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         return btnDisconnect;
     }
 
+    public TextField getTimeSort() {
+        return timeSort;
+    }
+
+    public TextField getTimeQuery() {
+        return timeQuery;
+    }
+
+    public TextField getTimeList() {
+        return timeList;
+    }
+
+    public TextField getResultCount() {
+        return resultCount;
+    }
+
     /**
      * @noinspection WeakerAccess
      */
@@ -106,28 +126,35 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
 
         loginStage.initModality(Modality.APPLICATION_MODAL);
         loginStage.setTitle("Documentum Login");
-        fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/Login.fxml"));
 
-        try {
-            VBox loginPane = fxmlLoader.load();
-            loginStage.setScene(new Scene(loginPane));
-            loginStage.setOnCloseRequest(this);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
+
+        VBox loginPane = (VBox) resources.loadFXML("/nl/bos/views/Login.fxml");
+        fxmlLoader = resources.getFxmlLoader();
+        loginStage.setScene(new Scene(loginPane));
+        loginStage.setOnCloseRequest(this);
     }
 
     @FXML
     private void initialize() {
         btnDisconnect.managedProperty().bindBidirectional(btnDisconnect.visibleProperty());
         btnDisconnect.setManaged(false);
+
+        resultCount.textProperty().addListener((observableValue, oldValue, newValue) -> {
+            Menu menuLoaderController = (Menu) Controllers.get(Menu.class.getSimpleName());
+            if (Integer.parseInt(newValue) > 0) {
+                menuLoaderController.getMiExportResults().setDisable(false);
+            } else {
+                menuLoaderController.getMiExportResults().setDisable(true);
+            }
+        });
+
+        updateNodesBasedOnConnectionStatus();
     }
 
-    public void handle(WindowEvent event) {
-        IDfSession session = repository.getSession();
-        if (session != null && session.isConnected()) {
+    private void updateNodesBasedOnConnectionStatus() {
+        if (repository.isConnected()) {
             try {
-                updateNodes(session);
+                updateNodes(repository.getSession());
             } catch (DfException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
@@ -136,7 +163,11 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         }
     }
 
-    public void updateNodes(IDfSession session) throws DfException {
+    public void handle(WindowEvent event) {
+        updateNodesBasedOnConnectionStatus();
+    }
+
+    private void updateNodes(IDfSession session) throws DfException {
         IDfUser user = session.getUser(session.getLoginUserName());
 
         lblStatus.setText(session.getDocbaseName());
@@ -242,53 +273,58 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         String statement = queryWithResultController.getStatement().getText();
         JSONObject jsonObject = queryWithResultController.getJsonObject();
 
+        Instant start = Instant.now();
         IDfCollection result = repository.query(statement);
+        Instant end = Instant.now();
+        timeQuery.setText(Calculations.getDurationInSeconds(start, end));
+
         if (result != null) {
             try {
-                queryWithResultController.updateResultTable(result);
+                Instant startList = Instant.now();
+                int rowCount = queryWithResultController.updateResultTable(result);
                 result.close();
+
+                Instant endList = Instant.now();
+                timeList.setText(Calculations.getDurationInSeconds(startList, endList));
+                resultCount.setText(String.valueOf(rowCount));
             } catch (DfException e) {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
 
-            ComboBox<String> cmbHistory = queryWithResultController.getHistoryStatements();
-            ObservableList<String> items = cmbHistory.getItems();
+            ComboBox<HistoryItem> cmbHistory = queryWithResultController.getHistoryStatements();
+            ObservableList<HistoryItem> items = cmbHistory.getItems();
             if (statementNotExists(items, statement)) {
-                items.add(0, statement);
-                cmbHistory.setValue(statement);
+                HistoryItem historyItem = new HistoryItem(statement);
+                items.add(0, historyItem);
+                cmbHistory.setValue(historyItem);
                 JSONArray queries = (JSONArray) jsonObject.get("queries");
                 if (queries.length() > 0) {
                     queries.put(queries.get(0));
                 }
-                queries.put(0, statement);
-                try (FileWriter file = new FileWriter(HISTORY_JSON)) {
-                    file.write(jsonObject.toString());
-                    file.flush();
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
-                }
+                queries.put(0, new JSONObject(historyItem));
+
+                Resources.writeJsonDataToJsonHistoryFile(jsonObject);
                 cmbHistory.setItems(items);
             }
         }
     }
 
-    private boolean statementNotExists(ObservableList items, String statement) {
-        for (Object item : items) {
-            String historyStatement = (String) item;
-            if (historyStatement.equalsIgnoreCase(statement))
+    private boolean statementNotExists(ObservableList<HistoryItem> items, String statement) {
+        for (HistoryItem item : items) {
+            if (item.getQuery().equalsIgnoreCase(statement))
                 return false;
         }
         return true;
     }
 
     @FXML
-    private void handleClearQuery(ActionEvent actionEvent) {
+    private void handleClearQuery() {
         QueryWithResult queryWithResultController = (QueryWithResult) Controllers.get(QueryWithResult.class.getSimpleName());
         queryWithResultController.getStatement().clear();
     }
 
     @FXML
-    private void handleDisconnect(ActionEvent actionEvent) {
+    private void handleDisconnect() {
         Login loginController = fxmlLoader.getController();
         loginController.initialize();
         loginStage.showAndWait();

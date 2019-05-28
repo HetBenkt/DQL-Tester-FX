@@ -5,8 +5,16 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import nl.bos.Repository;
 import nl.bos.contextmenu.menuitem.action.*;
+import nl.bos.controllers.ConnectionWithStatus;
+import nl.bos.controllers.QueryWithResult;
+import nl.bos.utils.Calculations;
+import nl.bos.utils.Controllers;
+
+import java.time.Instant;
+import java.util.logging.Logger;
 
 public class ContextMenuOnResultTable {
+    private static final Logger LOGGER = Logger.getLogger(ContextMenuOnResultTable.class.getName());
     private final Repository repository = Repository.getInstance();
 
     private final ContextMenu contextMenu = new ContextMenu();
@@ -18,6 +26,8 @@ public class ContextMenuOnResultTable {
     private final MenuItem copyRowToClipBoard;
     private final MenuItem describeObject;
     private final MenuItem destroyObject;
+    private final MenuItem versions;
+    private final MenuItem renditions;
 
     private final TableView result;
     private final MenuItemShowPropertiesAction menuItemShowPropertiesAction;
@@ -53,6 +63,14 @@ public class ContextMenuOnResultTable {
         destroyObject.setDisable(true);
         new MenuItemDestroyObjectAction(destroyObject, result);
 
+        versions = new MenuItem("Versions");
+        versions.setDisable(true);
+        new MenuItemResultTableAction(versions, result, "Versions");
+
+        renditions = new MenuItem("Reditions");
+        renditions.setDisable(true);
+        new MenuItemResultTableAction(renditions, result, "Renditions");
+
         contextMenu.getItems().addAll(
                 showProperties,
                 new SeparatorMenuItem(),
@@ -63,13 +81,32 @@ public class ContextMenuOnResultTable {
                 describeObject,
                 new SeparatorMenuItem(),
                 getAttributes,
-                destroyObject
+                destroyObject,
+                new SeparatorMenuItem(),
+                versions,
+                renditions
         );
     }
 
     public void onRightMouseClick(MouseEvent t) {
         if (t.getButton() == MouseButton.PRIMARY) {
             contextMenu.hide();
+
+            if (t.getTarget().getClass().getName().contains("TableColumnHeader")) {
+                QueryWithResult queryWithResultController = (QueryWithResult) Controllers.get(QueryWithResult.class.getSimpleName());
+                ConnectionWithStatus connectionWithStatusController = (ConnectionWithStatus) Controllers.get(ConnectionWithStatus.class.getSimpleName());
+
+                Instant start = queryWithResultController.getStart();
+                if (start != null) {
+                    Instant end = Instant.now();
+                    LOGGER.info("End..." + end);
+                    connectionWithStatusController.getTimeSort().setText(Calculations.getDurationInSeconds(start, end));
+                } else {
+                    connectionWithStatusController.getTimeSort().setText("0.000 sec.");
+                }
+
+                queryWithResultController.cleanStart();
+            }
         } else if (t.getButton() == MouseButton.SECONDARY) {
             validateMenuItems();
             contextMenu.show(result, t.getScreenX(), t.getScreenY());
@@ -86,6 +123,8 @@ public class ContextMenuOnResultTable {
 
         getAttributes.setDisable(selectionIsNotAnObjectId());
         destroyObject.setDisable(selectionIsNotAnObjectId());
+        versions.setDisable(selectionIsNotAnDocumentType());
+        renditions.setDisable(selectionIsNotAnDocumentType());
     }
 
     private boolean hasNoRowsInResultTable() {
@@ -104,6 +143,17 @@ public class ContextMenuOnResultTable {
             Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
 
             return !(repository.isTypeName(String.valueOf(cellData)) || repository.isTableName(String.valueOf(cellData)));
+        }
+    }
+
+    private boolean selectionIsNotAnDocumentType() {
+        if (result.getSelectionModel().getSelectedCells().size() == 0) {
+            return true;
+        } else {
+            TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
+            Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
+
+            return !repository.isDocumentType(repository.getPersistentObject(String.valueOf(cellData)));
         }
     }
 

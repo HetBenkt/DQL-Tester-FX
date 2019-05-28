@@ -4,6 +4,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 
 import java.util.Optional;
 
@@ -31,6 +32,14 @@ public class AppAlert {
     public static Optional<ButtonType> confirmationWithResponse(String title, String message) {
         Alert alert = getAlert(title, message, Alert.AlertType.CONFIRMATION);
         return alert.showAndWait();
+    }
+
+    public static Optional<String> confirmationWithPanelAndResponse(String title, String text) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle(title);
+        dialog.setHeaderText(null);
+        dialog.setContentText(text);
+        return dialog.showAndWait();
     }
 
     private static Alert getAlert(String title, String message, Alert.AlertType alertType) {
