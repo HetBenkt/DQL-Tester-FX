@@ -11,7 +11,6 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -21,6 +20,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import nl.bos.BrowserTreeItem;
@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
 
-public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeItem>>, EventHandler<ActionEvent> {
+public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeItem>> {
     private static final Logger LOGGER = Logger.getLogger(RepositoryBrowser.class.getName());
 
     private final Repository repository = Repository.getInstance();
@@ -84,6 +84,9 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
     private final ContextMenu rootContextMenu = new ContextMenu();
     private Resources resources = new Resources();
 
+    private MenuItem miVersions;
+    private MenuItem miRenditions;
+
     @FXML
     private void initialize() {
         vbox.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPressEvent);
@@ -96,15 +99,66 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         LOGGER.finest(String.format("Keycode = %s", keyEvent.getCode()));
 
         if (keyEvent.getCode() == KeyCode.F3) {
-            String searchId = showSearchPopup();
-            searchForTreeItem(searchId);
+            triggerFindItem(null);
         }
     }
 
     private void initContextMenu() {
         MenuItem miDump = new MenuItem("Get Attributes");
-        miDump.setOnAction(this);
-        rootContextMenu.getItems().add(miDump);
+        miDump.setOnAction(this::triggerGetAttributes);
+
+        miVersions = new MenuItem("Versions");
+        miVersions.setDisable(true);
+        miVersions.setOnAction(this::triggerVersions);
+
+        miRenditions = new MenuItem("Renditions");
+        miRenditions.setDisable(true);
+        miRenditions.setOnAction(this::triggerRenditions);
+
+        MenuItem miFindItem = new MenuItem("Find item <F3>");
+        miFindItem.setOnAction(this::triggerFindItem);
+
+        rootContextMenu.getItems().addAll(miDump, new SeparatorMenuItem(), miVersions, miRenditions, new SeparatorMenuItem(), miFindItem);
+    }
+
+    private void triggerGetAttributes(ActionEvent actionEvent) {
+        String selectedId = repository.getIdFromObject(selected.getValue().getObject());
+        LOGGER.info(selectedId);
+
+        Stage dumpAttributes = new Stage();
+        dumpAttributes.setTitle(String.format("Attributes List - %s (%s)", selectedId, repository.getRepositoryName()));
+
+        VBox loginPane = (VBox) resources.loadFXML("/nl/bos/views/GetAttributes.fxml");
+        Scene scene = new Scene(loginPane);
+        dumpAttributes.setScene(scene);
+
+        GetAttributes controller = resources.getFxmlLoader().getController();
+        controller.dumpObject(selectedId);
+        dumpAttributes.showAndWait();
+    }
+
+    private void triggerRenditions(ActionEvent actionEvent) {
+        showResultTable("Renditions");
+    }
+
+    private void triggerVersions(ActionEvent actionEvent) {
+        showResultTable("Versions");
+    }
+
+    private void showResultTable(String label) {
+        String id = repository.getIdFromObject(selected.getValue().getObject());
+        LOGGER.info(id);
+
+        Stage resultStage = new Stage();
+        resultStage.setTitle(String.format("%s - %s (%s)", label, repository.getObjectName(id), repository.getRepositoryName()));
+
+        AnchorPane resultPane = (AnchorPane) resources.loadFXML("/nl/bos/views/ResultTable.fxml");
+        Scene scene = new Scene(resultPane);
+        resultStage.setScene(scene);
+
+        ResultTable controller = resources.getFxmlLoader().getController();
+        controller.loadResult(id);
+        resultStage.showAndWait();
     }
 
     private void initBrowserTree() {
@@ -135,13 +189,16 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         //item is selected - this prevents fail when clicking on empty space
         if (selected != null && !selected.getValue().getType().equals(TYPE_REPOSITORY)) {
             //open context contextmenu on current screen position
+            boolean isDocumentType = repository.isDocumentType(selected.getValue().getObject());
+            miVersions.setDisable(!isDocumentType);
+            miRenditions.setDisable(!isDocumentType);
             rootContextMenu.show(treeView, mouseEvent.getScreenX(), mouseEvent.getScreenY());
         }
     }
 
     private String showSearchPopup() {
         Optional<String> findTreeItem = AppAlert.confirmationWithPanelAndResponse("Find Tree Item", "Object ID:");
-        return findTreeItem.orElse(null);
+        return findTreeItem.orElse("");
     }
 
     private void searchForTreeItem(String searchId) {
@@ -301,23 +358,6 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         return "";
     }
 
-    @Override
-    public void handle(ActionEvent event) {
-        String selectedId = repository.getIdFromObject(selected.getValue().getObject());
-        LOGGER.info(selectedId);
-
-        Stage dumpAttributes = new Stage();
-        dumpAttributes.setTitle(String.format("Attributes List - %s (%s)", selectedId, repository.getRepositoryName()));
-
-        VBox loginPane = (VBox) resources.loadFXML("/nl/bos/views/GetAttributes.fxml");
-        Scene scene = new Scene(loginPane);
-        dumpAttributes.setScene(scene);
-
-        GetAttributes controller = resources.getFxmlLoader().getController();
-        controller.dumpObject(selectedId);
-        dumpAttributes.showAndWait();
-    }
-
     @FXML
     private void handleExit(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
@@ -330,6 +370,12 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         TreeItem<BrowserTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
         treeItemBrowser.setExpanded(true);
         treeView.setRoot(treeItemBrowser);
+    }
+
+    private void triggerFindItem(ActionEvent actionEvent) {
+        String searchId = showSearchPopup();
+        if (!searchId.isEmpty())
+            searchForTreeItem(searchId);
     }
 
     private class MyTreeNode extends TreeItem<BrowserTreeItem> {

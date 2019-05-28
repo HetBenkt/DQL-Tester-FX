@@ -232,8 +232,9 @@ public class Repository {
         String regex = "^[0-9a-f]{16}$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(id);
-        return !matcher.find();
+        return matcher.find();
     }
+
 
     public boolean isConnected() {
         return session != null && session.isConnected();
@@ -325,4 +326,34 @@ public class Repository {
 
 		return result;
 	}
+
+    public boolean isDocumentType(IDfPersistentObject object) {
+        try {
+            if (object.getType().isTypeOf("dm_folder") || object.getType().isSubTypeOf("dm_folder")) {
+                return false;
+            }
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return true;
+    }
+
+    public IDfPersistentObject getPersistentObject(String id) {
+        try {
+            return getObjectById(id);
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
+    }
+
+    public String getObjectName(String id) {
+        try {
+            IDfPersistentObject objectById = getObjectById(id);
+            return objectById.getString("object_name");
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
+    }
 }
