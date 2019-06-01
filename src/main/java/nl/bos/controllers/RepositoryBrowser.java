@@ -87,6 +87,8 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
     private MenuItem miVersions;
     private MenuItem miRenditions;
 
+	private MenuItem miDownload;
+
     @FXML
     private void initialize() {
         vbox.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPressEvent);
@@ -107,6 +109,10 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         MenuItem miDump = new MenuItem("Get Attributes");
         miDump.setOnAction(this::triggerGetAttributes);
 
+        miDownload = new MenuItem("Download");
+        miDownload.setDisable(true);
+        miDownload.setOnAction(this::triggerDownload);
+        
         miVersions = new MenuItem("Versions");
         miVersions.setDisable(true);
         miVersions.setOnAction(this::triggerVersions);
@@ -118,7 +124,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         MenuItem miFindItem = new MenuItem("Find item <F3>");
         miFindItem.setOnAction(this::triggerFindItem);
 
-        rootContextMenu.getItems().addAll(miDump, new SeparatorMenuItem(), miVersions, miRenditions, new SeparatorMenuItem(), miFindItem);
+        rootContextMenu.getItems().addAll(miDump, new SeparatorMenuItem(), miDownload, miVersions, miRenditions, new SeparatorMenuItem(), miFindItem);
     }
 
     private void triggerGetAttributes(ActionEvent actionEvent) {
@@ -136,11 +142,18 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         controller.dumpObject(selectedId);
         dumpAttributes.showAndWait();
     }
+    
+    private void triggerDownload(ActionEvent actionEvent) {
+        String selectedId = repository.getIdFromObject(selected.getValue().getObject());
+        LOGGER.info("Download " + selectedId);
+        repository.downloadContent(selectedId);
+    }
 
     private void triggerRenditions(ActionEvent actionEvent) {
         showResultTable("Renditions");
     }
-
+    
+    
     private void triggerVersions(ActionEvent actionEvent) {
         showResultTable("Versions");
     }
@@ -190,6 +203,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         if (selected != null && !selected.getValue().getType().equals(TYPE_REPOSITORY)) {
             //open context contextmenu on current screen position
             boolean isDocumentType = repository.isDocumentType(selected.getValue().getObject());
+            miDownload.setDisable(!isDocumentType);
             miVersions.setDisable(!isDocumentType);
             miRenditions.setDisable(!isDocumentType);
             rootContextMenu.show(treeView, mouseEvent.getScreenX(), mouseEvent.getScreenY());

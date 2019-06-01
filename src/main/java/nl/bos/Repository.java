@@ -7,7 +7,9 @@ import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfLoginInfo;
 import nl.bos.utils.AppAlert;
+import nl.bos.utils.Resources;
 
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -329,7 +331,7 @@ public class Repository {
 
     public boolean isDocumentType(IDfPersistentObject object) {
         try {
-            if (object.getType().isTypeOf("dm_folder") || object.getType().isSubTypeOf("dm_folder")) {
+            if (!object.isInstanceOf("dm_sysobject") || object.isInstanceOf("dm_folder")) {
                 return false;
             }
         } catch (DfException e) {
@@ -356,4 +358,27 @@ public class Repository {
         }
         return null;
     }
+    
+    
+    /** Get document primary content */
+	public void downloadContent(String id) {
+		try {
+			LOGGER.info(id);
+			IDfSysObject sysObject = (IDfSysObject) repository.getSession().getObject(new DfId(id));
+			if (!(sysObject.getContentSize() > 0)) {
+				AppAlert.warning("Content is empty", sysObject.getObjectName());
+			} else {
+				final String extension = repository.getSession().getFormat(sysObject.getContentType())
+						.getDOSExtension();
+				final String path = sysObject
+						.getFile(new File(Resources.getExportPath(), sysObject.getObjectName() + "." + extension)
+								.getAbsolutePath());
+				LOGGER.info("Downloaded document to path " + path);
+			}
+
+		} catch (DfException e) {
+			AppAlert.error("Error while trying to retrieve content", id);
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
 }
