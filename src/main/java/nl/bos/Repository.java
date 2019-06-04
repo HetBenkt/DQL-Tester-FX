@@ -371,7 +371,7 @@ public class Repository {
 				final String extension = repository.getSession().getFormat(sysObject.getContentType())
 						.getDOSExtension();
 				final String path = sysObject
-						.getFile(new File(Resources.getExportPath(), sysObject.getObjectName() + "." + extension)
+						.getFile(new File(Resources.getExportPath(), sysObject.getObjectName().replaceAll("[^a-zA-Z0-9._]", "-") + "." + extension)
 								.getAbsolutePath());
 				LOGGER.info("Downloaded document to path " + path);
 			}
