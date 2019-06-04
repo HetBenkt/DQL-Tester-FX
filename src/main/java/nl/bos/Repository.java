@@ -231,10 +231,10 @@ public class Repository {
 	}
 
     public boolean isObjectId(String id) {
-        String regex = "^[0-9a-f]{16}$";
+        String regex = "[0-9a-f]{16}";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(id);
-        return matcher.find();
+        return matcher.matches();
     }
 
 

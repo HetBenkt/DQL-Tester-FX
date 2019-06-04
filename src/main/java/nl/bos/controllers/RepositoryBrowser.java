@@ -216,7 +216,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
     }
 
     private void searchForTreeItem(String searchId) {
-        if (repository.isObjectId(searchId)) {
+        if (!repository.isObjectId(searchId)) {
             AppAlert.error("No object ID", "The given input is not a valid object ID");
             return;
         }
