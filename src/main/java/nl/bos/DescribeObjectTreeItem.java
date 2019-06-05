@@ -32,7 +32,7 @@ public class DescribeObjectTreeItem extends TreeItem {
         return this.value;
     }
 
-    public void sort() {
+    public void sortTree() {
         sortTree(this);
     }
 
@@ -42,7 +42,7 @@ public class DescribeObjectTreeItem extends TreeItem {
             root.getChildren().forEach(this::sortTree);
         }
     }
-    public static final Comparator<TreeItem<? extends DescribeObjectTreeItem>> alphabetical
+    private static final Comparator<TreeItem<? extends DescribeObjectTreeItem>> alphabetical
             = Comparator.comparing(item -> item.toString(), AlphanumComparator.INSTANCE);
 
 }
