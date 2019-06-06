@@ -385,6 +385,27 @@ public class Repository {
 		return false;
 
 	}
+	
+	public boolean checkin(String objectId, File content) {
+		IDfPersistentObject object = repository.getPersistentObject(objectId);
+		try {
+			if (object.isInstanceOf("dm_sysobject")) {
+				IDfSysObject sysObj = (IDfSysObject) object;
+				if(sysObj.isCheckedOut()) {
+					sysObj.setFile(content.getAbsolutePath());
+					//should offer choice to user if they want to keep lock, which version number
+					sysObj.checkin(false, "");
+					return true;
+				}
+			} else {
+				return false;
+			}
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return false;
+		
+	}
 
 	public IDfPersistentObject getPersistentObject(String id) {
 		try {

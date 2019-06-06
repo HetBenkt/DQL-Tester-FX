@@ -12,6 +12,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import nl.bos.Repository;
 import nl.bos.contextmenu.menuitem.action.MenuItemCancelCheckoutAction;
+import nl.bos.contextmenu.menuitem.action.MenuItemCheckinAction;
 import nl.bos.contextmenu.menuitem.action.MenuItemCheckoutAction;
 import nl.bos.contextmenu.menuitem.action.MenuItemCopyCellToClipBoardAction;
 import nl.bos.contextmenu.menuitem.action.MenuItemCopyRowToClipBoardAction;
@@ -100,7 +101,8 @@ public class ContextMenuOnResultTable {
 
 		checkin = new MenuItem("Checkin");
 		checkin.setVisible(false);
-
+		new MenuItemCheckinAction(checkin, result);
+		
 		cancelcheckout = new MenuItem("Cancel Checkout");
 		cancelcheckout.setVisible(false);
 		new MenuItemCancelCheckoutAction(cancelcheckout, result);
@@ -156,6 +158,7 @@ public class ContextMenuOnResultTable {
 		destroyObject.setDisable(selectionIsNotAnObjectId(selectedCell));
 		download.setDisable(selectionIsNotAnDocumentType(selectedCell));
 		checkout.setVisible(selectionCanBeCheckedOut(selectedCell));
+		checkin.setVisible(selectionIsCheckedOut(selectedCell));
 		cancelcheckout.setVisible(selectionIsCheckedOut(selectedCell));
 		versions.setDisable(selectionIsNotAnDocumentType(selectedCell));
 		renditions.setDisable(selectionIsNotAnDocumentType(selectedCell));
