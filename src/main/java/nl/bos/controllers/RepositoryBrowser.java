@@ -88,6 +88,9 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
     private MenuItem miRenditions;
 
 	private MenuItem miDownload;
+	private MenuItem miCheckout;
+	private MenuItem miCheckin;
+	private MenuItem miCancelCheckout;
 
     @FXML
     private void initialize() {
@@ -110,8 +113,20 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         miDump.setOnAction(this::triggerGetAttributes);
 
         miDownload = new MenuItem("Download");
-        miDownload.setDisable(true);
+        miDownload.setVisible(false);
         miDownload.setOnAction(this::triggerDownload);
+        
+        miCheckout = new MenuItem("Checkout");
+        miCheckout.setVisible(false);
+        miCheckout.setOnAction(this::triggerCheckout);
+        
+        miCheckin = new MenuItem("Checkin");
+        miCheckin.setVisible(false);
+        miCheckin.setOnAction(this::triggerCheckin);
+        
+        miCancelCheckout = new MenuItem("Cancel Checkout");
+        miCancelCheckout.setVisible(false);
+        miCancelCheckout.setOnAction(this::triggerCancelCheckout);
         
         miVersions = new MenuItem("Versions");
         miVersions.setDisable(true);
@@ -124,7 +139,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         MenuItem miFindItem = new MenuItem("Find item <F3>");
         miFindItem.setOnAction(this::triggerFindItem);
 
-        rootContextMenu.getItems().addAll(miDump, new SeparatorMenuItem(), miDownload, miVersions, miRenditions, new SeparatorMenuItem(), miFindItem);
+        rootContextMenu.getItems().addAll(miDump, new SeparatorMenuItem(), miDownload, miCheckout, miCancelCheckout, miCheckin, miVersions, miRenditions, new SeparatorMenuItem(), miFindItem);
     }
 
     private void triggerGetAttributes(ActionEvent actionEvent) {
@@ -149,6 +164,33 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         repository.downloadContent(selectedId);
     }
 
+    private void triggerCheckout(ActionEvent actionEvent) {
+        String selectedId = repository.getIdFromObject(selected.getValue().getObject());
+        LOGGER.info("Checkout " + selectedId);
+        repository.checkoutContent(selectedId);
+    }
+    
+    private void triggerCancelCheckout(ActionEvent actionEvent) {
+        String selectedId = repository.getIdFromObject(selected.getValue().getObject());
+        LOGGER.info("CancelCheckout " + selectedId);
+        repository.cancelCheckout(selectedId);
+    }
+    
+    private void triggerCheckin(ActionEvent actionEvent) {
+        String selectedId = repository.getIdFromObject(selected.getValue().getObject());
+        LOGGER.info("Checkin " + selectedId);
+        Stage checkinStage = new Stage();
+        checkinStage.setTitle("Checkin");
+        Resources resources = new Resources();
+        VBox checkinDialog = (VBox) resources.loadFXML("/nl/bos/views/dialogs/CheckinDialog.fxml");
+        Scene scene = new Scene(checkinDialog);
+        checkinStage.setScene(scene);
+        CheckinDialog controller = resources.getFxmlLoader().getController();
+        controller.setStage(checkinStage);
+        controller.initialize();
+        controller.checkinDialog(selectedId);
+        checkinStage.showAndWait();
+    }
     private void triggerRenditions(ActionEvent actionEvent) {
         showResultTable("Renditions");
     }
@@ -202,8 +244,12 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
         //item is selected - this prevents fail when clicking on empty space
         if (selected != null && !selected.getValue().getType().equals(TYPE_REPOSITORY)) {
             //open context contextmenu on current screen position
-            boolean isDocumentType = repository.isDocumentType(selected.getValue().getObject());
-            miDownload.setDisable(!isDocumentType);
+        	IDfPersistentObject selectedObject = selected.getValue().getObject();
+            boolean isDocumentType = repository.isDocumentType(selectedObject);
+            miDownload.setVisible(isDocumentType);
+            miCheckout.setVisible(repository.canCheckOut(selectedObject));
+            miCancelCheckout.setVisible(repository.isCheckedOut(selectedObject));
+            miCheckin.setVisible(repository.isCheckedOut(selectedObject));
             miVersions.setDisable(!isDocumentType);
             miRenditions.setDisable(!isDocumentType);
             rootContextMenu.show(treeView, mouseEvent.getScreenX(), mouseEvent.getScreenY());

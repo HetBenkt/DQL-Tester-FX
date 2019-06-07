@@ -232,7 +232,7 @@ public class Repository {
 	}
 
 	public boolean isObjectId(String id) {
-		if(id==null) {
+		if (id == null) {
 			return false;
 		}
 		String regex = "[0-9a-f]{16}";
@@ -351,9 +351,14 @@ public class Repository {
 	}
 
 	public boolean canCheckOut(String objectId) {
+		LOGGER.log(Level.FINE, "Test if user can checkout" + objectId);
+		IDfPersistentObject object = repository.getPersistentObject(objectId);
+		return canCheckOut(object);
+
+	}
+
+	public boolean canCheckOut(IDfPersistentObject object) {
 		try {
-			LOGGER.log(Level.FINE, "Test if user can checkout" + objectId);
-			IDfPersistentObject object = repository.getPersistentObject(objectId);
 			if (object.isInstanceOf("dm_sysobject") && !object.isInstanceOf("dm_folder")) {
 				IDfSysObject sysObj = (IDfSysObject) object;
 				if (IDfACL.DF_PERMIT_VERSION <= sysObj.getPermit() && !sysObj.isCheckedOut()) {
@@ -366,13 +371,18 @@ public class Repository {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return false;
-
 	}
 
 	public boolean isCheckedOut(String objectId) {
+		IDfPersistentObject object = repository.getPersistentObject(objectId);
+		LOGGER.log(Level.FINE, "Test if user can checkout" + objectId);		
+		return isCheckedOut(object);
+
+	}
+
+	public boolean isCheckedOut(IDfPersistentObject object) {
 		try {
-			LOGGER.log(Level.FINE, "Test if user can checkout" + objectId);
-			IDfPersistentObject object = repository.getPersistentObject(objectId);
+				
 			if (object.isInstanceOf("dm_sysobject")) {
 				IDfSysObject sysObj = (IDfSysObject) object;
 				return sysObj.isCheckedOut();
@@ -383,17 +393,16 @@ public class Repository {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return false;
-
 	}
-	
+
 	public boolean checkin(String objectId, File content) {
 		IDfPersistentObject object = repository.getPersistentObject(objectId);
 		try {
 			if (object.isInstanceOf("dm_sysobject")) {
 				IDfSysObject sysObj = (IDfSysObject) object;
-				if(sysObj.isCheckedOut()) {
+				if (sysObj.isCheckedOut()) {
 					sysObj.setFile(content.getAbsolutePath());
-					//should offer choice to user if they want to keep lock, which version number
+					// should offer choice to user if they want to keep lock, which version number
 					sysObj.checkin(false, "");
 					return true;
 				}
@@ -404,7 +413,7 @@ public class Repository {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return false;
-		
+
 	}
 
 	public IDfPersistentObject getPersistentObject(String id) {

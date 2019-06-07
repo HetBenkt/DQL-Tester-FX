@@ -92,7 +92,7 @@ public class ContextMenuOnResultTable {
 		new MenuItemResultTableAction(renditions, result, "Renditions");
 
 		download = new MenuItem("Download");
-		download.setDisable(true);
+		download.setVisible(false);
 		new MenuItemDownloadObjectAction(download, result);
 
 		checkout = new MenuItem("Checkout");
@@ -156,7 +156,7 @@ public class ContextMenuOnResultTable {
 
 		getAttributes.setDisable(selectionIsNotAnObjectId(selectedCell));
 		destroyObject.setDisable(selectionIsNotAnObjectId(selectedCell));
-		download.setDisable(selectionIsNotAnDocumentType(selectedCell));
+		download.setVisible(!selectionIsNotAnDocumentType(selectedCell));
 		checkout.setVisible(selectionCanBeCheckedOut(selectedCell));
 		checkin.setVisible(selectionIsCheckedOut(selectedCell));
 		cancelcheckout.setVisible(selectionIsCheckedOut(selectedCell));
