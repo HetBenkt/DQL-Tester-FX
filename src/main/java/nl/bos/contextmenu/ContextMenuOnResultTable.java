@@ -1,19 +1,32 @@
 package nl.bos.contextmenu;
 
-import javafx.scene.control.*;
+import java.time.Instant;
+import java.util.logging.Logger;
+
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TablePosition;
+import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import nl.bos.Repository;
-import nl.bos.contextmenu.menuitem.action.*;
+import nl.bos.contextmenu.menuitem.action.MenuItemCancelCheckoutAction;
+import nl.bos.contextmenu.menuitem.action.MenuItemCheckinAction;
+import nl.bos.contextmenu.menuitem.action.MenuItemCheckoutAction;
+import nl.bos.contextmenu.menuitem.action.MenuItemCopyCellToClipBoardAction;
+import nl.bos.contextmenu.menuitem.action.MenuItemCopyRowToClipBoardAction;
+import nl.bos.contextmenu.menuitem.action.MenuItemDescribeObjectAction;
+import nl.bos.contextmenu.menuitem.action.MenuItemDestroyObjectAction;
+import nl.bos.contextmenu.menuitem.action.MenuItemDownloadObjectAction;
+import nl.bos.contextmenu.menuitem.action.MenuItemExportToCsvAction;
+import nl.bos.contextmenu.menuitem.action.MenuItemGetAttributesAction;
+import nl.bos.contextmenu.menuitem.action.MenuItemResultTableAction;
+import nl.bos.contextmenu.menuitem.action.MenuItemShowPropertiesAction;
 import nl.bos.controllers.ConnectionWithStatus;
 import nl.bos.controllers.QueryWithResult;
 import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
-
-import java.time.Instant;
-import java.util.logging.Logger;
-
-import com.documentum.fc.common.IDfId;
 
 public class ContextMenuOnResultTable {
 	private static final Logger LOGGER = Logger.getLogger(ContextMenuOnResultTable.class.getName());
@@ -32,6 +45,9 @@ public class ContextMenuOnResultTable {
 	private final MenuItem renditions;
 
 	private final MenuItem download;
+	private final MenuItem checkout;
+	private final MenuItem checkin;
+	private final MenuItem cancelcheckout;
 
 	private final TableView result;
 	private final MenuItemShowPropertiesAction menuItemShowPropertiesAction;
@@ -76,12 +92,24 @@ public class ContextMenuOnResultTable {
 		new MenuItemResultTableAction(renditions, result, "Renditions");
 
 		download = new MenuItem("Download");
-		download.setDisable(true);
+		download.setVisible(false);
 		new MenuItemDownloadObjectAction(download, result);
+
+		checkout = new MenuItem("Checkout");
+		checkout.setVisible(false);
+		new MenuItemCheckoutAction(checkout, result);
+
+		checkin = new MenuItem("Checkin");
+		checkin.setVisible(false);
+		new MenuItemCheckinAction(checkin, result);
+		
+		cancelcheckout = new MenuItem("Cancel Checkout");
+		cancelcheckout.setVisible(false);
+		new MenuItemCancelCheckoutAction(cancelcheckout, result);
 
 		contextMenu.getItems().addAll(showProperties, new SeparatorMenuItem(), copyCellToClipBoard, copyRowToClipBoard,
 				exportToCsv, new SeparatorMenuItem(), describeObject, new SeparatorMenuItem(), getAttributes, download,
-				destroyObject, new SeparatorMenuItem(), versions, renditions);
+				checkout, checkin, cancelcheckout, destroyObject, new SeparatorMenuItem(), versions, renditions);
 	}
 
 	public void onRightMouseClick(MouseEvent t) {
@@ -112,18 +140,28 @@ public class ContextMenuOnResultTable {
 	}
 
 	private void validateMenuItems() {
+		String selectedCell = null;
+		if (result.getSelectionModel().getSelectedCells().size() > 0) {
+			TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
+			Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
+			selectedCell = String.valueOf(cellData);
+		}
+
 		exportToCsv.setDisable(hasNoRowsInResultTable());
 
 		showProperties.setDisable(hasNoSelectedCellsInResultTable());
-		copyCellToClipBoard.setDisable(hasNoSelectedCellsInResultTable());
-		copyRowToClipBoard.setDisable(hasNoSelectedCellsInResultTable());
-		describeObject.setDisable(selectionIsNotAnDescribeObjectType());
+		copyCellToClipBoard.setDisable(selectedCell == null);
+		copyRowToClipBoard.setDisable(selectedCell == null);
+		describeObject.setDisable(selectionIsNotAnDescribeObjectType(selectedCell));
 
-		getAttributes.setDisable(selectionIsNotAnObjectId());
-		destroyObject.setDisable(selectionIsNotAnObjectId());
-		download.setDisable(selectionIsNotAnDocumentType());
-		versions.setDisable(selectionIsNotAnDocumentType());
-		renditions.setDisable(selectionIsNotAnDocumentType());
+		getAttributes.setDisable(selectionIsNotAnObjectId(selectedCell));
+		destroyObject.setDisable(selectionIsNotAnObjectId(selectedCell));
+		download.setVisible(!selectionIsNotAnDocumentType(selectedCell));
+		checkout.setVisible(selectionCanBeCheckedOut(selectedCell));
+		checkin.setVisible(selectionIsCheckedOut(selectedCell));
+		cancelcheckout.setVisible(selectionIsCheckedOut(selectedCell));
+		versions.setDisable(selectionIsNotAnDocumentType(selectedCell));
+		renditions.setDisable(selectionIsNotAnDocumentType(selectedCell));
 	}
 
 	private boolean hasNoRowsInResultTable() {
@@ -134,40 +172,43 @@ public class ContextMenuOnResultTable {
 		return result.getSelectionModel().getSelectedCells().isEmpty();
 	}
 
-	private boolean selectionIsNotAnDescribeObjectType() {
-		if (result.getSelectionModel().getSelectedCells().size() == 0) {
+	private boolean selectionIsNotAnDescribeObjectType(String selectedCell) {
+		if (selectedCell == null) {
 			return true;
 		} else {
-			TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
-			Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
-
-			return !(repository.isTypeName(String.valueOf(cellData))
-					|| repository.isTableName(String.valueOf(cellData)));
+			return !(repository.isTypeName(selectedCell) || repository.isTableName(selectedCell));
 		}
 	}
 
-	private boolean selectionIsNotAnDocumentType() {
-		if (result.getSelectionModel().getSelectedCells().size() == 0) {
+	private boolean selectionIsNotAnDocumentType(String id) {
+		if (id == null || !repository.isObjectId(id)) {
 			return true;
 		} else {
-			TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
-			Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
-			if (repository.isObjectId(String.valueOf(cellData))) {
-				return !repository.isDocumentType(repository.getPersistentObject(String.valueOf(cellData)));
-			} else {
-				return true;
-			}
+			return !repository.isDocumentType(repository.getPersistentObject(id));
 		}
 	}
 
-	private boolean selectionIsNotAnObjectId() {
-		if (result.getSelectionModel().getSelectedCells().size() == 0) {
+	private boolean selectionIsNotAnObjectId(String id) {
+		if (id == null || !repository.isObjectId(id)) {
 			return true;
 		} else {
-			TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
-			Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
+			return !repository.isObjectId(id);
+		}
+	}
 
-			return !repository.isObjectId(String.valueOf(cellData));
+	private boolean selectionCanBeCheckedOut(String id) {
+		if (id == null || !repository.isObjectId(id)) {
+			return false;
+		} else {
+			return repository.canCheckOut(id);
+		}
+	}
+
+	private boolean selectionIsCheckedOut(String id) {
+		if (id == null || !repository.isObjectId(id)) {
+			return false;
+		} else {
+			return repository.isCheckedOut(id);
 		}
 	}
 
