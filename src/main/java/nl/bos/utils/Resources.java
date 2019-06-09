@@ -27,6 +27,10 @@ public class Resources {
 	private static final Logger LOGGER = Logger.getLogger(Resources.class.getName());
 
 	private static Properties settings = null;
+	
+	private static File exportPath = null;
+	
+	
 
 	private FXMLLoader fxmlLoader;
 
@@ -36,6 +40,13 @@ public class Resources {
 		return fileChooser.showOpenDialog(null);
 	}
 
+	public static File selectFileFromFileChooser(String title, File path) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialDirectory(path);
+		fileChooser.setTitle(title);
+		return fileChooser.showOpenDialog(null);
+	}
+	
 	public static List<String> readLines(File file) {
 		try {
 			return Files.readAllLines(file.toPath());
@@ -185,8 +196,11 @@ public class Resources {
 		return settings;
 	}
 
-	public static String getExportPath() {
-		return (String) getSettingProperty("export.path", System.getenv("TEMP"));
+	public static File getExportPath() {
+		if(exportPath!=null) {
+			return exportPath;
+		}
+		return new File((String) getSettingProperty("export.path", System.getenv("TEMP")));
 	}
 
 	public static String setExportPath(String path) {

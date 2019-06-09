@@ -1,7 +1,13 @@
 package nl.bos;
 
 public final class Constants {
-    //General
+    public enum Version{
+		SAMEVER,
+		MINOR,
+		MAJOR
+	}
+
+	//General
     static final String APP_TITLE = "DQL Tester FX";
 
     //Messages

@@ -2,27 +2,50 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="400.0" prefWidth="254.0"
-	xmlns="http://javafx.com/javafx/8.0.172-ea"
-	xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="nl.bos.controllers.CheckinDialog"
-	fx:id="vboxCheckinDialog">
+<VBox fx:id="vboxCheckinDialog" prefHeight="206.0" prefWidth="376.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nl.bos.controllers.CheckinDialog">
 	<HBox spacing="5.0">
-		<TextField fx:id="filepath" editable="false"
-			HBox.hgrow="ALWAYS" />
-		<Button mnemonicParsing="false" onAction="#loadFile"
-			text="Load" />
+		<TextField fx:id="filepath" editable="false" HBox.hgrow="ALWAYS" />
+		<Button mnemonicParsing="false" onAction="#loadFile" text="From file..." />
+      <padding>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
 	</HBox>
-	<Button fx:id="btnOK" defaultButton="true" disable="true"
-		layoutX="60.0" layoutY="361.0" mnemonicParsing="false"
-		onAction="#handleCheckin" prefWidth="65.0" text="OK" />
-	<Button fx:id="btnCancel" cancelButton="true" layoutX="150.0"
-		layoutY="361.0" mnemonicParsing="false" onAction="#handleExit"
-		prefWidth="65.0" text="Cancel" />
+	<RadioButton id="SAMEVER" mnemonicParsing="false" text="As same version">
+		<toggleGroup>
+			<ToggleGroup fx:id="checkinVersion" />
+		</toggleGroup>
+      <VBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </VBox.margin>
+	</RadioButton>
+	<RadioButton id="MINOR" mnemonicParsing="false" selected="true" text="As minor version" toggleGroup="$checkinVersion">
+      <VBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </VBox.margin></RadioButton>
+	<RadioButton id="MAJOR" mnemonicParsing="false" text="As MAJOR version" toggleGroup="$checkinVersion">
+      <VBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </VBox.margin></RadioButton>
+	<CheckBox fx:id="keepLock" mnemonicParsing="false" text="Retain Lock">
+      <VBox.margin>
+         <Insets bottom="10.0" left="5.0" right="10.0" top="10.0" />
+      </VBox.margin></CheckBox>
+
+	<HBox alignment="BOTTOM_CENTER" spacing="5.0">
+   		<Button fx:id="btnOK" defaultButton="true" disable="true" layoutX="60.0" layoutY="361.0" mnemonicParsing="false" onAction="#handleCheckin" prefWidth="65.0" text="OK" />
+		<Button fx:id="btnCancel" cancelButton="true" layoutX="150.0" layoutY="361.0" mnemonicParsing="false" onAction="#handleExit" prefWidth="65.0" text="Cancel">
+         <HBox.margin>
+            <Insets top="5.0" />
+         </HBox.margin></Button>
+      <VBox.margin>
+         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </VBox.margin>
+	</HBox>
 </VBox>

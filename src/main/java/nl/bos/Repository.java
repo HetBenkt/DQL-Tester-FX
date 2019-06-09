@@ -6,6 +6,8 @@ import com.documentum.fc.client.*;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfLoginInfo;
+
+import nl.bos.Constants.Version;
 import nl.bos.utils.AppAlert;
 import nl.bos.utils.Resources;
 
@@ -375,14 +377,14 @@ public class Repository {
 
 	public boolean isCheckedOut(String objectId) {
 		IDfPersistentObject object = repository.getPersistentObject(objectId);
-		LOGGER.log(Level.FINE, "Test if user can checkout" + objectId);		
+		LOGGER.log(Level.FINE, "Test if user can checkout" + objectId);
 		return isCheckedOut(object);
 
 	}
 
 	public boolean isCheckedOut(IDfPersistentObject object) {
 		try {
-				
+
 			if (object.isInstanceOf("dm_sysobject")) {
 				IDfSysObject sysObj = (IDfSysObject) object;
 				return sysObj.isCheckedOut();
@@ -395,7 +397,7 @@ public class Repository {
 		return false;
 	}
 
-	public boolean checkin(String objectId, File content) {
+	public boolean checkin(String objectId, File content, Version version, boolean keepLock) {
 		IDfPersistentObject object = repository.getPersistentObject(objectId);
 		try {
 			if (object.isInstanceOf("dm_sysobject")) {
@@ -403,7 +405,20 @@ public class Repository {
 				if (sysObj.isCheckedOut()) {
 					sysObj.setFile(content.getAbsolutePath());
 					// should offer choice to user if they want to keep lock, which version number
-					sysObj.checkin(false, "");
+					switch (version) {
+					case SAMEVER:
+						sysObj.save();
+						if(!keepLock) {
+							sysObj.cancelCheckout();
+						}
+						break;
+					case MAJOR:
+						sysObj.checkin(keepLock, sysObj.getVersionPolicy().getNextMajorLabel()+", CURRENT");
+						break;
+					default:
+						sysObj.checkin(keepLock, null);
+					}
+
 					return true;
 				}
 			} else {
