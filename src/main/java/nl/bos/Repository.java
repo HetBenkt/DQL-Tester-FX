@@ -400,35 +400,40 @@ public class Repository {
 	public boolean checkin(String objectId, File content, Version version, boolean keepLock) {
 		IDfPersistentObject object = repository.getPersistentObject(objectId);
 		try {
-			if (object.isInstanceOf("dm_sysobject")) {
-				IDfSysObject sysObj = (IDfSysObject) object;
+			checkin(object, content, version, keepLock);
+		} catch (DfException e) {
+			return false;
+		}
+		return true;
+	}
+
+	public void checkin(IDfPersistentObject sysObject, File content, Version version, boolean keepLock)
+			throws DfException {
+		try {
+			if (sysObject.isInstanceOf("dm_sysobject")) {
+				IDfSysObject sysObj = (IDfSysObject) sysObject;
 				if (sysObj.isCheckedOut()) {
 					sysObj.setFile(content.getAbsolutePath());
 					// should offer choice to user if they want to keep lock, which version number
 					switch (version) {
 					case SAMEVER:
 						sysObj.save();
-						if(!keepLock) {
+						if (!keepLock) {
 							sysObj.cancelCheckout();
 						}
 						break;
 					case MAJOR:
-						sysObj.checkin(keepLock, sysObj.getVersionPolicy().getNextMajorLabel()+", CURRENT");
+						sysObj.checkin(keepLock, sysObj.getVersionPolicy().getNextMajorLabel() + ", CURRENT");
 						break;
 					default:
 						sysObj.checkin(keepLock, null);
 					}
-
-					return true;
 				}
-			} else {
-				return false;
 			}
 		} catch (DfException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
 		}
-		return false;
-
 	}
 
 	public IDfPersistentObject getPersistentObject(String id) {
@@ -455,10 +460,19 @@ public class Repository {
 			LOGGER.info(id);
 
 			IDfSysObject sysObject = (IDfSysObject) repository.getSession().getObject(new DfId(id));
-			sysObject.cancelCheckout();
+			cancelCheckout(sysObject);
 		} catch (DfException e) {
 			AppAlert.error("Unable to cancel Checkout", id);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+
+	public void cancelCheckout(IDfSysObject sysObject) throws DfException {
+		try {
+			sysObject.cancelCheckout();
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
 		}
 	}
 
@@ -467,34 +481,53 @@ public class Repository {
 			LOGGER.info(id);
 
 			IDfSysObject sysObject = (IDfSysObject) repository.getSession().getObject(new DfId(id));
-			sysObject.checkout();
-			downloadContent(id);
-
+			checkoutContent(sysObject);
 		} catch (DfException e) {
 			AppAlert.error("Error while trying to retrieve content", id);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
+	public void checkoutContent(IDfSysObject sysObject) throws DfException {
+		try {
+			sysObject.checkout();
+			downloadContent(sysObject);
+
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+	}
+
 	/** Get document primary content */
 	public void downloadContent(String id) {
+		LOGGER.info(id);
+		IDfSysObject sysObject;
 		try {
-			LOGGER.info(id);
-			IDfSysObject sysObject = (IDfSysObject) repository.getSession().getObject(new DfId(id));
+			sysObject = (IDfSysObject) repository.getSession().getObject(new DfId(id));
+			downloadContent(sysObject);
+		} catch (DfException e) {
+			AppAlert.error("Error while trying to retrieve content", id);
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+
+	public void downloadContent(IDfSysObject sysObject) throws DfException {
+		try {
+			String objectName = sysObject.getObjectName();
 			if (!(sysObject.getContentSize() > 0)) {
-				AppAlert.warning("Content is empty", sysObject.getObjectName());
+				AppAlert.warning("Content is empty", objectName);
 			} else {
 				final String extension = repository.getSession().getFormat(sysObject.getContentType())
 						.getDOSExtension();
 				final String path = sysObject.getFile(new File(Resources.getExportPath(),
-						sysObject.getObjectName().replaceAll("[^a-zA-Z0-9._]", "-") + "." + extension)
-								.getAbsolutePath());
+						objectName.replaceAll("[^a-zA-Z0-9._]", "-") + "." + extension).getAbsolutePath());
 				LOGGER.info("Downloaded document to path " + path);
 			}
 
 		} catch (DfException e) {
-			AppAlert.error("Error while trying to retrieve content", id);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
 		}
 	}
 }
