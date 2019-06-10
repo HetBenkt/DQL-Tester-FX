@@ -1,15 +1,6 @@
 package nl.bos;
 
-import com.documentum.com.DfClientX;
-import com.documentum.com.IDfClientX;
-import com.documentum.fc.client.*;
-import com.documentum.fc.common.DfException;
-import com.documentum.fc.common.DfId;
-import com.documentum.fc.common.IDfLoginInfo;
-
-import nl.bos.Constants.Version;
-import nl.bos.utils.AppAlert;
-import nl.bos.utils.Resources;
+import static nl.bos.Constants.MSG_TITLE_INFO_DIALOG;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -20,7 +11,27 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static nl.bos.Constants.MSG_TITLE_INFO_DIALOG;
+import com.documentum.com.DfClientX;
+import com.documentum.com.IDfClientX;
+import com.documentum.fc.client.DfServiceException;
+import com.documentum.fc.client.IDfACL;
+import com.documentum.fc.client.IDfClient;
+import com.documentum.fc.client.IDfCollection;
+import com.documentum.fc.client.IDfDocbaseMap;
+import com.documentum.fc.client.IDfPersistentObject;
+import com.documentum.fc.client.IDfQuery;
+import com.documentum.fc.client.IDfSession;
+import com.documentum.fc.client.IDfSessionManager;
+import com.documentum.fc.client.IDfSysObject;
+import com.documentum.fc.client.IDfTypedObject;
+import com.documentum.fc.client.IDfUser;
+import com.documentum.fc.common.DfException;
+import com.documentum.fc.common.DfId;
+import com.documentum.fc.common.IDfLoginInfo;
+
+import nl.bos.Constants.Version;
+import nl.bos.utils.AppAlert;
+import nl.bos.utils.Resources;
 
 public class Repository {
 	private static final Logger LOGGER = Logger.getLogger(Repository.class.getName());
@@ -400,35 +411,44 @@ public class Repository {
 	public boolean checkin(String objectId, File content, Version version, boolean keepLock) {
 		IDfPersistentObject object = repository.getPersistentObject(objectId);
 		try {
-			if (object.isInstanceOf("dm_sysobject")) {
-				IDfSysObject sysObj = (IDfSysObject) object;
+			checkin(object, content, version, keepLock);
+		} catch (DfException e) {
+			return false;
+		}
+		return true;
+	}
+
+	public void checkin(IDfPersistentObject sysObject, File content, Version version, boolean keepLock)
+			throws DfException {
+		try {
+			if (sysObject.isInstanceOf("dm_sysobject")) {
+				IDfSysObject sysObj = (IDfSysObject) sysObject;
 				if (sysObj.isCheckedOut()) {
 					sysObj.setFile(content.getAbsolutePath());
 					// should offer choice to user if they want to keep lock, which version number
 					switch (version) {
 					case SAMEVER:
 						sysObj.save();
-						if(!keepLock) {
+						if (!keepLock) {
 							sysObj.cancelCheckout();
 						}
 						break;
 					case MAJOR:
-						sysObj.checkin(keepLock, sysObj.getVersionPolicy().getNextMajorLabel()+", CURRENT");
+						sysObj.checkin(keepLock, sysObj.getVersionPolicy().getNextMajorLabel() + ", CURRENT");
 						break;
 					default:
 						sysObj.checkin(keepLock, null);
 					}
-
-					return true;
+					//if the document stays checked out, we keep the checkout path
+					if(!keepLock) {
+						Resources.removeContentPathFromCheckoutFile(sysObject.getObjectId().getId());
+					}
 				}
-			} else {
-				return false;
 			}
 		} catch (DfException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
 		}
-		return false;
-
 	}
 
 	public IDfPersistentObject getPersistentObject(String id) {
@@ -455,46 +475,86 @@ public class Repository {
 			LOGGER.info(id);
 
 			IDfSysObject sysObject = (IDfSysObject) repository.getSession().getObject(new DfId(id));
-			sysObject.cancelCheckout();
+			cancelCheckout(sysObject);
 		} catch (DfException e) {
 			AppAlert.error("Unable to cancel Checkout", id);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
-	public void checkoutContent(String id) {
+	public void cancelCheckout(IDfSysObject sysObject) throws DfException {
+		try {
+			sysObject.cancelCheckout();
+			Resources.removeContentPathFromCheckoutFile(sysObject.getObjectId().getId());
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+	}
+
+	/**
+	 * Checkout document, store export path to JSON file
+	 * @param id
+	 * @throws DfException
+	 */	public void checkoutContent(String id) {
 		try {
 			LOGGER.info(id);
 
 			IDfSysObject sysObject = (IDfSysObject) repository.getSession().getObject(new DfId(id));
-			sysObject.checkout();
-			downloadContent(id);
-
+			checkoutContent(sysObject);
 		} catch (DfException e) {
 			AppAlert.error("Error while trying to retrieve content", id);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
-	/** Get document primary content */
-	public void downloadContent(String id) {
+	/**
+	 * Checkout document, store export path to JSON file
+	 * @param sysObject
+	 * @throws DfException
+	 */
+	public void checkoutContent(IDfSysObject sysObject) throws DfException {
 		try {
-			LOGGER.info(id);
-			IDfSysObject sysObject = (IDfSysObject) repository.getSession().getObject(new DfId(id));
-			if (!(sysObject.getContentSize() > 0)) {
-				AppAlert.warning("Content is empty", sysObject.getObjectName());
-			} else {
-				final String extension = repository.getSession().getFormat(sysObject.getContentType())
-						.getDOSExtension();
-				final String path = sysObject.getFile(new File(Resources.getExportPath(),
-						sysObject.getObjectName().replaceAll("[^a-zA-Z0-9._]", "-") + "." + extension)
-								.getAbsolutePath());
-				LOGGER.info("Downloaded document to path " + path);
-			}
+			sysObject.checkout();
+			String path = downloadContent(sysObject);
+			Resources.putContentPathToCheckoutFile(sysObject.getObjectId().getId(), path);
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+	}
 
+	/** Get document primary content*/
+	public void downloadContent(String id) {
+		LOGGER.info(id);
+		IDfSysObject sysObject;
+		try {
+			sysObject = (IDfSysObject) repository.getSession().getObject(new DfId(id));
+			downloadContent(sysObject);
 		} catch (DfException e) {
 			AppAlert.error("Error while trying to retrieve content", id);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
+	}
+
+	/** Get document primary content*/
+	public String downloadContent(IDfSysObject sysObject) throws DfException {
+		try {
+			String objectName = sysObject.getObjectName();
+			if (!(sysObject.getContentSize() > 0)) {
+				AppAlert.warning("Content is empty", objectName);
+			} else {
+				final String extension = repository.getSession().getFormat(sysObject.getContentType())
+						.getDOSExtension();
+				final String path = sysObject.getFile(new File(Resources.getExportPath(),
+						objectName.replaceAll("[^a-zA-Z0-9._]", "-") + "." + extension).getAbsolutePath());
+				LOGGER.info("Downloaded document to path " + path);
+				return path;
+			}
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			throw e;
+		}
+		return null;
 	}
 }

@@ -54,6 +54,10 @@ public class CheckinDialog {
 	@FXML
 	private void loadFile() {
 		checkinFile = Resources.selectFileFromFileChooser("Select Content", Resources.getExportPath());
+		getCheckinFile();
+	}
+
+	private void getCheckinFile() {
 		filepath.setText(checkinFile.getAbsolutePath());
 		if (checkinFile == null || !checkinFile.exists() || !checkinFile.canRead()) {
 			btnOK.setDisable(true);
@@ -75,6 +79,11 @@ public class CheckinDialog {
 
 	public void checkinDialog(String id) {
 		this.objectId = id;
+		String initPath = Resources.getContentPathFromCheckoutFile(id);
+		if(initPath!=null) {
+			checkinFile = new File(initPath);
+			getCheckinFile();
+		}
 	}
 
 	public void setStage(Stage stage) {
