@@ -1,15 +1,6 @@
 package nl.bos;
 
-import com.documentum.com.DfClientX;
-import com.documentum.com.IDfClientX;
-import com.documentum.fc.client.*;
-import com.documentum.fc.common.DfException;
-import com.documentum.fc.common.DfId;
-import com.documentum.fc.common.IDfLoginInfo;
-
-import nl.bos.Constants.Version;
-import nl.bos.utils.AppAlert;
-import nl.bos.utils.Resources;
+import static nl.bos.Constants.MSG_TITLE_INFO_DIALOG;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -20,7 +11,27 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static nl.bos.Constants.MSG_TITLE_INFO_DIALOG;
+import com.documentum.com.DfClientX;
+import com.documentum.com.IDfClientX;
+import com.documentum.fc.client.DfServiceException;
+import com.documentum.fc.client.IDfACL;
+import com.documentum.fc.client.IDfClient;
+import com.documentum.fc.client.IDfCollection;
+import com.documentum.fc.client.IDfDocbaseMap;
+import com.documentum.fc.client.IDfPersistentObject;
+import com.documentum.fc.client.IDfQuery;
+import com.documentum.fc.client.IDfSession;
+import com.documentum.fc.client.IDfSessionManager;
+import com.documentum.fc.client.IDfSysObject;
+import com.documentum.fc.client.IDfTypedObject;
+import com.documentum.fc.client.IDfUser;
+import com.documentum.fc.common.DfException;
+import com.documentum.fc.common.DfId;
+import com.documentum.fc.common.IDfLoginInfo;
+
+import nl.bos.Constants.Version;
+import nl.bos.utils.AppAlert;
+import nl.bos.utils.Resources;
 
 public class Repository {
 	private static final Logger LOGGER = Logger.getLogger(Repository.class.getName());
@@ -428,6 +439,10 @@ public class Repository {
 					default:
 						sysObj.checkin(keepLock, null);
 					}
+					//if the document stays checked out, we keep the checkout path
+					if(!keepLock) {
+						Resources.removeContentPathFromCheckoutFile(sysObject.getObjectId().getId());
+					}
 				}
 			}
 		} catch (DfException e) {
@@ -470,13 +485,18 @@ public class Repository {
 	public void cancelCheckout(IDfSysObject sysObject) throws DfException {
 		try {
 			sysObject.cancelCheckout();
+			Resources.removeContentPathFromCheckoutFile(sysObject.getObjectId().getId());
 		} catch (DfException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
 	}
 
-	public void checkoutContent(String id) {
+	/**
+	 * Checkout document, store export path to JSON file
+	 * @param id
+	 * @throws DfException
+	 */	public void checkoutContent(String id) {
 		try {
 			LOGGER.info(id);
 
@@ -488,18 +508,23 @@ public class Repository {
 		}
 	}
 
+	/**
+	 * Checkout document, store export path to JSON file
+	 * @param sysObject
+	 * @throws DfException
+	 */
 	public void checkoutContent(IDfSysObject sysObject) throws DfException {
 		try {
 			sysObject.checkout();
-			downloadContent(sysObject);
-
+			String path = downloadContent(sysObject);
+			Resources.putContentPathToCheckoutFile(sysObject.getObjectId().getId(), path);
 		} catch (DfException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
 	}
 
-	/** Get document primary content */
+	/** Get document primary content*/
 	public void downloadContent(String id) {
 		LOGGER.info(id);
 		IDfSysObject sysObject;
@@ -512,7 +537,8 @@ public class Repository {
 		}
 	}
 
-	public void downloadContent(IDfSysObject sysObject) throws DfException {
+	/** Get document primary content*/
+	public String downloadContent(IDfSysObject sysObject) throws DfException {
 		try {
 			String objectName = sysObject.getObjectName();
 			if (!(sysObject.getContentSize() > 0)) {
@@ -523,11 +549,12 @@ public class Repository {
 				final String path = sysObject.getFile(new File(Resources.getExportPath(),
 						objectName.replaceAll("[^a-zA-Z0-9._]", "-") + "." + extension).getAbsolutePath());
 				LOGGER.info("Downloaded document to path " + path);
+				return path;
 			}
-
 		} catch (DfException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
+		return null;
 	}
 }

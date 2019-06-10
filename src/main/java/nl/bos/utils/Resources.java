@@ -30,12 +30,12 @@ public class Resources {
 	private static final Logger LOGGER = Logger.getLogger(Resources.class.getName());
 
 	private static Properties settings = null;
-	
+
 	private static File exportPath = null;
-	
-	
 
 	private FXMLLoader fxmlLoader;
+
+	private static File checkoutFile;
 
 	public static File createFileFromFileChooser(String title) {
 		FileChooser fileChooser = new FileChooser();
@@ -49,7 +49,7 @@ public class Resources {
 		fileChooser.setTitle(title);
 		return fileChooser.showOpenDialog(null);
 	}
-	
+
 	public static List<String> readLines(File file) {
 		try {
 			return Files.readAllLines(file.toPath());
@@ -63,7 +63,11 @@ public class Resources {
 		File historyFile = new File(HISTORY_JSON);
 		try {
 			if (historyFile.createNewFile()) {
-				writePreparedJsonDataToFile(QUERIES);
+				JSONArray list = new JSONArray();
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put(QUERIES, list);
+
+				writeJsonToFile(jsonObject, historyFile);
 			}
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -71,22 +75,16 @@ public class Resources {
 	}
 
 	public static void initCheckoutFile() {
-		File exportFile = new File(CHECKOUT_JSON);
+		checkoutFile = new File(CHECKOUT_JSON);
 		try {
-			if (exportFile.createNewFile()) {
-				writePreparedJsonDataToFile(CHECKOUTS);
+			if (checkoutFile.createNewFile()) {
+				LOGGER.log(Level.INFO, "New Checkout file");
+				JSONObject jsonObject = new JSONObject();
+				writeJsonToFile(jsonObject, checkoutFile);
 			}
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
-	}
-	
-	private static void writePreparedJsonDataToFile(String listName) {
-		JSONArray list = new JSONArray();
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put(listName, list);
-
-		writeJsonDataToJsonHistoryFile(jsonObject);
 	}
 
 	public static byte[] readHistoryJsonBytes() {
@@ -99,13 +97,45 @@ public class Resources {
 	}
 
 	public static void writeJsonDataToJsonHistoryFile(JSONObject jsonObject) {
+		writeJsonToFile(jsonObject, new File(HISTORY_JSON));
+	}
 
-		try (FileWriter file = new FileWriter(HISTORY_JSON)) {
+	public static void writeJsonToFile(JSONObject jsonObject, File jsonFile) {
+		try (FileWriter file = new FileWriter(jsonFile)) {
 			file.write(jsonObject.toString());
 			file.flush();
 		} catch (IOException ioe) {
 			LOGGER.log(Level.SEVERE, ioe.getMessage(), ioe);
 		}
+	}
+
+	public static JSONObject readCheckoutFile() {
+		try {
+			if (checkoutFile == null || !checkoutFile.exists()) {
+				initCheckoutFile();
+			}
+			return new JSONObject(new String(Files.readAllBytes(Paths.get(CHECKOUT_JSON)), StandardCharsets.UTF_8));
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			return null;
+		}
+	}
+
+	public static void putContentPathToCheckoutFile(String objectId, String path) {
+		JSONObject currentJson = readCheckoutFile();
+		currentJson.put(objectId, path);
+		writeJsonToFile(currentJson, checkoutFile);
+	}
+	
+	public static void removeContentPathFromCheckoutFile(String objectId) {
+		JSONObject currentJson = readCheckoutFile();
+		currentJson.remove(objectId);
+		writeJsonToFile(currentJson, checkoutFile);
+	}
+	
+	public static String getContentPathFromCheckoutFile(String objectId) {
+		JSONObject currentJson = readCheckoutFile();
+		return currentJson.getString(objectId);
 	}
 
 	public static File createTempFile(String prefix, String suffic) {
@@ -211,7 +241,7 @@ public class Resources {
 	}
 
 	public static File getExportPath() {
-		if(exportPath!=null) {
+		if (exportPath != null) {
 			return exportPath;
 		}
 		return new File((String) getSettingProperty("export.path", System.getenv("TEMP")));
