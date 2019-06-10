@@ -23,6 +23,9 @@ import java.util.logging.Logger;
 import static nl.bos.Constants.HISTORY_JSON;
 import static nl.bos.Constants.QUERIES;
 
+import static nl.bos.Constants.CHECKOUT_JSON;
+import static nl.bos.Constants.CHECKOUTS;
+
 public class Resources {
 	private static final Logger LOGGER = Logger.getLogger(Resources.class.getName());
 
@@ -60,17 +63,28 @@ public class Resources {
 		File historyFile = new File(HISTORY_JSON);
 		try {
 			if (historyFile.createNewFile()) {
-				writePreparedJsonDataToFile();
+				writePreparedJsonDataToFile(QUERIES);
 			}
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 
-	private static void writePreparedJsonDataToFile() {
+	public static void initCheckoutFile() {
+		File exportFile = new File(CHECKOUT_JSON);
+		try {
+			if (exportFile.createNewFile()) {
+				writePreparedJsonDataToFile(CHECKOUTS);
+			}
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+	
+	private static void writePreparedJsonDataToFile(String listName) {
 		JSONArray list = new JSONArray();
 		JSONObject jsonObject = new JSONObject();
-		jsonObject.put(QUERIES, list);
+		jsonObject.put(listName, list);
 
 		writeJsonDataToJsonHistoryFile(jsonObject);
 	}
