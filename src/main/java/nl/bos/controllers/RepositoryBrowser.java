@@ -38,402 +38,477 @@ import java.util.logging.Logger;
 import static nl.bos.Constants.*;
 
 public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeItem>> {
-    private static final Logger LOGGER = Logger.getLogger(RepositoryBrowser.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(RepositoryBrowser.class.getName());
 
-    private final Repository repository = Repository.getInstance();
+	private final Repository repository = Repository.getInstance();
 
-    @FXML
-    private TreeView<BrowserTreeItem> treeView;
-    @FXML
-    private TextField txtObjectId;
-    @FXML
-    private TextField txtObjectType;
-    @FXML
-    private TextField txtContentType;
-    @FXML
-    private TextField txtContentSize;
-    @FXML
-    private TextField txtCreationDate;
-    @FXML
-    private TextField txtModifyDate;
-    @FXML
-    private TextField txtLockOwner;
-    @FXML
-    private TextField txtLockMachine;
-    @FXML
-    private TextField txtLockDate;
-    @FXML
-    private TextField txtAclName;
-    @FXML
-    private TextField txtPermission;
-    @FXML
-    private TextField txtVersion;
-    @FXML
-    private Button btnExit;
-    @FXML
-    private Label lblNrOfItems;
-    @FXML
-    private CheckBox ckbShowAllCabinets;
-    @FXML
-    private CheckBox ckbShowAllVersions;
-    @FXML
-    private VBox vbox;
+	@FXML
+	private TreeView<BrowserTreeItem> treeView;
+	@FXML
+	private TextField txtObjectId;
+	@FXML
+	private TextField txtObjectType;
+	@FXML
+	private TextField txtContentType;
+	@FXML
+	private TextField txtContentSize;
+	@FXML
+	private TextField txtCreationDate;
+	@FXML
+	private TextField txtModifyDate;
+	@FXML
+	private TextField txtLockOwner;
+	@FXML
+	private TextField txtLockMachine;
+	@FXML
+	private TextField txtLockDate;
+	@FXML
+	private TextField txtAclName;
+	@FXML
+	private TextField txtPermission;
+	@FXML
+	private TextField txtVersion;
+	@FXML
+	private Button btnExit;
+	@FXML
+	private Label lblNrOfItems;
+	@FXML
+	private CheckBox ckbShowAllCabinets;
+	@FXML
+	private CheckBox ckbShowAllVersions;
+	@FXML
+	private VBox vbox;
 
-    private BrowserTreeItem rootItem;
-    private MyTreeNode selected;
-    private final ContextMenu rootContextMenu = new ContextMenu();
-    private Resources resources = new Resources();
+	private BrowserTreeItem rootItem;
+	private MyTreeNode selected;
+	private final ContextMenu rootContextMenu = new ContextMenu();
+	private Resources resources = new Resources();
 
-    private MenuItem miVersions;
-    private MenuItem miRenditions;
+	private MenuItem miVersions;
+	private MenuItem miRenditions;
 
-    @FXML
-    private void initialize() {
-        vbox.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPressEvent);
+	private MenuItem miDownload;
+	private MenuItem miCheckout;
+	private MenuItem miCheckin;
+	private MenuItem miCancelCheckout;
+	
+	private Image imgLockedDocument = new Image(resources.getResourceStream("nl/bos/icons/type/t_dm_document_lock_16.gif"));
 
-        initContextMenu();
-        initBrowserTree();
-    }
+	@FXML
+	private void initialize() {
+		vbox.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPressEvent);
 
-    private void handleKeyPressEvent(KeyEvent keyEvent) {
-        LOGGER.finest(String.format("Keycode = %s", keyEvent.getCode()));
+		initContextMenu();
+		initBrowserTree();
+	}
 
-        if (keyEvent.getCode() == KeyCode.F3) {
-            triggerFindItem(null);
-        }
-    }
+	private void handleKeyPressEvent(KeyEvent keyEvent) {
+		LOGGER.finest(String.format("Keycode = %s", keyEvent.getCode()));
 
-    private void initContextMenu() {
-        MenuItem miDump = new MenuItem("Get Attributes");
-        miDump.setOnAction(this::triggerGetAttributes);
+		if (keyEvent.getCode() == KeyCode.F3) {
+			triggerFindItem(null);
+		}
+	}
 
-        miVersions = new MenuItem("Versions");
-        miVersions.setDisable(true);
-        miVersions.setOnAction(this::triggerVersions);
+	private void initContextMenu() {
+		MenuItem miDump = new MenuItem("Get Attributes");
+		miDump.setOnAction(this::triggerGetAttributes);
 
-        miRenditions = new MenuItem("Renditions");
-        miRenditions.setDisable(true);
-        miRenditions.setOnAction(this::triggerRenditions);
+		miDownload = new MenuItem("Download");
+		miDownload.setVisible(false);
+		miDownload.setOnAction(this::triggerDownload);
 
-        MenuItem miFindItem = new MenuItem("Find item <F3>");
-        miFindItem.setOnAction(this::triggerFindItem);
+		miCheckout = new MenuItem("Checkout");
+		miCheckout.setVisible(false);
+		miCheckout.setOnAction(this::triggerCheckout);
 
-        rootContextMenu.getItems().addAll(miDump, new SeparatorMenuItem(), miVersions, miRenditions, new SeparatorMenuItem(), miFindItem);
-    }
+		miCheckin = new MenuItem("Checkin");
+		miCheckin.setVisible(false);
+		miCheckin.setOnAction(this::triggerCheckin);
 
-    private void triggerGetAttributes(ActionEvent actionEvent) {
-        String selectedId = repository.getIdFromObject(selected.getValue().getObject());
-        LOGGER.info(selectedId);
+		miCancelCheckout = new MenuItem("Cancel Checkout");
+		miCancelCheckout.setVisible(false);
+		miCancelCheckout.setOnAction(this::triggerCancelCheckout);
 
-        Stage dumpAttributes = new Stage();
-        dumpAttributes.setTitle(String.format("Attributes List - %s (%s)", selectedId, repository.getRepositoryName()));
+		miVersions = new MenuItem("Versions");
+		miVersions.setDisable(true);
+		miVersions.setOnAction(this::triggerVersions);
 
-        VBox loginPane = (VBox) resources.loadFXML("/nl/bos/views/GetAttributes.fxml");
-        Scene scene = new Scene(loginPane);
-        dumpAttributes.setScene(scene);
+		miRenditions = new MenuItem("Renditions");
+		miRenditions.setDisable(true);
+		miRenditions.setOnAction(this::triggerRenditions);
 
-        GetAttributes controller = resources.getFxmlLoader().getController();
-        controller.dumpObject(selectedId);
-        dumpAttributes.showAndWait();
-    }
+		MenuItem miFindItem = new MenuItem("Find item <F3>");
+		miFindItem.setOnAction(this::triggerFindItem);
 
-    private void triggerRenditions(ActionEvent actionEvent) {
-        showResultTable("Renditions");
-    }
+		rootContextMenu.getItems().addAll(miDump, new SeparatorMenuItem(), miDownload, miCheckout, miCancelCheckout,
+				miCheckin, miVersions, miRenditions, new SeparatorMenuItem(), miFindItem);
+	}
 
-    private void triggerVersions(ActionEvent actionEvent) {
-        showResultTable("Versions");
-    }
+	private void triggerGetAttributes(ActionEvent actionEvent) {
+		String selectedId = repository.getIdFromObject(selected.getValue().getObject());
+		LOGGER.info(selectedId);
 
-    private void showResultTable(String label) {
-        String id = repository.getIdFromObject(selected.getValue().getObject());
-        LOGGER.info(id);
+		Stage dumpAttributes = new Stage();
+		dumpAttributes.setTitle(String.format("Attributes List - %s (%s)", selectedId, repository.getRepositoryName()));
 
-        Stage resultStage = new Stage();
-        resultStage.setTitle(String.format("%s - %s (%s)", label, repository.getObjectName(id), repository.getRepositoryName()));
+		VBox loginPane = (VBox) resources.loadFXML("/nl/bos/views/GetAttributes.fxml");
+		Scene scene = new Scene(loginPane);
+		dumpAttributes.setScene(scene);
 
-        AnchorPane resultPane = (AnchorPane) resources.loadFXML("/nl/bos/views/ResultTable.fxml");
-        Scene scene = new Scene(resultPane);
-        resultStage.setScene(scene);
+		GetAttributes controller = resources.getFxmlLoader().getController();
+		controller.dumpObject(selectedId);
+		dumpAttributes.showAndWait();
+	}
 
-        ResultTable controller = resources.getFxmlLoader().getController();
-        controller.loadResult(id);
-        resultStage.showAndWait();
-    }
+	private void triggerDownload(ActionEvent actionEvent) {
+		try {
+			repository.downloadContent((IDfSysObject) selected.getValue().getObject());
+		} catch (DfException e) {
+			AppAlert.error("Error during download", e.getMessage());
+		}
+	}
 
-    private void initBrowserTree() {
-        rootItem = new BrowserTreeItem(null, repository.getRepositoryName(), TYPE_REPOSITORY, "");
-        TreeItem<BrowserTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
-        treeItemBrowser.setExpanded(true);
-        treeView.setRoot(treeItemBrowser);
-        treeView.getSelectionModel().selectedItemProperty().addListener(this);
+	private void triggerCheckout(ActionEvent actionEvent) {
+		try {
+			repository.checkoutContent((IDfSysObject) selected.getValue().getObject());
+			selected.setGraphic(new ImageView(imgLockedDocument));
+		} catch (DfException e) {
+			AppAlert.error("Error during checkout", e.getMessage());
+		}
 
-        treeView.addEventHandler(MouseEvent.MOUSE_RELEASED, this::handleContextMenu);
-    }
+	}
 
-    private void handleContextMenu(MouseEvent mouseEvent) {
-        LOGGER.finest(String.format("Click-count: %s", String.valueOf(mouseEvent.getClickCount())));
+	private void triggerCancelCheckout(ActionEvent actionEvent) {
+		try {
+			repository.cancelCheckout((IDfSysObject) selected.getValue().getObject());
+		} catch (DfException e) {
+			AppAlert.error("Error during cancel checkout", e.getMessage());
 
-        selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
+		}
+	}
 
-        if (selected != null && !selected.isExpanded()) {
-            selected.isFirstTimeChildren = true;
-        }
+	private void triggerCheckin(ActionEvent actionEvent) {
+		String selectedId = repository.getIdFromObject(selected.getValue().getObject());
+		LOGGER.info("Checkin " + selectedId);
+		Stage checkinStage = new Stage();
+		checkinStage.setTitle("Checkin");
+		Resources resources = new Resources();
+		VBox checkinDialog = (VBox) resources.loadFXML("/nl/bos/views/dialogs/CheckinDialog.fxml");
+		Scene scene = new Scene(checkinDialog);
+		checkinStage.setScene(scene);
+		CheckinDialog controller = resources.getFxmlLoader().getController();
+		controller.setStage(checkinStage);
+		controller.initialize();
+		controller.checkinDialog(selectedId);
+		checkinStage.showAndWait();
+	}
 
-        if (mouseEvent.getButton() != MouseButton.SECONDARY) {
-            rootContextMenu.hide();
-            return;
-        }
+	private void triggerRenditions(ActionEvent actionEvent) {
+		showResultTable("Renditions");
+	}
 
-        selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
-        //item is selected - this prevents fail when clicking on empty space
-        if (selected != null && !selected.getValue().getType().equals(TYPE_REPOSITORY)) {
-            //open context contextmenu on current screen position
-            boolean isDocumentType = repository.isDocumentType(selected.getValue().getObject());
-            miVersions.setDisable(!isDocumentType);
-            miRenditions.setDisable(!isDocumentType);
-            rootContextMenu.show(treeView, mouseEvent.getScreenX(), mouseEvent.getScreenY());
-        }
-    }
+	private void triggerVersions(ActionEvent actionEvent) {
+		showResultTable("Versions");
+	}
 
-    private String showSearchPopup() {
-        Optional<String> findTreeItem = AppAlert.confirmationWithPanelAndResponse("Find Tree Item", "Object ID:");
-        return findTreeItem.orElse("");
-    }
+	private void showResultTable(String label) {
+		String id = repository.getIdFromObject(selected.getValue().getObject());
+		LOGGER.info(id);
 
-    private void searchForTreeItem(String searchId) {
-        if (repository.isObjectId(searchId)) {
-            AppAlert.error("No object ID", "The given input is not a valid object ID");
-            return;
-        }
+		Stage resultStage = new Stage();
+		resultStage.setTitle(
+				String.format("%s - %s (%s)", label, repository.getObjectName(id), repository.getRepositoryName()));
 
-        try {
-            IDfSysObject objectToBeFound = (IDfSysObject) repository.getObjectById(searchId);
+		AnchorPane resultPane = (AnchorPane) resources.loadFXML("/nl/bos/views/ResultTable.fxml");
+		Scene scene = new Scene(resultPane);
+		resultStage.setScene(scene);
 
-            if (objectToBeFound == null) {
-                AppAlert.error("No object found", "No object found for the given object ID");
-                return;
-            }
+		ResultTable controller = resources.getFxmlLoader().getController();
+		controller.loadResult(id);
+		resultStage.showAndWait();
+	}
 
-            if (!objectToBeFound.getHasFolder()) {
-                return;
-            }
+	private void initBrowserTree() {
+		rootItem = new BrowserTreeItem(null, repository.getRepositoryName(), TYPE_REPOSITORY, "");
+		TreeItem<BrowserTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
+		treeItemBrowser.setExpanded(true);
+		treeView.setRoot(treeItemBrowser);
+		treeView.getSelectionModel().selectedItemProperty().addListener(this);
 
-            List<IDfId> ancestorIds = getAncestorList(objectToBeFound);
+		treeView.addEventHandler(MouseEvent.MOUSE_RELEASED, this::handleContextMenu);
+	}
 
-            TreeItem<BrowserTreeItem> root = treeView.getRoot();
+	private void handleContextMenu(MouseEvent mouseEvent) {
+		LOGGER.finest(String.format("Click-count: %s", String.valueOf(mouseEvent.getClickCount())));
 
-            while (!ancestorIds.isEmpty()) {
-                int ancestorCount = ancestorIds.size();
-                ObservableList<TreeItem<BrowserTreeItem>> children = root.getChildren();
+		selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
 
-                for (TreeItem<BrowserTreeItem> child : children) {
-                    IDfId childId = child.getValue().getObject().getObjectId();
+		if (selected != null && !selected.isExpanded()) {
+			selected.isFirstTimeChildren = true;
+		}
 
-                    if (ancestorIds.contains(childId)) {
-                        treeView.getSelectionModel().select(child);
-                        treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
-                        root = child;
-                        ancestorIds.remove(childId);
-                    }
-                }
+		if (mouseEvent.getButton() != MouseButton.SECONDARY) {
+			rootContextMenu.hide();
+			return;
+		}
 
-                if (ancestorCount == ancestorIds.size()) {
-                    LOGGER.warning("Could not find full path in browser tree!");
-                    break;
-                }
-            }
+		selected = (MyTreeNode) treeView.getSelectionModel().getSelectedItem();
+		// item is selected - this prevents fail when clicking on empty space
+		if (selected != null && !selected.getValue().getType().equals(TYPE_REPOSITORY)) {
+			// open context contextmenu on current screen position
+			IDfPersistentObject selectedObject = selected.getValue().getObject();
+			boolean isDocumentType = repository.isDocumentType(selectedObject);
+			miDownload.setVisible(isDocumentType);
+			miCheckout.setVisible(repository.canCheckOut(selectedObject));
+			miCancelCheckout.setVisible(repository.isCheckedOut(selectedObject));
+			miCheckin.setVisible(repository.isCheckedOut(selectedObject));
+			miVersions.setDisable(!isDocumentType);
+			miRenditions.setDisable(!isDocumentType);
+			rootContextMenu.show(treeView, mouseEvent.getScreenX(), mouseEvent.getScreenY());
+		}
+	}
 
-        } catch (DfException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-    }
+	private String showSearchPopup() {
+		Optional<String> findTreeItem = AppAlert.confirmationWithPanelAndResponse("Find Tree Item", "Object ID:");
+		return findTreeItem.orElse("");
+	}
 
-    private List<IDfId> getAncestorList(IDfSysObject objectToBeFound) throws DfException {
-        List<IDfId> ancestorIds = new ArrayList<>();
-        ancestorIds.add(objectToBeFound.getObjectId());
+	private void searchForTreeItem(String searchId) {
+		if (!repository.isObjectId(searchId)) {
+			AppAlert.error("No object ID", "The given input is not a valid object ID");
+			return;
+		}
 
-        IDfFolder folderToBeFound = (IDfFolder) repository.getObjectById(objectToBeFound.getFolderId(0).getId());
-        for (int i = 0; i < folderToBeFound.getValueCount("i_ancestor_id"); i++) {
-            ancestorIds.add(folderToBeFound.getRepeatingId("i_ancestor_id", i));
-        }
+		try {
+			IDfSysObject objectToBeFound = (IDfSysObject) repository.getObjectById(searchId);
 
-        return ancestorIds;
-    }
+			if (objectToBeFound == null) {
+				AppAlert.error("No object found", "No object found for the given object ID");
+				return;
+			}
 
+			if (!objectToBeFound.getHasFolder()) {
+				return;
+			}
 
-    private TreeItem<BrowserTreeItem> buildTreeItemBrowser(BrowserTreeItem treeItem) {
-        return createNode(treeItem);
-    }
+			List<IDfId> ancestorIds = getAncestorList(objectToBeFound);
 
-    // This method creates a TreeItem to represent the given File. It does this
-    // by overriding the TreeItem.getChildren() and TreeItem.isLeaf() methods
-    // anonymously, but this could be better abstracted by creating a
-    // 'FileTreeItem' subclass of TreeItem. However, this is left as an exercise
-    // for the reader.
-    private TreeItem<BrowserTreeItem> createNode(final BrowserTreeItem treeItem) {
-        Image image = new Image(resources.getResourceStream(String.format("nl/bos/icons/type/t_%s_16.gif", treeItem.getType())));
-        try {
-            if (treeItem.getType().equals(TYPE_CABINET)) {
-                boolean isPrivate = treeItem.getObject().getBoolean(ATTR_IS_PRIVATE);
-                if (isPrivate)
-                    image = new Image(resources.getResourceStream("nl/bos/icons/type/t_mycabinet_16.gif"));
-            } else if (treeItem.getType().equals(TYPE_DOCUMENT)) {
-                String lockOwner = treeItem.getObject().getString(Constants.ATTR_R_LOCK_OWNER);
-                if (!lockOwner.equals(""))
-                    image = new Image(resources.getResourceStream("nl/bos/icons/type/t_dm_document_lock_16.gif"));
-            }
+			TreeItem<BrowserTreeItem> root = treeView.getRoot();
 
-        } catch (DfException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-        ImageView imageView = new ImageView(image);
-        return new MyTreeNode(treeItem, imageView);
-    }
+			while (!ancestorIds.isEmpty()) {
+				int ancestorCount = ancestorIds.size();
+				ObservableList<TreeItem<BrowserTreeItem>> children = root.getChildren();
 
-    @Override
-    public void changed(ObservableValue<? extends TreeItem<BrowserTreeItem>> observable, TreeItem<BrowserTreeItem> oldValue, TreeItem<BrowserTreeItem> newValue) {
-        BrowserTreeItem selectedItem = newValue.getValue();
-        LOGGER.info(String.format("Selected item: %s", selectedItem.getName()));
-        IDfPersistentObject selectedObject = selectedItem.getObject();
-        if (selectedObject != null) {
-            try {
-                txtObjectId.setText(selectedObject.getObjectId().getId());
-                txtObjectType.setText(selectedObject.getType().getName());
-                txtContentType.setText(selectedObject.getString(ATTR_A_CONTENT_TYPE));
-                txtContentSize.setText(selectedObject.getString(ATTR_R_CONTENT_SIZE));
-                txtCreationDate.setText(selectedObject.getTime(ATTR_R_CREATION_DATE).asString(""));
-                txtModifyDate.setText(selectedObject.getTime(ATTR_R_MODIFY_DATE).asString(""));
-                txtLockOwner.setText(selectedObject.getString(ATTR_R_LOCK_OWNER));
-                txtLockMachine.setText(selectedObject.getString(ATTR_R_LOCK_MACHINE));
-                txtLockDate.setText(selectedObject.getTime(ATTR_R_LOCK_DATE).asString(""));
-                txtAclName.setText(selectedObject.getString(ATTR_ACL_NAME));
-                txtPermission.setText(convertPermitToLabel(selectedObject.getInt(ATTR_OWNER_PERMIT)));
-                txtVersion.setText(getRepeatingValue(selectedObject));
-            } catch (DfException e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            }
-        } else {
-            txtObjectId.setText("");
-            txtObjectType.setText("");
-            txtContentType.setText("");
-            txtContentSize.setText("");
-            txtCreationDate.setText("");
-            txtModifyDate.setText("");
-            txtLockOwner.setText("");
-            txtLockMachine.setText("");
-            txtLockDate.setText("");
-            txtAclName.setText("");
-            txtPermission.setText("");
-            txtVersion.setText("");
-        }
-    }
+				for (TreeItem<BrowserTreeItem> child : children) {
+					IDfId childId = child.getValue().getObject().getObjectId();
 
-    private String getRepeatingValue(IDfPersistentObject object) throws DfException {
-        int count = object.getValueCount(ATTR_R_VERSION_LABEL);
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            result.append(object.getRepeatingString(ATTR_R_VERSION_LABEL, i));
-            if (i != count - 1)
-                result.append(", ");
-        }
-        return String.valueOf(result);
-    }
+					if (ancestorIds.contains(childId)) {
+						treeView.getSelectionModel().select(child);
+						treeView.scrollTo(treeView.getSelectionModel().getSelectedIndex());
+						root = child;
+						ancestorIds.remove(childId);
+					}
+				}
 
-    private String convertPermitToLabel(int permit) {
-        if (permit == DfACL.DF_PERMIT_NONE)
-            return DfACL.DF_PERMIT_NONE_STR;
-        if (permit == DfACL.DF_PERMIT_BROWSE)
-            return DfACL.DF_PERMIT_BROWSE_STR;
-        if (permit == DfACL.DF_PERMIT_READ)
-            return DfACL.DF_PERMIT_READ_STR;
-        if (permit == DfACL.DF_PERMIT_RELATE)
-            return DfACL.DF_PERMIT_RELATE_STR;
-        if (permit == DfACL.DF_PERMIT_VERSION)
-            return DfACL.DF_PERMIT_VERSION_STR;
-        if (permit == DfACL.DF_PERMIT_WRITE)
-            return DfACL.DF_PERMIT_WRITE_STR;
-        if (permit == DfACL.DF_PERMIT_DELETE)
-            return DfACL.DF_PERMIT_DELETE_STR;
-        return "";
-    }
+				if (ancestorCount == ancestorIds.size()) {
+					LOGGER.warning("Could not find full path in browser tree!");
+					break;
+				}
+			}
 
-    @FXML
-    private void handleExit(ActionEvent actionEvent) {
-        LOGGER.info(String.valueOf(actionEvent.getSource()));
-        Stage stage = (Stage) btnExit.getScene().getWindow();
-        stage.close();
-    }
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
 
-    @FXML
-    private void handleShowAllCabinets(ActionEvent actionEvent) {
-        TreeItem<BrowserTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
-        treeItemBrowser.setExpanded(true);
-        treeView.setRoot(treeItemBrowser);
-    }
+	private List<IDfId> getAncestorList(IDfSysObject objectToBeFound) throws DfException {
+		List<IDfId> ancestorIds = new ArrayList<>();
+		ancestorIds.add(objectToBeFound.getObjectId());
 
-    private void triggerFindItem(ActionEvent actionEvent) {
-        String searchId = showSearchPopup();
-        if (!searchId.isEmpty())
-            searchForTreeItem(searchId);
-    }
+		IDfFolder folderToBeFound = (IDfFolder) repository.getObjectById(objectToBeFound.getFolderId(0).getId());
+		for (int i = 0; i < folderToBeFound.getValueCount("i_ancestor_id"); i++) {
+			ancestorIds.add(folderToBeFound.getRepeatingId("i_ancestor_id", i));
+		}
 
-    private class MyTreeNode extends TreeItem<BrowserTreeItem> {
-        // We cache whether the File is a leaf or not. A File is a leaf if
-        // it is not a directory and does not have any files contained within
-        // it. We cache this as isLeaf() is called often, and doing the
-        // actual check on File is expensive.
-        private boolean isLeaf;
+		return ancestorIds;
+	}
 
-        // We do the children and leaf testing only once, and then set these
-        // booleans to false so that we do not check again during this
-        // run. A more complete implementation may need to handle more
-        // dynamic file system situations (such as where a folder has files
-        // added after the TreeView is shown). Again, this is left as an
-        // exercise for the reader.
-        private boolean isFirstTimeChildren;
-        private boolean isFirstTimeLeaf;
+	private TreeItem<BrowserTreeItem> buildTreeItemBrowser(BrowserTreeItem treeItem) {
+		return createNode(treeItem);
+	}
 
-        private MyTreeNode(BrowserTreeItem treeItem, ImageView imageView) {
-            super(treeItem, imageView);
-            isFirstTimeChildren = true;
-            isFirstTimeLeaf = true;
-        }
+	// This method creates a TreeItem to represent the given File. It does this
+	// by overriding the TreeItem.getChildren() and TreeItem.isLeaf() methods
+	// anonymously, but this could be better abstracted by creating a
+	// 'FileTreeItem' subclass of TreeItem. However, this is left as an exercise
+	// for the reader.
+	private TreeItem<BrowserTreeItem> createNode(final BrowserTreeItem treeItem) {
+		Image image = new Image(
+				resources.getResourceStream(String.format("nl/bos/icons/type/t_%s_16.gif", treeItem.getType())));
+		try {
+			if (treeItem.getType().equals(TYPE_CABINET)) {
+				boolean isPrivate = treeItem.getObject().getBoolean(ATTR_IS_PRIVATE);
+				if (isPrivate)
+					image = new Image(resources.getResourceStream("nl/bos/icons/type/t_mycabinet_16.gif"));
+			} else if (treeItem.getType().equals(TYPE_DOCUMENT)) {
+				String lockOwner = treeItem.getObject().getString(Constants.ATTR_R_LOCK_OWNER);
+				if (!lockOwner.equals(""))
+					image = imgLockedDocument;
+			}
 
-        @Override
-        public ObservableList<TreeItem<BrowserTreeItem>> getChildren() {
-            if (isFirstTimeChildren) {
-                isFirstTimeChildren = false;
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+		ImageView imageView = new ImageView(image);
+		return new MyTreeNode(treeItem, imageView);
+	}
 
-                // First getChildren() call, so we actually go off and
-                // determine the children of the File contained in this TreeItem.
-                super.getChildren().setAll(buildChildren(this));
-            }
-            return super.getChildren();
-        }
+	@Override
+	public void changed(ObservableValue<? extends TreeItem<BrowserTreeItem>> observable,
+			TreeItem<BrowserTreeItem> oldValue, TreeItem<BrowserTreeItem> newValue) {
+		BrowserTreeItem selectedItem = newValue.getValue();
+		LOGGER.info(String.format("Selected item: %s", selectedItem.getName()));
+		IDfPersistentObject selectedObject = selectedItem.getObject();
+		if (selectedObject != null) {
+			try {
+				txtObjectId.setText(selectedObject.getObjectId().getId());
+				txtObjectType.setText(selectedObject.getType().getName());
+				txtContentType.setText(selectedObject.getString(ATTR_A_CONTENT_TYPE));
+				txtContentSize.setText(selectedObject.getString(ATTR_R_CONTENT_SIZE));
+				txtCreationDate.setText(selectedObject.getTime(ATTR_R_CREATION_DATE).asString(""));
+				txtModifyDate.setText(selectedObject.getTime(ATTR_R_MODIFY_DATE).asString(""));
+				txtLockOwner.setText(selectedObject.getString(ATTR_R_LOCK_OWNER));
+				txtLockMachine.setText(selectedObject.getString(ATTR_R_LOCK_MACHINE));
+				txtLockDate.setText(selectedObject.getTime(ATTR_R_LOCK_DATE).asString(""));
+				txtAclName.setText(selectedObject.getString(ATTR_ACL_NAME));
+				txtPermission.setText(convertPermitToLabel(selectedObject.getInt(ATTR_OWNER_PERMIT)));
+				txtVersion.setText(getRepeatingValue(selectedObject));
+			} catch (DfException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			}
+		} else {
+			txtObjectId.setText("");
+			txtObjectType.setText("");
+			txtContentType.setText("");
+			txtContentSize.setText("");
+			txtCreationDate.setText("");
+			txtModifyDate.setText("");
+			txtLockOwner.setText("");
+			txtLockMachine.setText("");
+			txtLockDate.setText("");
+			txtAclName.setText("");
+			txtPermission.setText("");
+			txtVersion.setText("");
+		}
+	}
 
-        @Override
-        public boolean isLeaf() {
-            if (isFirstTimeLeaf) {
-                isFirstTimeLeaf = false;
-                BrowserTreeItem treeItem = getValue();
-                isLeaf = !treeItem.isDirectory();
-            }
-            return isLeaf;
-        }
+	private String getRepeatingValue(IDfPersistentObject object) throws DfException {
+		int count = object.getValueCount(ATTR_R_VERSION_LABEL);
+		StringBuilder result = new StringBuilder();
+		for (int i = 0; i < count; i++) {
+			result.append(object.getRepeatingString(ATTR_R_VERSION_LABEL, i));
+			if (i != count - 1)
+				result.append(", ");
+		}
+		return String.valueOf(result);
+	}
 
-        private ObservableList<TreeItem<BrowserTreeItem>> buildChildren(MyTreeNode parent) {
-            BrowserTreeItem parentItem = parent.getValue();
-            if (parentItem != null && parentItem.isDirectory()) {
-                List<BrowserTreeItem> treeItems = parentItem.listObjects(parentItem, ckbShowAllCabinets.isSelected(), ckbShowAllVersions.isSelected());
-                lblNrOfItems.setText(String.format("%s items found", treeItems.size()));
-                ObservableList<TreeItem<BrowserTreeItem>> children = FXCollections.observableArrayList();
-                for (BrowserTreeItem treeItem : treeItems) {
-                    children.add(createNode(treeItem));
-                }
-                return children;
-            }
-            return FXCollections.emptyObservableList();
-        }
-    }
+	private String convertPermitToLabel(int permit) {
+		if (permit == DfACL.DF_PERMIT_NONE)
+			return DfACL.DF_PERMIT_NONE_STR;
+		if (permit == DfACL.DF_PERMIT_BROWSE)
+			return DfACL.DF_PERMIT_BROWSE_STR;
+		if (permit == DfACL.DF_PERMIT_READ)
+			return DfACL.DF_PERMIT_READ_STR;
+		if (permit == DfACL.DF_PERMIT_RELATE)
+			return DfACL.DF_PERMIT_RELATE_STR;
+		if (permit == DfACL.DF_PERMIT_VERSION)
+			return DfACL.DF_PERMIT_VERSION_STR;
+		if (permit == DfACL.DF_PERMIT_WRITE)
+			return DfACL.DF_PERMIT_WRITE_STR;
+		if (permit == DfACL.DF_PERMIT_DELETE)
+			return DfACL.DF_PERMIT_DELETE_STR;
+		return "";
+	}
+
+	@FXML
+	private void handleExit(ActionEvent actionEvent) {
+		LOGGER.info(String.valueOf(actionEvent.getSource()));
+		Stage stage = (Stage) btnExit.getScene().getWindow();
+		stage.close();
+	}
+
+	@FXML
+	private void handleShowAllCabinets(ActionEvent actionEvent) {
+		TreeItem<BrowserTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
+		treeItemBrowser.setExpanded(true);
+		treeView.setRoot(treeItemBrowser);
+	}
+
+	private void triggerFindItem(ActionEvent actionEvent) {
+		String searchId = showSearchPopup();
+		if (!searchId.isEmpty())
+			searchForTreeItem(searchId);
+	}
+
+	private class MyTreeNode extends TreeItem<BrowserTreeItem> {
+		// We cache whether the File is a leaf or not. A File is a leaf if
+		// it is not a directory and does not have any files contained within
+		// it. We cache this as isLeaf() is called often, and doing the
+		// actual check on File is expensive.
+		private boolean isLeaf;
+
+		// We do the children and leaf testing only once, and then set these
+		// booleans to false so that we do not check again during this
+		// run. A more complete implementation may need to handle more
+		// dynamic file system situations (such as where a folder has files
+		// added after the TreeView is shown). Again, this is left as an
+		// exercise for the reader.
+		private boolean isFirstTimeChildren;
+		private boolean isFirstTimeLeaf;
+
+		private MyTreeNode(BrowserTreeItem treeItem, ImageView imageView) {
+			super(treeItem, imageView);
+			isFirstTimeChildren = true;
+			isFirstTimeLeaf = true;
+		}
+
+		@Override
+		public ObservableList<TreeItem<BrowserTreeItem>> getChildren() {
+			if (isFirstTimeChildren) {
+				isFirstTimeChildren = false;
+
+				// First getChildren() call, so we actually go off and
+				// determine the children of the File contained in this TreeItem.
+				super.getChildren().setAll(buildChildren(this));
+			}
+			return super.getChildren();
+		}
+
+		@Override
+		public boolean isLeaf() {
+			if (isFirstTimeLeaf) {
+				isFirstTimeLeaf = false;
+				BrowserTreeItem treeItem = getValue();
+				isLeaf = !treeItem.isDirectory();
+			}
+			return isLeaf;
+		}
+
+		private ObservableList<TreeItem<BrowserTreeItem>> buildChildren(MyTreeNode parent) {
+			BrowserTreeItem parentItem = parent.getValue();
+			if (parentItem != null && parentItem.isDirectory()) {
+				List<BrowserTreeItem> treeItems = parentItem.listObjects(parentItem, ckbShowAllCabinets.isSelected(),
+						ckbShowAllVersions.isSelected());
+				lblNrOfItems.setText(String.format("%s items found", treeItems.size()));
+				ObservableList<TreeItem<BrowserTreeItem>> children = FXCollections.observableArrayList();
+				for (BrowserTreeItem treeItem : treeItems) {
+					children.add(createNode(treeItem));
+				}
+				return children;
+			}
+			return FXCollections.emptyObservableList();
+		}
+	}
 }

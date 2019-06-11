@@ -23,133 +23,231 @@ import java.util.logging.Logger;
 import static nl.bos.Constants.HISTORY_JSON;
 import static nl.bos.Constants.QUERIES;
 
+import static nl.bos.Constants.CHECKOUT_JSON;
+import static nl.bos.Constants.CHECKOUTS;
+
 public class Resources {
-    private static final Logger LOGGER = Logger.getLogger(Resources.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Resources.class.getName());
 
-    private FXMLLoader fxmlLoader;
+	private static Properties settings = null;
 
-    public static File createFileFromFileChooser(String title) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle(title);
-        return fileChooser.showOpenDialog(null);
-    }
+	private static File exportPath = null;
 
-    public static List<String> readLines(File file) {
-        try {
-            return Files.readAllLines(file.toPath());
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return new ArrayList<>();
-    }
+	private FXMLLoader fxmlLoader;
 
-    public static void initHistoryFile() {
-        File historyFile = new File(HISTORY_JSON);
-        try {
-            if (historyFile.createNewFile()) {
-                writePreparedJsonDataToFile();
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-    }
+	private static File checkoutFile;
 
-    private static void writePreparedJsonDataToFile() {
-        JSONArray list = new JSONArray();
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(QUERIES, list);
+	public static File createFileFromFileChooser(String title) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle(title);
+		return fileChooser.showOpenDialog(null);
+	}
 
-        writeJsonDataToJsonHistoryFile(jsonObject);
-    }
+	public static File selectFileFromFileChooser(String title, File path) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialDirectory(path);
+		fileChooser.setTitle(title);
+		return fileChooser.showOpenDialog(null);
+	}
 
-    public static byte[] readHistoryJsonBytes() {
-        try {
-            return Files.readAllBytes(Paths.get(HISTORY_JSON));
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return new byte[0];
-    }
+	public static List<String> readLines(File file) {
+		try {
+			return Files.readAllLines(file.toPath());
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return new ArrayList<>();
+	}
 
-    public static void writeJsonDataToJsonHistoryFile(JSONObject jsonObject) {
+	public static void initHistoryFile() {
+		File historyFile = new File(HISTORY_JSON);
+		try {
+			if (historyFile.createNewFile()) {
+				JSONArray list = new JSONArray();
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put(QUERIES, list);
 
-        try (FileWriter file = new FileWriter(HISTORY_JSON)) {
-            file.write(jsonObject.toString());
-            file.flush();
-        } catch (IOException ioe) {
-            LOGGER.log(Level.SEVERE, ioe.getMessage(), ioe);
-        }
-    }
+				writeJsonToFile(jsonObject, historyFile);
+			}
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
 
-    public static File createTempFile(String prefix, String suffic) {
-        try {
-            return File.createTempFile(prefix, suffic);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return null;
-    }
+	public static void initCheckoutFile() {
+		checkoutFile = new File(CHECKOUT_JSON);
+		try {
+			if (checkoutFile.createNewFile()) {
+				LOGGER.log(Level.INFO, "New Checkout file");
+				JSONObject jsonObject = new JSONObject();
+				writeJsonToFile(jsonObject, checkoutFile);
+			}
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
 
-    public FXMLLoader getFxmlLoader() {
-        return fxmlLoader;
-    }
+	public static byte[] readHistoryJsonBytes() {
+		try {
+			return Files.readAllBytes(Paths.get(HISTORY_JSON));
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return new byte[0];
+	}
 
-    public String getProjectVersion() {
-        try {
-            final Properties properties = new Properties();
-            properties.load(getClass().getClassLoader().getResourceAsStream("project.properties"));
-            return properties.getProperty("version");
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return "";
-    }
+	public static void writeJsonDataToJsonHistoryFile(JSONObject jsonObject) {
+		writeJsonToFile(jsonObject, new File(HISTORY_JSON));
+	}
 
-    public static File exportStringToFile(File tempFile, String tableResult) {
-        try (InputStream tableResultContent = new ByteArrayInputStream(tableResult.getBytes(StandardCharsets.UTF_8));
-             ReadableByteChannel readableByteChannel = Channels.newChannel(tableResultContent);
-             FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-             FileChannel fileChannel = fileOutputStream.getChannel()
-        ) {
-            fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
+	public static void writeJsonToFile(JSONObject jsonObject, File jsonFile) {
+		try (FileWriter file = new FileWriter(jsonFile)) {
+			file.write(jsonObject.toString());
+			file.flush();
+		} catch (IOException ioe) {
+			LOGGER.log(Level.SEVERE, ioe.getMessage(), ioe);
+		}
+	}
 
-        return tempFile;
-    }
+	public static JSONObject readCheckoutFile() {
+		try {
+			if (checkoutFile == null || !checkoutFile.exists()) {
+				initCheckoutFile();
+			}
+			return new JSONObject(new String(Files.readAllBytes(Paths.get(CHECKOUT_JSON)), StandardCharsets.UTF_8));
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			return null;
+		}
+	}
 
-    public static File exportStreamToFile(File tempFile, ByteArrayInputStream jobLogContent) {
-        int n = jobLogContent.available();
-        byte[] bytes = new byte[n];
-        String tableResult = new String(bytes, StandardCharsets.UTF_8);
+	public static void putContentPathToCheckoutFile(String objectId, String path) {
+		JSONObject currentJson = readCheckoutFile();
+		currentJson.put(objectId, path);
+		writeJsonToFile(currentJson, checkoutFile);
+	}
+	
+	public static void removeContentPathFromCheckoutFile(String objectId) {
+		JSONObject currentJson = readCheckoutFile();
+		currentJson.remove(objectId);
+		writeJsonToFile(currentJson, checkoutFile);
+	}
+	
+	public static String getContentPathFromCheckoutFile(String objectId) {
+		JSONObject currentJson = readCheckoutFile();
+		return currentJson.getString(objectId);
+	}
 
-        return exportStringToFile(tempFile, tableResult);
-    }
+	public static File createTempFile(String prefix, String suffic) {
+		try {
+			return File.createTempFile(prefix, suffic);
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return null;
+	}
 
-    public static void openCSV(File tempFile) {
-        Desktop desktop = Desktop.getDesktop();
-        if (tempFile.exists()) {
-            try {
-                desktop.open(tempFile);
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            }
-        }
-    }
+	public FXMLLoader getFxmlLoader() {
+		return fxmlLoader;
+	}
 
-    public InputStream getResourceStream(String name) {
-        return getClass().getClassLoader().getResourceAsStream(name);
-    }
+	public String getProjectVersion() {
+		try {
+			final Properties properties = new Properties();
+			properties.load(getClass().getClassLoader().getResourceAsStream("project.properties"));
+			return properties.getProperty("version");
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return "";
+	}
 
-    public Pane loadFXML(String fxml) {
-        fxmlLoader = new FXMLLoader(getClass().getResource(fxml));
-        Pane pane = null;
-        try {
-            pane = fxmlLoader.load();
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-        return pane;
-    }
+	public static File exportStringToFile(File tempFile, String tableResult) {
+		try (InputStream tableResultContent = new ByteArrayInputStream(tableResult.getBytes(StandardCharsets.UTF_8));
+				ReadableByteChannel readableByteChannel = Channels.newChannel(tableResultContent);
+				FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
+				FileChannel fileChannel = fileOutputStream.getChannel()) {
+			fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+
+		return tempFile;
+	}
+
+	public static File exportStreamToFile(File tempFile, ByteArrayInputStream jobLogContent) {
+		int n = jobLogContent.available();
+		byte[] bytes = new byte[n];
+		String tableResult = new String(bytes, StandardCharsets.UTF_8);
+
+		return exportStringToFile(tempFile, tableResult);
+	}
+
+	public static void openCSV(File tempFile) {
+		Desktop desktop = Desktop.getDesktop();
+		if (tempFile.exists()) {
+			try {
+				desktop.open(tempFile);
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+			}
+		}
+	}
+
+	public InputStream getResourceStream(String name) {
+		return getClass().getClassLoader().getResourceAsStream(name);
+	}
+
+	public Pane loadFXML(String fxml) {
+		fxmlLoader = new FXMLLoader(getClass().getResource(fxml));
+		Pane pane = null;
+		try {
+			pane = fxmlLoader.load();
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return pane;
+	}
+
+	public static String getSettingProperty(String property, String defaultValue) {
+		return getSettings().getProperty(property, defaultValue);
+	}
+
+	public static Object setSettingProperty(String property, String value) {
+		return getSettings().setProperty(property, value);
+	}
+
+	/**
+	 * Get the application settings properties as a singleton
+	 */
+	private static Properties getSettings() {
+		if (settings == null) {
+			String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+			File settingsFile = new File(rootPath, "settings.properties");
+
+			try {
+				if (!settingsFile.exists() || !settingsFile.isFile()) {
+					settingsFile.createNewFile();
+				}
+				settings = new Properties();
+				settings.load(new FileInputStream(settingsFile));
+			} catch (FileNotFoundException e) {
+				LOGGER.warning("Could not find settings.properties");
+			} catch (IOException e) {
+				LOGGER.warning("Could not read settings.properties");
+			}
+		}
+		return settings;
+	}
+
+	public static File getExportPath() {
+		if (exportPath != null) {
+			return exportPath;
+		}
+		return new File((String) getSettingProperty("export.path", System.getenv("TEMP")));
+	}
+
+	public static String setExportPath(String path) {
+		return (String) setSettingProperty("export.path", path);
+	}
 }

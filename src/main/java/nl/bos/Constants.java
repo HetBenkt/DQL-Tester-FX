@@ -1,7 +1,13 @@
 package nl.bos;
 
 public final class Constants {
-    //General
+    public enum Version{
+		SAMEVER,
+		MINOR,
+		MAJOR
+	}
+
+	//General
     static final String APP_TITLE = "DQL Tester FX";
 
     //Messages
@@ -66,7 +72,14 @@ public final class Constants {
     public static final String TABLE = "TABLE";
 
     public static final String HISTORY_JSON = "history.json";
+
+    public static final String CHECKOUT_JSON = "checkout.json";
+
     public static final String QUERIES = "queries";
+    
+    public static final String CHECKOUTS = "checkouts";
+    
+    
     static final String NR_OF_TABLES = "nr_of_tables";
     static final String NR_OF_TYPES = "nr_of_types";
 

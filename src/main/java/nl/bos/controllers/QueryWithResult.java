@@ -116,8 +116,23 @@ public class QueryWithResult {
 
         historyStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, historyStatements));
         favoriteStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, favoriteStatements));
+        historyStatements.setCellFactory(cellFactory);
+        historyStatements.setButtonCell(cellFactory.call(null));
+        favoriteStatements.setCellFactory(cellFactory);
+        favoriteStatements.setButtonCell(cellFactory.call(null));
     }
 
+    Callback<ListView<HistoryItem>, ListCell<HistoryItem>> cellFactory = lv -> new ListCell<>() {
+        @Override
+        protected void updateItem(HistoryItem item, boolean empty) {
+            super.updateItem(item, empty);
+            if (item != null) {
+                setText(item.getQuery().substring(0, Math.min(item.getQuery().length(), 100)).replaceAll("\n", " "));
+                setTooltip(new Tooltip(item.getQuery()));
+            }
+        }
+    };
+    
     private void onStatementsSelection(Number newValue, ComboBox<HistoryItem> statements) {
         if (newValue.intValue() != -1) {
             String selectedItem = String.valueOf(statements.getItems().get((Integer) newValue));
@@ -139,8 +154,6 @@ public class QueryWithResult {
         List<HistoryItem> statements = makeListFrom(history);
         setHistoryItems(statements);
         setFavoriteItems(statements);
-        addToolTipToItems(historyStatements);
-        addToolTipToItems(favoriteStatements);
     }
 
     private String convertFileToString() {
@@ -173,20 +186,6 @@ public class QueryWithResult {
         favoriteStatements.setItems(value);
     }
 
-
-    private void addToolTipToItems(ComboBox<HistoryItem> statements) {
-        Callback<ListView<HistoryItem>, ListCell<HistoryItem>> factory = lv -> new ListCell<>() {
-            @Override
-            protected void updateItem(HistoryItem item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item != null) {
-                    setText(item.getQuery().substring(0, Math.min(item.getQuery().length(), 100)).replaceAll("\n", " "));
-                    setTooltip(new Tooltip(item.getQuery()));
-                }
-            }
-        };
-        statements.setCellFactory(factory);
-    }
 
     private HistoryItem histroryItemFromJsonObject(JSONObject jsonObject) {
         String query = jsonObject.getString("query");
