@@ -85,16 +85,12 @@ public class Login {
                 LOGGER.info(MessageFormat.format("Repositories for Connection Broker: {0}", hostName));
                 LOGGER.info(MessageFormat.format("Total number of Repositories: {0}", repositoryMap.getDocbaseCount()));
 
-                ObservableList<String> repositories = FXCollections.observableArrayList();
-
                 for (int i = 0; i < repositoryMap.getDocbaseCount(); i++) {
                     LOGGER.info(MessageFormat.format("Repository {0}: {1}", i + 1, repositoryMap.getDocbaseName(i)));
-                    repositories.add(repositoryMap.getDocbaseName(i));
+                    chbRepository.getItems().add(repositoryMap.getDocbaseName(i));
                 }
 
-                chbRepository.setItems(repositories);
                 chbRepository.setValue(chbRepository.getItems().get(0));
-
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
