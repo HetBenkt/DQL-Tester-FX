@@ -1,31 +1,23 @@
 package nl.bos.contextmenu.menuitem.action;
 
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import com.documentum.fc.client.IDfSysObject;
-import com.documentum.fc.common.DfException;
-import com.documentum.fc.common.DfId;
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import nl.bos.Repository;
-import nl.bos.utils.AppAlert;
-import nl.bos.utils.Resources;
 
-public class MenuItemDownloadObjectAction implements EventHandler<ActionEvent> {
-	private static final Logger LOGGER = Logger.getLogger(MenuItemDownloadObjectAction.class.getName());
+import java.util.logging.Logger;
+
+public class MenuItemExportContentAction implements EventHandler<ActionEvent> {
+    private static final Logger LOGGER = Logger.getLogger(MenuItemExportContentAction.class.getName());
 
 	private final Repository repository = Repository.getInstance();
 	private final TableView result;
 
-	public MenuItemDownloadObjectAction(MenuItem destroyObject, TableView result) {
+    public MenuItemExportContentAction(MenuItem exportContent, TableView result) {
 		this.result = result;
-		destroyObject.setOnAction(this);
+        exportContent.setOnAction(this);
 	}
 
 	@Override

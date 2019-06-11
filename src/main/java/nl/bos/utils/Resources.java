@@ -16,15 +16,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static nl.bos.Constants.HISTORY_JSON;
-import static nl.bos.Constants.QUERIES;
-
-import static nl.bos.Constants.CHECKOUT_JSON;
-import static nl.bos.Constants.CHECKOUTS;
+import static nl.bos.Constants.*;
 
 public class Resources {
 	private static final Logger LOGGER = Logger.getLogger(Resources.class.getName());
@@ -74,7 +71,7 @@ public class Resources {
 		}
 	}
 
-	public static void initCheckoutFile() {
+	private static void initCheckoutFile() {
 		checkoutFile = new File(CHECKOUT_JSON);
 		try {
 			if (checkoutFile.createNewFile()) {
@@ -100,7 +97,7 @@ public class Resources {
 		writeJsonToFile(jsonObject, new File(HISTORY_JSON));
 	}
 
-	public static void writeJsonToFile(JSONObject jsonObject, File jsonFile) {
+	private static void writeJsonToFile(JSONObject jsonObject, File jsonFile) {
 		try (FileWriter file = new FileWriter(jsonFile)) {
 			file.write(jsonObject.toString());
 			file.flush();
@@ -109,7 +106,7 @@ public class Resources {
 		}
 	}
 
-	public static JSONObject readCheckoutFile() {
+	private static JSONObject readCheckoutFile() {
 		try {
 			if (checkoutFile == null || !checkoutFile.exists()) {
 				initCheckoutFile();
@@ -123,19 +120,19 @@ public class Resources {
 
 	public static void putContentPathToCheckoutFile(String objectId, String path) {
 		JSONObject currentJson = readCheckoutFile();
-		currentJson.put(objectId, path);
+		Objects.requireNonNull(currentJson).put(objectId, path);
 		writeJsonToFile(currentJson, checkoutFile);
 	}
 	
 	public static void removeContentPathFromCheckoutFile(String objectId) {
 		JSONObject currentJson = readCheckoutFile();
-		currentJson.remove(objectId);
+		Objects.requireNonNull(currentJson).remove(objectId);
 		writeJsonToFile(currentJson, checkoutFile);
 	}
 	
 	public static String getContentPathFromCheckoutFile(String objectId) {
 		JSONObject currentJson = readCheckoutFile();
-		return currentJson.getString(objectId);
+		return Objects.requireNonNull(currentJson).getString(objectId);
 	}
 
 	public static File createTempFile(String prefix, String suffic) {
@@ -183,7 +180,7 @@ public class Resources {
 		return exportStringToFile(tempFile, tableResult);
 	}
 
-	public static void openCSV(File tempFile) {
+	public static void openFile(File tempFile) {
 		Desktop desktop = Desktop.getDesktop();
 		if (tempFile.exists()) {
 			try {
@@ -209,11 +206,11 @@ public class Resources {
 		return pane;
 	}
 
-	public static String getSettingProperty(String property, String defaultValue) {
+	private static String getSettingProperty(String property, String defaultValue) {
 		return getSettings().getProperty(property, defaultValue);
 	}
 
-	public static Object setSettingProperty(String property, String value) {
+	private static Object setSettingProperty(String property, String value) {
 		return getSettings().setProperty(property, value);
 	}
 
@@ -222,12 +219,13 @@ public class Resources {
 	 */
 	private static Properties getSettings() {
 		if (settings == null) {
-			String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+			String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
 			File settingsFile = new File(rootPath, "settings.properties");
 
 			try {
 				if (!settingsFile.exists() || !settingsFile.isFile()) {
-					settingsFile.createNewFile();
+					if (settingsFile.createNewFile())
+						LOGGER.info("New settings.properties file created");
 				}
 				settings = new Properties();
 				settings.load(new FileInputStream(settingsFile));
@@ -244,7 +242,7 @@ public class Resources {
 		if (exportPath != null) {
 			return exportPath;
 		}
-		return new File((String) getSettingProperty("export.path", System.getenv("TEMP")));
+		return new File(getSettingProperty("export.path", System.getenv("TEMP")));
 	}
 
 	public static String setExportPath(String path) {

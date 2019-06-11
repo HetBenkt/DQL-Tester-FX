@@ -1,32 +1,17 @@
 package nl.bos.contextmenu;
 
-import java.time.Instant;
-import java.util.logging.Logger;
-
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TablePosition;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import nl.bos.Repository;
-import nl.bos.contextmenu.menuitem.action.MenuItemCancelCheckoutAction;
-import nl.bos.contextmenu.menuitem.action.MenuItemCheckinAction;
-import nl.bos.contextmenu.menuitem.action.MenuItemCheckoutAction;
-import nl.bos.contextmenu.menuitem.action.MenuItemCopyCellToClipBoardAction;
-import nl.bos.contextmenu.menuitem.action.MenuItemCopyRowToClipBoardAction;
-import nl.bos.contextmenu.menuitem.action.MenuItemDescribeObjectAction;
-import nl.bos.contextmenu.menuitem.action.MenuItemDestroyObjectAction;
-import nl.bos.contextmenu.menuitem.action.MenuItemDownloadObjectAction;
-import nl.bos.contextmenu.menuitem.action.MenuItemExportToCsvAction;
-import nl.bos.contextmenu.menuitem.action.MenuItemGetAttributesAction;
-import nl.bos.contextmenu.menuitem.action.MenuItemResultTableAction;
-import nl.bos.contextmenu.menuitem.action.MenuItemShowPropertiesAction;
+import nl.bos.contextmenu.menuitem.action.*;
 import nl.bos.controllers.ConnectionWithStatus;
 import nl.bos.controllers.QueryWithResult;
 import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
+
+import java.time.Instant;
+import java.util.logging.Logger;
 
 public class ContextMenuOnResultTable {
 	private static final Logger LOGGER = Logger.getLogger(ContextMenuOnResultTable.class.getName());
@@ -44,7 +29,8 @@ public class ContextMenuOnResultTable {
 	private final MenuItem versions;
 	private final MenuItem renditions;
 
-	private final MenuItem download;
+	private final MenuItem openContent;
+	private final MenuItem exportContent;
 	private final MenuItem checkout;
 	private final MenuItem checkin;
 	private final MenuItem cancelcheckout;
@@ -91,25 +77,29 @@ public class ContextMenuOnResultTable {
 		renditions.setDisable(true);
 		new MenuItemResultTableAction(renditions, result, "Renditions");
 
-		download = new MenuItem("Download");
-		download.setVisible(false);
-		new MenuItemDownloadObjectAction(download, result);
+		openContent = new MenuItem("Open Content");
+		openContent.setDisable(true);
+		new MenuItemOpenContentAction(openContent, result);
 
-		checkout = new MenuItem("Checkout");
-		checkout.setVisible(false);
+		exportContent = new MenuItem("Export Content");
+		exportContent.setDisable(true);
+		new MenuItemExportContentAction(exportContent, result);
+
+		checkout = new MenuItem("Check Out Document");
+		checkout.setDisable(true);
 		new MenuItemCheckoutAction(checkout, result);
 
-		checkin = new MenuItem("Checkin");
-		checkin.setVisible(false);
+		checkin = new MenuItem("Check In Document");
+		checkin.setDisable(true);
 		new MenuItemCheckinAction(checkin, result);
 		
 		cancelcheckout = new MenuItem("Cancel Checkout");
-		cancelcheckout.setVisible(false);
+		cancelcheckout.setDisable(true);
 		new MenuItemCancelCheckoutAction(cancelcheckout, result);
 
-		contextMenu.getItems().addAll(showProperties, new SeparatorMenuItem(), copyCellToClipBoard, copyRowToClipBoard,
-				exportToCsv, new SeparatorMenuItem(), describeObject, new SeparatorMenuItem(), getAttributes, download,
-				checkout, checkin, cancelcheckout, destroyObject, new SeparatorMenuItem(), versions, renditions);
+		contextMenu.getItems().addAll(openContent, new SeparatorMenuItem(), showProperties, new SeparatorMenuItem(), copyCellToClipBoard, copyRowToClipBoard,
+				exportToCsv, new SeparatorMenuItem(), describeObject, new SeparatorMenuItem(), getAttributes, destroyObject, new SeparatorMenuItem(), versions, renditions, new SeparatorMenuItem(),
+				checkout, checkin, cancelcheckout, new SeparatorMenuItem(), exportContent);
 	}
 
 	public void onRightMouseClick(MouseEvent t) {
@@ -156,10 +146,11 @@ public class ContextMenuOnResultTable {
 
 		getAttributes.setDisable(selectionIsNotAnObjectId(selectedCell));
 		destroyObject.setDisable(selectionIsNotAnObjectId(selectedCell));
-		download.setVisible(!selectionIsNotAnDocumentType(selectedCell));
-		checkout.setVisible(selectionCanBeCheckedOut(selectedCell));
-		checkin.setVisible(selectionIsCheckedOut(selectedCell));
-		cancelcheckout.setVisible(selectionIsCheckedOut(selectedCell));
+		openContent.setDisable(selectionIsNotAnDocumentType(selectedCell));
+		exportContent.setDisable(selectionIsNotAnDocumentType(selectedCell));
+		checkout.setDisable(selectionCanBeCheckedOut(selectedCell));
+		checkin.setDisable(selectionIsCheckedOut(selectedCell));
+		cancelcheckout.setDisable(selectionIsCheckedOut(selectedCell));
 		versions.setDisable(selectionIsNotAnDocumentType(selectedCell));
 		renditions.setDisable(selectionIsNotAnDocumentType(selectedCell));
 	}
@@ -181,7 +172,7 @@ public class ContextMenuOnResultTable {
 	}
 
 	private boolean selectionIsNotAnDocumentType(String id) {
-		if (id == null || !repository.isObjectId(id)) {
+		if (id == null || repository.isObjectId(id)) {
 			return true;
 		} else {
 			return !repository.isDocumentType(repository.getPersistentObject(id));
@@ -189,26 +180,26 @@ public class ContextMenuOnResultTable {
 	}
 
 	private boolean selectionIsNotAnObjectId(String id) {
-		if (id == null || !repository.isObjectId(id)) {
+		if (id == null || repository.isObjectId(id)) {
 			return true;
 		} else {
-			return !repository.isObjectId(id);
+			return repository.isObjectId(id);
 		}
 	}
 
 	private boolean selectionCanBeCheckedOut(String id) {
-		if (id == null || !repository.isObjectId(id)) {
-			return false;
+		if (id == null || repository.isObjectId(id)) {
+			return true;
 		} else {
-			return repository.canCheckOut(id);
+			return !repository.canCheckOut(id);
 		}
 	}
 
 	private boolean selectionIsCheckedOut(String id) {
-		if (id == null || !repository.isObjectId(id)) {
-			return false;
+		if (id == null || repository.isObjectId(id)) {
+			return true;
 		} else {
-			return repository.isCheckedOut(id);
+			return !repository.isCheckedOut(id);
 		}
 	}
 

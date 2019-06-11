@@ -28,7 +28,7 @@ public class MenuItemExportToCsvAction implements EventHandler<ActionEvent> {
         if (tempFile != null) {
             Resources.exportStringToFile(tempFile, convertTableResultsToString());
             if (Desktop.isDesktopSupported()) {
-                Resources.openCSV(tempFile);
+                Resources.openFile(tempFile);
             }
         }
     }

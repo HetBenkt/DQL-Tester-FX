@@ -1,6 +1,14 @@
 package nl.bos;
 
-import static nl.bos.Constants.MSG_TITLE_INFO_DIALOG;
+import com.documentum.com.DfClientX;
+import com.documentum.com.IDfClientX;
+import com.documentum.fc.client.*;
+import com.documentum.fc.common.DfException;
+import com.documentum.fc.common.DfId;
+import com.documentum.fc.common.IDfLoginInfo;
+import nl.bos.Constants.Version;
+import nl.bos.utils.AppAlert;
+import nl.bos.utils.Resources;
 
 import java.io.File;
 import java.text.MessageFormat;
@@ -11,27 +19,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.documentum.com.DfClientX;
-import com.documentum.com.IDfClientX;
-import com.documentum.fc.client.DfServiceException;
-import com.documentum.fc.client.IDfACL;
-import com.documentum.fc.client.IDfClient;
-import com.documentum.fc.client.IDfCollection;
-import com.documentum.fc.client.IDfDocbaseMap;
-import com.documentum.fc.client.IDfPersistentObject;
-import com.documentum.fc.client.IDfQuery;
-import com.documentum.fc.client.IDfSession;
-import com.documentum.fc.client.IDfSessionManager;
-import com.documentum.fc.client.IDfSysObject;
-import com.documentum.fc.client.IDfTypedObject;
-import com.documentum.fc.client.IDfUser;
-import com.documentum.fc.common.DfException;
-import com.documentum.fc.common.DfId;
-import com.documentum.fc.common.IDfLoginInfo;
-
-import nl.bos.Constants.Version;
-import nl.bos.utils.AppAlert;
-import nl.bos.utils.Resources;
+import static nl.bos.Constants.MSG_TITLE_INFO_DIALOG;
 
 public class Repository {
 	private static final Logger LOGGER = Logger.getLogger(Repository.class.getName());
@@ -251,7 +239,7 @@ public class Repository {
 		String regex = "[0-9a-f]{16}";
 		Pattern pattern = Pattern.compile(regex);
 		Matcher matcher = pattern.matcher(id);
-		return matcher.matches();
+		return !matcher.matches();
 	}
 
 	public boolean isConnected() {
@@ -352,11 +340,7 @@ public class Repository {
 
 	public boolean isDocumentType(IDfPersistentObject object) {
 		try {
-			if (!object.isInstanceOf("dm_sysobject") || object.isInstanceOf("dm_folder")) {
-				return false;
-			} else {
-				return true;
-			}
+			return object.isInstanceOf("dm_sysobject") && !object.isInstanceOf("dm_folder");
 		} catch (DfException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
@@ -418,7 +402,7 @@ public class Repository {
 		return true;
 	}
 
-	public void checkin(IDfPersistentObject sysObject, File content, Version version, boolean keepLock)
+	private void checkin(IDfPersistentObject sysObject, File content, Version version, boolean keepLock)
 			throws DfException {
 		try {
 			if (sysObject.isInstanceOf("dm_sysobject")) {
@@ -492,11 +476,7 @@ public class Repository {
 		}
 	}
 
-	/**
-	 * Checkout document, store export path to JSON file
-	 * @param id
-	 * @throws DfException
-	 */	public void checkoutContent(String id) {
+	public void checkoutContent(String id) {
 		try {
 			LOGGER.info(id);
 
@@ -508,11 +488,6 @@ public class Repository {
 		}
 	}
 
-	/**
-	 * Checkout document, store export path to JSON file
-	 * @param sysObject
-	 * @throws DfException
-	 */
 	public void checkoutContent(IDfSysObject sysObject) throws DfException {
 		try {
 			sysObject.checkout();
@@ -525,16 +500,17 @@ public class Repository {
 	}
 
 	/** Get document primary content*/
-	public void downloadContent(String id) {
+	public String downloadContent(String id) {
 		LOGGER.info(id);
 		IDfSysObject sysObject;
 		try {
 			sysObject = (IDfSysObject) repository.getSession().getObject(new DfId(id));
-			downloadContent(sysObject);
+			return downloadContent(sysObject);
 		} catch (DfException e) {
 			AppAlert.error("Error while trying to retrieve content", id);
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
+		return null;
 	}
 
 	/** Get document primary content*/

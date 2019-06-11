@@ -499,7 +499,7 @@ public class JobEditor {
                 if (tempFile != null) {
                     Resources.exportStreamToFile(tempFile, jobLogContent);
                     if (Desktop.isDesktopSupported()) {
-                        Resources.openCSV(tempFile);
+                        Resources.openFile(tempFile);
                     }
                 }
             }
