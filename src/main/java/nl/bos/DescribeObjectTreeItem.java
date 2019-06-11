@@ -43,6 +43,6 @@ public class DescribeObjectTreeItem extends TreeItem {
         }
     }
     private static final Comparator<TreeItem<? extends DescribeObjectTreeItem>> alphabetical
-            = Comparator.comparing(item -> item.toString(), AlphanumComparator.INSTANCE);
+            = Comparator.comparing(TreeItem::toString, AlphanumComparator.INSTANCE);
 
 }
