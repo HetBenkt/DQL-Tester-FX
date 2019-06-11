@@ -93,7 +93,7 @@ public class DescribeObject {
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-        parent.sort();
+        parent.sortTree();
         return parent;
     }
 
@@ -143,7 +143,7 @@ public class DescribeObject {
 
     @FXML
     private void handleOK(ActionEvent actionEvent) {
-        LOGGER.info(String.valueOf(currentSelected));
+        LOGGER.log(Level.INFO, "Currently Selected: {0}", currentSelected);
         describeObjectStage.fireEvent(new WindowEvent(describeObjectStage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
