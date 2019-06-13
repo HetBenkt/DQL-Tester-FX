@@ -175,7 +175,7 @@ public class ContextMenuOnResultTable {
 		if (id == null || repository.isObjectId(id)) {
 			return true;
 		} else {
-			return !repository.isDocumentType(repository.getPersistentObject(id));
+            return !repository.isDocumentType(repository.getObjectById(id));
 		}
 	}
 

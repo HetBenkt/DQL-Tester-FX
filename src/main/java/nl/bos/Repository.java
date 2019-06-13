@@ -246,8 +246,13 @@ public class Repository {
 		return session != null && session.isConnected();
 	}
 
-	public IDfPersistentObject getObjectById(String objectId) throws DfException {
-		return session.getObject(new DfId(objectId));
+    public IDfPersistentObject getObjectById(String objectId) {
+        try {
+            return session.getObject(new DfId(objectId));
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+        return null;
 	}
 
 	public String getIdFromObject(IDfPersistentObject object) {
@@ -349,7 +354,7 @@ public class Repository {
 
 	public boolean canCheckOut(String objectId) {
 		LOGGER.log(Level.FINE, "Test if user can checkout" + objectId);
-		IDfPersistentObject object = repository.getPersistentObject(objectId);
+        IDfPersistentObject object = repository.getObjectById(objectId);
 		return canCheckOut(object);
 
 	}
@@ -371,7 +376,7 @@ public class Repository {
 	}
 
 	public boolean isCheckedOut(String objectId) {
-		IDfPersistentObject object = repository.getPersistentObject(objectId);
+        IDfPersistentObject object = repository.getObjectById(objectId);
 		LOGGER.log(Level.FINE, "Test if user can checkout" + objectId);
 		return isCheckedOut(object);
 
@@ -393,7 +398,7 @@ public class Repository {
 	}
 
 	public boolean checkin(String objectId, File content, Version version, boolean keepLock) {
-		IDfPersistentObject object = repository.getPersistentObject(objectId);
+        IDfPersistentObject object = repository.getObjectById(objectId);
 		try {
 			checkin(object, content, version, keepLock);
 		} catch (DfException e) {
@@ -433,15 +438,6 @@ public class Repository {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
 		}
-	}
-
-	public IDfPersistentObject getPersistentObject(String id) {
-		try {
-			return getObjectById(id);
-		} catch (DfException e) {
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
-		}
-		return null;
 	}
 
 	public String getObjectName(String id) {
