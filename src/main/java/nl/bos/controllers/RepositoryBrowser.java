@@ -24,7 +24,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import nl.bos.BrowserTreeItem;
@@ -242,7 +241,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 		resultStage.setTitle(
 				String.format("%s - %s (%s)", label, repository.getObjectName(id), repository.getRepositoryName()));
 
-		AnchorPane resultPane = (AnchorPane) resources.loadFXML("/nl/bos/views/ResultTable.fxml");
+		VBox resultPane = (VBox) resources.loadFXML("/nl/bos/views/ResultTable.fxml");
 		Scene scene = new Scene(resultPane);
 		resultStage.setScene(scene);
 

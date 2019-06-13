@@ -6,7 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import nl.bos.Repository;
 import nl.bos.controllers.ResultTable;
@@ -38,7 +38,7 @@ public class MenuItemResultTableAction implements EventHandler<ActionEvent> {
         Stage resultStage = new Stage();
         resultStage.setTitle(String.format("%s - %s (%s)", label, repository.getObjectName(id), repository.getRepositoryName()));
         Resources resources = new Resources();
-        AnchorPane resultPane = (AnchorPane) resources.loadFXML("/nl/bos/views/ResultTable.fxml");
+        VBox resultPane = (VBox) resources.loadFXML("/nl/bos/views/ResultTable.fxml");
         Scene scene = new Scene(resultPane);
         resultStage.setScene(scene);
         ResultTable controller = resources.getFxmlLoader().getController();
