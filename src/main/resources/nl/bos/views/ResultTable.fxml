@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121"
       fx:controller="nl.bos.controllers.ResultTable">
     <TableView fx:id="tvResults">
-        <columns>
-            <TableColumn prefWidth="75.0" text="C1"/>
-            <TableColumn prefWidth="75.0" text="C2"/>
-        </columns>
         <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
         </VBox.margin>
