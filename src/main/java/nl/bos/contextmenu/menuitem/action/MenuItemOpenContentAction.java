@@ -6,6 +6,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import nl.bos.Repository;
+import nl.bos.beans.RenditionObject;
 import nl.bos.utils.Resources;
 
 import java.awt.*;
@@ -28,7 +29,16 @@ public class MenuItemOpenContentAction implements EventHandler<ActionEvent> {
         TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
         String id = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
 
-        String path = repository.downloadContent(id);
+        String path;
+        if (id.startsWith("06")) {
+            RenditionObject cellData = (RenditionObject) result.getSelectionModel().getSelectedItems().get(0);
+            id = repository.getParentId(id);
+            path = repository.downloadContent(id, cellData.getFullFormat());
+        } else {
+            path = repository.downloadContent(id);
+        }
+
+
         if (Desktop.isDesktopSupported()) {
             Resources.openFile(new File(path));
         }

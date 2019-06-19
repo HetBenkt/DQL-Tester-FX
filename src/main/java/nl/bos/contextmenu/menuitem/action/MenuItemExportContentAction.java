@@ -6,6 +6,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import nl.bos.Repository;
+import nl.bos.beans.RenditionObject;
 
 import java.util.logging.Logger;
 
@@ -25,8 +26,12 @@ public class MenuItemExportContentAction implements EventHandler<ActionEvent> {
 		TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
 		String id = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
 
-		repository.downloadContent(id);
-	}
-	
-
+        if (id.startsWith("06")) {
+            RenditionObject cellData = (RenditionObject) result.getSelectionModel().getSelectedItems().get(0);
+            id = repository.getParentId(id);
+            repository.downloadContent(id, cellData.getFullFormat());
+        } else {
+            repository.downloadContent(id);
+        }
+    }
 }

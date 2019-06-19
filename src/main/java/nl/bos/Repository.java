@@ -3,6 +3,7 @@ package nl.bos;
 import com.documentum.com.DfClientX;
 import com.documentum.com.IDfClientX;
 import com.documentum.fc.client.*;
+import com.documentum.fc.client.content.IDfContent;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfLoginInfo;
@@ -526,6 +527,36 @@ public class Repository {
 		} catch (DfException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			throw e;
+		}
+		return null;
+	}
+
+	public String getParentId(String id) {
+		try {
+			IDfContent contentObject = (IDfContent) repository.getSession().getObject(new DfId(id));
+			return contentObject.getParentId(0).getId();
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return null;
+	}
+
+	public String downloadContent(String id, String format) {
+		IDfSysObject sysObject = (IDfSysObject) repository.getObjectById(id);
+		try {
+			String objectName = sysObject.getObjectName();
+			if (!(sysObject.getContentSize() > 0)) {
+				AppAlert.warning("Content is empty", objectName);
+			} else {
+				final String extension = repository.getSession().getFormat(format)
+						.getDOSExtension();
+				final String path = sysObject.getFileEx2(new File(Resources.getExportPath(),
+						objectName.replaceAll("[^a-zA-Z0-9._]", "-") + "." + extension).getAbsolutePath(), format, 0, "", false);
+				LOGGER.info("Downloaded document to path " + path);
+				return path;
+			}
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return null;
 	}

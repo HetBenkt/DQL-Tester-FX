@@ -27,24 +27,25 @@ public class ResultTable {
     private final Repository repository = Repository.getInstance();
 
     private final ContextMenu contextMenu = new ContextMenu();
-    private final MenuItem getAttributes;
-    private final MenuItem destroyObject;
+    private MenuItem getAttributes;
+    private MenuItem destroyObject;
 
-    private final MenuItem openContent;
-    private final MenuItem exportContent;
-    private final MenuItem importContent;
-    private final MenuItem removeContent;
+    private MenuItem openContent;
+    private MenuItem exportContent;
+    private MenuItem importContent;
+    private MenuItem removeContent;
 
     @FXML
     private Button btnOk;
-    @FXML
-    private Button btnRefresh;
     @FXML
     private TableView tvResults;
     @FXML
     private TextField txtCount;
 
-    public ResultTable() {
+
+    @FXML
+    private void initialize() {
+
         getAttributes = new MenuItem("Get Attributes");
         getAttributes.setDisable(true);
         new MenuItemGetAttributesAction(getAttributes, tvResults);
@@ -63,11 +64,11 @@ public class ResultTable {
 
         importContent = new MenuItem("Import Content");
         importContent.setDisable(true);
-        new MenuItemExportContentAction(importContent, tvResults);
+        //new MenuItemImportContentAction(importContent, tvResults);
 
         removeContent = new MenuItem("Remove Content");
         removeContent.setDisable(true);
-        new MenuItemExportContentAction(removeContent, tvResults);
+        //new MenuItemRemoveContentAction(removeContent, tvResults);
 
         contextMenu.getItems().addAll(openContent, destroyObject, importContent, exportContent, removeContent, new SeparatorMenuItem(), getAttributes);
     }
@@ -141,15 +142,22 @@ public class ResultTable {
     private void validateMenuItems() {
         Stage stage = (Stage) btnOk.getScene().getWindow();
 
-        openContent.setDisable(true);
+        String selectedCell = null;
+        if (tvResults.getSelectionModel().getSelectedCells().size() > 0) {
+            TablePosition focusedCell = (TablePosition) tvResults.getSelectionModel().getSelectedCells().get(0);
+            Object cellData = focusedCell.getTableColumn().getCellData(focusedCell.getRow());
+            selectedCell = String.valueOf(cellData);
+        }
+
+        openContent.setDisable(selectedCell == null || repository.isObjectId(selectedCell));
         destroyObject.setVisible(stage.getTitle().contains("Versions"));
-        destroyObject.setDisable(true);
+        destroyObject.setDisable(selectedCell == null || repository.isObjectId(selectedCell));
         importContent.setVisible(stage.getTitle().contains("Renditions"));
         importContent.setDisable(true);
-        exportContent.setDisable(true);
+        exportContent.setDisable(selectedCell == null || repository.isObjectId(selectedCell));
         removeContent.setVisible(stage.getTitle().contains("Renditions"));
         removeContent.setDisable(true);
-        getAttributes.setDisable(true);
+        getAttributes.setDisable(selectedCell == null || repository.isObjectId(selectedCell));
     }
 
     private void getRenditions(String id) {
