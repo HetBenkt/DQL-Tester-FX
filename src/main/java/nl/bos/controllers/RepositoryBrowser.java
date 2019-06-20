@@ -103,7 +103,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 	@FXML
 	private void initialize() {
 		vbox.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPressEvent);
-
+		ckbShowAllCabinets.setSelected(Resources.isBrowserAllCabinet());
 		initContextMenu();
 		initBrowserTree();
 	}
@@ -466,6 +466,8 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 		TreeItem<BrowserTreeItem> treeItemBrowser = buildTreeItemBrowser(rootItem);
 		treeItemBrowser.setExpanded(true);
 		treeView.setRoot(treeItemBrowser);
+		Resources.setBrowserAllCabinet(ckbShowAllCabinets.isSelected());
+		
 	}
 
 	private void triggerFindItem(ActionEvent actionEvent) {

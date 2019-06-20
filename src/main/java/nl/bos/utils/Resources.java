@@ -30,6 +30,8 @@ public class Resources {
 
 	private static File exportPath = null;
 
+	private static Boolean isBrowserAllCabinet = null;
+
 	private FXMLLoader fxmlLoader;
 
 	private static File checkoutFile;
@@ -123,13 +125,13 @@ public class Resources {
 		Objects.requireNonNull(currentJson).put(objectId, path);
 		writeJsonToFile(currentJson, checkoutFile);
 	}
-	
+
 	public static void removeContentPathFromCheckoutFile(String objectId) {
 		JSONObject currentJson = readCheckoutFile();
 		Objects.requireNonNull(currentJson).remove(objectId);
 		writeJsonToFile(currentJson, checkoutFile);
 	}
-	
+
 	public static String getContentPathFromCheckoutFile(String objectId) {
 		JSONObject currentJson = readCheckoutFile();
 		return Objects.requireNonNull(currentJson).getString(objectId);
@@ -210,8 +212,23 @@ public class Resources {
 		return getSettings().getProperty(property, defaultValue);
 	}
 
-	private static Object setSettingProperty(String property, String value) {
-		return getSettings().setProperty(property, value);
+	private static void setSettingProperty(String property, String value) {
+		getSettings().setProperty(property, value);
+		
+		String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(""))
+				.getPath();
+		File settingsFile = new File(rootPath, "settings.properties");
+		try {
+			if (!settingsFile.exists() || !settingsFile.isFile()) {
+				if (settingsFile.createNewFile())
+					LOGGER.info("New settings.properties file created");
+			}
+			settings.store(new FileOutputStream(settingsFile), "");
+		} catch (FileNotFoundException e) {
+			LOGGER.warning("Could not find settings.properties");
+		} catch (IOException e) {
+			LOGGER.warning("Could not read settings.properties");
+		}
 	}
 
 	/**
@@ -219,7 +236,8 @@ public class Resources {
 	 */
 	private static Properties getSettings() {
 		if (settings == null) {
-			String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource("")).getPath();
+			String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(""))
+					.getPath();
 			File settingsFile = new File(rootPath, "settings.properties");
 
 			try {
@@ -239,13 +257,25 @@ public class Resources {
 	}
 
 	public static File getExportPath() {
-		if (exportPath != null) {
-			return exportPath;
+		if (exportPath == null) {
+			exportPath = new File(getSettingProperty("export.path", System.getenv("TEMP")));
 		}
-		return new File(getSettingProperty("export.path", System.getenv("TEMP")));
+		return exportPath;
 	}
 
-	public static String setExportPath(String path) {
-		return (String) setSettingProperty("export.path", path);
+	public static boolean isBrowserAllCabinet() {
+		if (isBrowserAllCabinet == null) {
+			isBrowserAllCabinet = Boolean.valueOf(getSettingProperty("browser.allcabinet", "false"));
+		}
+		return isBrowserAllCabinet;
+	}
+
+	public static void setBrowserAllCabinet(boolean allCabinet) {
+		isBrowserAllCabinet = Boolean.valueOf(allCabinet);
+		setSettingProperty("browser.allcabinet", isBrowserAllCabinet.toString());
+	}
+	
+	public static void setExportPath(String path) {
+		setSettingProperty("export.path", path);
 	}
 }
