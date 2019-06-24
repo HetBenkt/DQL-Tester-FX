@@ -8,6 +8,7 @@ import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfLoginInfo;
 import nl.bos.Constants.Version;
+import nl.bos.beans.WorkflowObject;
 import nl.bos.utils.AppAlert;
 import nl.bos.utils.Resources;
 
@@ -559,5 +560,22 @@ public class Repository {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return null;
+	}
+
+	public List<WorkflowObject> getAllWorkflows() {
+		List<WorkflowObject> workflows = new ArrayList<>();
+		try {
+			IDfCollection collection = repository.query("select wfl.r_object_id as workflow_id, wi.r_object_id as workitem_id, pr.object_name as pname from dm_workflow wfl, dm_process pr, dmi_workitem wi where pr.r_object_id = wfl.process_id and wi.r_workflow_id = wfl.r_object_id");
+			while (collection.next()) {
+				WorkflowObject workflowObject = new WorkflowObject();
+				workflowObject.setWorkflowId(collection.getString("workflow_id"));
+				workflowObject.setWorkitemId(collection.getString("workitem_id"));
+				workflowObject.setProcessName(collection.getString("pname"));
+				workflows.add(workflowObject);
+			}
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return workflows;
 	}
 }

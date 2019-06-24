@@ -105,7 +105,14 @@ public class Menu {
         new MenuItemExportToCsvAction(miExportResults, queryWithResult.getResult()).handle(null);
     }
 
-	public void manageUsers(ActionEvent actionEvent) {
+    @FXML
+    private void manageUsers(ActionEvent actionEvent) {
 		new ManageUsersAction();
 	}
+
+    @FXML
+    private void manageWorkflows(ActionEvent actionEvent) {
+        new ManageWorkflowsAction();
+    }
+
 }
