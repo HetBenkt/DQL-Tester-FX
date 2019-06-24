@@ -1,7 +1,5 @@
 package nl.bos.menu.menuitem.action;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.util.logging.Logger;
 
 import javafx.scene.Scene;
@@ -23,12 +21,7 @@ public class ExecuteDQLScriptAction {
 
         dqlScriptStage.setScene(new Scene(dqlScriptPane));
         
-        try {
-			dqlScriptStage.getScene().getStylesheets().add(new File("dql-keywords.css").toURI().toURL().toExternalForm());
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		dqlScriptStage.getScene().getStylesheets().add(resources.getResourceExternalForm("/nl/bos/themes/dql-keywords.css"));
         dqlScriptStage.showAndWait();
     }
 }

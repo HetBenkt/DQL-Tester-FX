@@ -199,7 +199,7 @@ public class Resources {
 
 	public String getResourceExternalForm(String name) {
 		LOGGER.info(getClass().getClassLoader().getName());
-		return getClass().getClassLoader().getResource(name).toExternalForm();
+		return getClass().getResource(name).toExternalForm();
 	}
 	
 	public Pane loadFXML(String fxml) {

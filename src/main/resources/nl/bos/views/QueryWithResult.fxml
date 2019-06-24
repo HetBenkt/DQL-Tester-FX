@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import org.fxmisc.richtext.CodeArea?>
+<?import org.fxmisc.flowless.VirtualizedScrollPane?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1"
 	fx:id="queryWithResultBox" BorderPane.alignment="CENTER"
@@ -25,10 +26,15 @@
 				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 			</padding>
 			<Label text="DQL/SQL Statement" />
-			<CodeArea fx:id="statement" VBox.vgrow="ALWAYS"></CodeArea>
+			<VirtualizedScrollPane VBox.vgrow="ALWAYS">
+				<content>
+					<CodeArea fx:id="statement" VBox.vgrow="ALWAYS"></CodeArea>
+				</content>
+			</VirtualizedScrollPane>
+
 			<Label text="DQL/SQL History" />
 			<HBox>
-					<ComboBox fx:id="historyStatements" />
+				<ComboBox fx:id="historyStatements" />
 				<ImageView fx:id="btnDeleteHistoryItem" fitHeight="24.0"
 					fitWidth="24.0" onMouseClicked="#handleDeleteHistoryItem"
 					pickOnBounds="true" preserveRatio="true">
