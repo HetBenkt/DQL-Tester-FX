@@ -6,3 +6,4 @@ src/main/resources/log4j.properties
 history.json
 checkout.json
 trace.log
+log4j.log

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="800.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/8.0.121"
+      fx:controller="nl.bos.controllers.WorkflowEditor">
+    <HBox>
+        <VBox prefWidth="300.0">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+            <RadioButton mnemonicParsing="false" text="Today's workflows">
+                <toggleGroup>
+                    <ToggleGroup fx:id="filterFlows"/>
+                </toggleGroup>
+            </RadioButton>
+            <RadioButton mnemonicParsing="false" selected="true" text="All workflows" toggleGroup="$filterFlows">
+                <VBox.margin>
+                    <Insets top="5.0"/>
+                </VBox.margin>
+            </RadioButton>
+            <RadioButton mnemonicParsing="false" text="Paused workflows" toggleGroup="$filterFlows">
+                <VBox.margin>
+                    <Insets top="5.0"/>
+                </VBox.margin>
+            </RadioButton>
+            <CheckBox mnemonicParsing="false" text="monitor">
+                <VBox.margin>
+                    <Insets top="20.0"/>
+                </VBox.margin>
+            </CheckBox>
+            <CheckBox mnemonicParsing="false" selected="true" text="oneRowPerWorkflowSeqNo">
+                <VBox.margin>
+                    <Insets top="5.0"/>
+                </VBox.margin>
+            </CheckBox>
+            <Label text="Filter by supervisor">
+                <VBox.margin>
+                    <Insets top="20.0"/>
+                </VBox.margin>
+            </Label>
+            <TextField promptText="supervisor_name"/>
+            <Label text="Filter by Object's Name or ID">
+                <VBox.margin>
+                    <Insets top="5.0"/>
+                </VBox.margin>
+            </Label>
+            <TextField promptText="object_name or r_object_id"/>
+        </VBox>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+            <Tab text="Process variable">
+                <AnchorPane>
+                    <TextArea prefWidth="650.0"/>
+                </AnchorPane>
+            </Tab>
+            <Tab text="Process packages">
+                <AnchorPane>
+                    <TextArea prefWidth="650.0"/>
+                </AnchorPane>
+            </Tab>
+            <Tab text="Process attachments">
+                <AnchorPane>
+                    <TextArea prefWidth="650.0"/>
+                </AnchorPane>
+            </Tab>
+            <Tab text="Process ErrorContents">
+                <AnchorPane>
+                    <TextArea prefWidth="650.0"/>
+                </AnchorPane>
+            </Tab>
+        </TabPane>
+    </HBox>
+    <TableView fx:id="tvResults" prefHeight="1000.0">
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </padding>
+    </TableView>
+    <HBox>
+        <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+        </padding>
+        <TextField editable="false"/>
+        <TextField editable="false">
+            <HBox.margin>
+                <Insets left="5.0"/>
+            </HBox.margin>
+        </TextField>
+    </HBox>
+</VBox>

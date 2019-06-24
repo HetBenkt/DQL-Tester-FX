@@ -1,37 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
-
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="825.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nl.bos.controllers.Menu">
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+            minWidth="-Infinity"
+            prefHeight="825.0" prefWidth="850.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+            fx:controller="nl.bos.controllers.Menu">
     <top>
         <MenuBar fx:id="menubar" disable="true" BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="Tools">
-                <MenuItem mnemonicParsing="false" onAction="#describeObject" text="Describe Object" />
-                <MenuItem mnemonicParsing="false" onAction="#getAttributes" text="Get Attributes" />
-                <SeparatorMenuItem mnemonicParsing="false" />
-                <MenuItem mnemonicParsing="false" onAction="#executeAPIScript" text="Execute API Script" />
-                <MenuItem mnemonicParsing="false" onAction="#executeDQLScript" text="Execute DQL Script" />
-                <SeparatorMenuItem mnemonicParsing="false" />
-                <MenuItem mnemonicParsing="false" onAction="#browseRepository" text="Browse Repository" />
-                <SeparatorMenuItem mnemonicParsing="false" />
-                <MenuItem fx:id="miExportResults" disable="true" mnemonicParsing="false" onAction="#exportResults" text="Export Results" />
+                <MenuItem mnemonicParsing="false" onAction="#describeObject" text="Describe Object"/>
+                <MenuItem mnemonicParsing="false" onAction="#getAttributes" text="Get Attributes"/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem mnemonicParsing="false" onAction="#executeAPIScript" text="Execute API Script"/>
+                <MenuItem mnemonicParsing="false" onAction="#executeDQLScript" text="Execute DQL Script"/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem mnemonicParsing="false" onAction="#browseRepository" text="Browse Repository"/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem fx:id="miExportResults" disable="true" mnemonicParsing="false" onAction="#exportResults"
+                          text="Export Results"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Administration">
-            <MenuItem mnemonicParsing="false" onAction="#manageUsers" text="Manage Users" />
-                <MenuItem mnemonicParsing="false" onAction="#manageJobs" text="Manage Jobs" />
+                <MenuItem mnemonicParsing="false" onAction="#manageUsers" text="Manage Users"/>
+                <MenuItem mnemonicParsing="false" onAction="#manageJobs" text="Manage Jobs"/>
+                <MenuItem mnemonicParsing="false" onAction="#manageWorkflows" text="Manage Workflows"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Info">
-                <MenuItem mnemonicParsing="false" onAction="#showCurrentSessions" text="Show Current Sessions..." />
-                <SeparatorMenuItem mnemonicParsing="false" />
-                <MenuItem mnemonicParsing="false" onAction="#getLastSQL" text="Get Last SQL" />
+                <MenuItem mnemonicParsing="false" onAction="#showCurrentSessions" text="Show Current Sessions..."/>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem mnemonicParsing="false" onAction="#getLastSQL" text="Get Last SQL"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Special">
-                <MenuItem mnemonicParsing="false" onAction="#enableSQLTrace" text="Enable SQL Trace" />
-                <MenuItem mnemonicParsing="false" onAction="#disableSQLTrace" text="Disable SQL Trace" />
+                <MenuItem mnemonicParsing="false" onAction="#enableSQLTrace" text="Enable SQL Trace"/>
+                <MenuItem mnemonicParsing="false" onAction="#disableSQLTrace" text="Disable SQL Trace"/>
             </Menu>
         </MenuBar>
     </top>
