@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="650.0" prefWidth="600.0"
-            xmlns="http://javafx.com/javafx/8.0.172-ea" fx:controller="nl.bos.controllers.ExecuteDQLScript">
-</AnchorPane>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.fxmisc.richtext.CodeArea?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+	prefHeight="650.0" prefWidth="600.0"
+	xmlns="http://javafx.com/javafx/8.0.172-ea"
+	fx:controller="nl.bos.controllers.ExecuteDQLScript">
+	<VBox spacing="5.0">
+		<CodeArea fx:id="dqlScriptView" prefHeight="600"></CodeArea>
+	</VBox>
+</VBox>

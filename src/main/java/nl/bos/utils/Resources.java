@@ -197,6 +197,11 @@ public class Resources {
 		return getClass().getClassLoader().getResourceAsStream(name);
 	}
 
+	public String getResourceExternalForm(String name) {
+		LOGGER.info(getClass().getClassLoader().getName());
+		return getClass().getClassLoader().getResource(name).toExternalForm();
+	}
+	
 	public Pane loadFXML(String fxml) {
 		fxmlLoader = new FXMLLoader(getClass().getResource(fxml));
 		Pane pane = null;
@@ -215,9 +220,7 @@ public class Resources {
 	private static void setSettingProperty(String property, String value) {
 		getSettings().setProperty(property, value);
 		
-		String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(""))
-				.getPath();
-		File settingsFile = new File(rootPath, "settings.properties");
+		File settingsFile = new File("config", "settings.properties");
 		try {
 			if (!settingsFile.exists() || !settingsFile.isFile()) {
 				if (settingsFile.createNewFile())
@@ -236,14 +239,13 @@ public class Resources {
 	 */
 	private static Properties getSettings() {
 		if (settings == null) {
-			String rootPath = Objects.requireNonNull(Thread.currentThread().getContextClassLoader().getResource(""))
-					.getPath();
-			File settingsFile = new File(rootPath, "settings.properties");
+			File settingsFile = new File("config", "settings.properties");
 
 			try {
 				if (!settingsFile.exists() || !settingsFile.isFile()) {
-					if (settingsFile.createNewFile())
+					if (settingsFile.createNewFile()) {
 						LOGGER.info("New settings.properties file created");
+					}
 				}
 				settings = new Properties();
 				settings.load(new FileInputStream(settingsFile));

@@ -8,6 +8,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import nl.bos.utils.Resources;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -36,6 +38,11 @@ public class Main extends Application {
         Image image = new Image(resources.getResourceStream("nl/bos/icons/logo_16.gif"));
 
         primaryStage.setScene(new Scene(rootPane));
+        try {
+        	primaryStage.getScene().getStylesheets().add(new File("dql-keywords.css").toURI().toURL().toExternalForm());
+        } catch (MalformedURLException e) {
+        	//nothing to see here
+        }
         primaryStage.getIcons().add(image);
 
         primaryStage.setTitle(APP_TITLE);

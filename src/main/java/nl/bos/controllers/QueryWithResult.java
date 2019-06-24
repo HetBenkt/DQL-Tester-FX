@@ -1,8 +1,26 @@
 package nl.bos.controllers;
 
+import static nl.bos.Constants.QUERIES;
+
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import org.fxmisc.richtext.CodeArea;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.reactfx.Subscription;
+
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfAttr;
+
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -10,7 +28,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -22,20 +44,8 @@ import nl.bos.beans.HistoryItem;
 import nl.bos.contextmenu.ContextMenuOnResultTable;
 import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
+import nl.bos.utils.DQLSyntax;
 import nl.bos.utils.Resources;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import static nl.bos.Constants.QUERIES;
 
 public class QueryWithResult {
     private static final Logger LOGGER = Logger.getLogger(QueryWithResult.class.getName());
@@ -54,7 +64,7 @@ public class QueryWithResult {
     @FXML
     private VBox queryWithResultBox;
     @FXML
-    private TextArea statement;
+    private CodeArea statement;
     @FXML
     private TableView result;
     @FXML
@@ -65,12 +75,14 @@ public class QueryWithResult {
     private ImageView btnDeleteFavoriteItem;
 
     private Instant start;
+    
+    private Subscription subscribeToText;
 
     ComboBox<HistoryItem> getHistoryStatements() {
         return historyStatements;
     }
 
-    TextArea getStatement() {
+    CodeArea getStatement() {
         return statement;
     }
 
@@ -111,6 +123,8 @@ public class QueryWithResult {
         });
         loadConnectionWithStatusFxml();
 
+		subscribeToText = statement.multiPlainChanges().successionEnds(Duration.ofMillis(500))
+				.subscribe(ignore -> statement.setStyleSpans(0, DQLSyntax.computeHighlighting(statement.getText())));
         Resources.initHistoryFile();
         reloadHistory();
 
@@ -137,9 +151,10 @@ public class QueryWithResult {
         if (newValue.intValue() != -1) {
             String selectedItem = String.valueOf(statements.getItems().get((Integer) newValue));
             LOGGER.info(selectedItem);
-            statement.setText(selectedItem);
+            
+            statement.replaceText(0, statement.getLength(), selectedItem);
         } else
-            statement.setText("");
+            statement.replaceText(0, statement.getLength(),"");
     }
 
     private void loadConnectionWithStatusFxml() {
