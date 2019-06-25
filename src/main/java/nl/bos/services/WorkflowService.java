@@ -12,4 +12,12 @@ public class WorkflowService {
     public List<WorkflowObject> getAllWorkflows() {
         return repository.getAllWorkflows();
     }
+
+    public List<WorkflowObject> getTodayWorkflows() {
+        return repository.getTodayWorkflows();
+    }
+
+    public List<WorkflowObject> getPausedWorkflows() {
+        return repository.getPausedWorkflows();
+    }
 }
