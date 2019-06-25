@@ -10,17 +10,20 @@
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
             </padding>
-            <RadioButton mnemonicParsing="false" text="Today's workflows">
+            <RadioButton fx:id="rbnTodayFlows" mnemonicParsing="false" onAction="#handleTodayFlows"
+                         text="Today's workflows">
                 <toggleGroup>
                     <ToggleGroup fx:id="filterFlows"/>
                 </toggleGroup>
             </RadioButton>
-            <RadioButton mnemonicParsing="false" selected="true" text="All workflows" toggleGroup="$filterFlows">
+            <RadioButton fx:id="rbnAllFlows" mnemonicParsing="false" onAction="#handleAllFlows" selected="true"
+                         text="All workflows" toggleGroup="$filterFlows">
                 <VBox.margin>
                     <Insets top="5.0"/>
                 </VBox.margin>
             </RadioButton>
-            <RadioButton mnemonicParsing="false" text="Paused workflows" toggleGroup="$filterFlows">
+            <RadioButton fx:id="rbnPausedFlows" mnemonicParsing="false" onAction="#handlePausedFlows"
+                         text="Paused workflows" toggleGroup="$filterFlows">
                 <VBox.margin>
                     <Insets top="5.0"/>
                 </VBox.margin>
@@ -69,7 +72,7 @@
             </Tab>
             <Tab text="Process ErrorContents">
                 <AnchorPane>
-                    <TextArea prefWidth="650.0"/>
+                    <TextArea fx:id="txaErrorContents" prefWidth="650.0"/>
                 </AnchorPane>
             </Tab>
         </TabPane>

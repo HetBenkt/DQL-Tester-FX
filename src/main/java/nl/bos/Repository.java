@@ -562,15 +562,33 @@ public class Repository {
 		return null;
 	}
 
-	public List<WorkflowObject> getAllWorkflows() {
+    private List<WorkflowObject> getWorkflows(String query) {
 		List<WorkflowObject> workflows = new ArrayList<>();
 		try {
-			IDfCollection collection = repository.query("select wfl.r_object_id as workflow_id, wi.r_object_id as workitem_id, pr.object_name as pname from dm_workflow wfl, dm_process pr, dmi_workitem wi where pr.r_object_id = wfl.process_id and wi.r_workflow_id = wfl.r_object_id");
+            IDfCollection collection = repository.query(query);
 			while (collection.next()) {
 				WorkflowObject workflowObject = new WorkflowObject();
 				workflowObject.setWorkflowId(collection.getString("workflow_id"));
 				workflowObject.setWorkitemId(collection.getString("workitem_id"));
 				workflowObject.setProcessName(collection.getString("pname"));
+                workflowObject.setActivityName(collection.getString("actname"));
+                workflowObject.setActivitySeqNo(collection.getString("act_seqno"));
+                workflowObject.setPackageName(collection.getString("pkgname"));
+                workflowObject.setObjectId(collection.getString("objid"));
+                workflowObject.setObjectName(collection.getString("object_name"));
+                workflowObject.setRuntimeState(collection.getString("rs"));
+                workflowObject.setPerformerName(collection.getString("r_performer_name"));
+                workflowObject.setSupervisorName(collection.getString("supervisor_name"));
+                workflowObject.setEvent(collection.getString("event"));
+                workflowObject.setWorkqueueName(collection.getString("a_wq_name"));
+                workflowObject.setStartDate(collection.getString("r_start_date"));
+                workflowObject.setCreationDae(collection.getString("r_creation_date"));
+                workflowObject.setActivityId(collection.getString("actid"));
+                workflowObject.setProcessId(collection.getString("pid"));
+                workflowObject.setParentId(collection.getString("parent_id"));
+                workflowObject.setQueueItemId(collection.getString("qid"));
+                workflowObject.setPackageId(collection.getString("pkgid"));
+                workflowObject.setExecOsError(collection.getString("r_exec_os_error"));
 				workflows.add(workflowObject);
 			}
 		} catch (DfException e) {
@@ -578,4 +596,57 @@ public class Repository {
 		}
 		return workflows;
 	}
+
+    public List<WorkflowObject> getAllWorkflows() {
+        return getWorkflows("select distinct wfl.r_object_id as workflow_id, wi.r_object_id as workitem_id, pr.object_name as pname, qi.task_name as actname, qi.task_number as act_seqno, pkg.r_package_name as pkgname, pkgr.r_component_id as objid, sys.object_name, wi.r_runtime_state as rs, wi.r_performer_name, wfl.supervisor_name, qi.event, wi.a_wq_name,  wfl.r_start_date, wi.r_creation_date,  act.r_object_id as actid, pr.r_object_id as pid, wfl.parent_id, qi.r_object_id as qid, pkg.r_object_id as pkgid, wi.r_exec_os_error\n" +
+                "from dm_workflow wfl, dm_process pr, dmi_workitem wi, dmi_queue_item qi, dmi_package pkg, dmi_package_r pkgr, dm_sysobject sys, dm_activity act\n" +
+                "where \n" +
+                "pr.r_object_id = wfl.process_id \n" +
+                "and wi.r_workflow_id = wfl.r_object_id\n" +
+                "and qi.router_id = wfl.r_object_id\n" +
+                "and pkg.r_workflow_id = wfl.r_object_id \n" +
+                "and qi.item_id = wi.r_object_id\n" +
+                "and pkg.r_act_seqno = qi.task_number\n" +
+                "and pkg.r_object_id = pkgr.r_object_id\n" +
+                "and pkgr.r_component_id = sys.r_object_id\n" +
+                "and act.r_object_id = wi.r_act_def_id\n" +
+                "and qi.delete_flag = FALSE\n" +
+                "order by wfl.r_start_date desc");
+    }
+
+    public List<WorkflowObject> getTodayWorkflows() {
+        return getWorkflows("select distinct wfl.r_object_id as workflow_id, wi.r_object_id as workitem_id, pr.object_name as pname, qi.task_name as actname, qi.task_number as act_seqno, pkg.r_package_name as pkgname, pkgr.r_component_id as objid, sys.object_name, wi.r_runtime_state as rs, wi.r_performer_name, wfl.supervisor_name, qi.event, wi.a_wq_name,  wfl.r_start_date, wi.r_creation_date,  act.r_object_id as actid, pr.r_object_id as pid, wfl.parent_id, qi.r_object_id as qid, pkg.r_object_id as pkgid, wi.r_exec_os_error\n" +
+                "from dm_workflow wfl, dm_process pr, dmi_workitem wi, dmi_queue_item qi, dmi_package pkg, dmi_package_r pkgr, dm_sysobject sys, dm_activity act\n" +
+                "where \n" +
+                "pr.r_object_id = wfl.process_id \n" +
+                "and wi.r_workflow_id = wfl.r_object_id\n" +
+                "and qi.router_id = wfl.r_object_id\n" +
+                "and pkg.r_workflow_id = wfl.r_object_id \n" +
+                "and qi.item_id = wi.r_object_id\n" +
+                "and pkg.r_act_seqno = qi.task_number\n" +
+                "and pkg.r_object_id = pkgr.r_object_id\n" +
+                "and pkgr.r_component_id = sys.r_object_id\n" +
+                "and act.r_object_id = wi.r_act_def_id\n" +
+                "and qi.delete_flag = FALSE\n" +
+                "and wfl.r_start_date > date(today)\n" +
+                "order by wfl.r_start_date desc");
+    }
+
+    public List<WorkflowObject> getPausedWorkflows() {
+        return getWorkflows("select distinct wfl.r_object_id as workflow_id, wi.r_object_id as workitem_id, pr.object_name as pname, qi.task_name as actname, qi.task_number as act_seqno, pkg.r_package_name as pkgname, pkgr.r_component_id as objid, sys.object_name, wi.r_runtime_state as rs, wi.r_performer_name, wfl.supervisor_name, qi.event, wi.a_wq_name,  wfl.r_start_date, wi.r_creation_date,  act.r_object_id as actid, pr.r_object_id as pid, wfl.parent_id, qi.r_object_id as qid, pkg.r_object_id as pkgid, wi.r_exec_os_error\n" +
+                "from dm_workflow wfl, dm_process pr, dmi_workitem wi, dmi_queue_item qi, dmi_package pkg, dmi_package_r pkgr, dm_sysobject sys, dm_activity act\n" +
+                "where \n" +
+                "pr.r_object_id = wfl.process_id \n" +
+                "and wi.r_workflow_id = wfl.r_object_id\n" +
+                "and qi.router_id = wfl.r_object_id\n" +
+                "and pkg.r_workflow_id = wfl.r_object_id \n" +
+                "and qi.item_id = wi.r_object_id\n" +
+                "and pkg.r_act_seqno = qi.task_number\n" +
+                "and pkg.r_object_id = pkgr.r_object_id\n" +
+                "and pkgr.r_component_id = sys.r_object_id\n" +
+                "and act.r_object_id = wi.r_act_def_id\n" +
+                "and qi.delete_flag = FALSE\n" +
+                "and wi.r_runtime_state = 5\n" +
+                "order by wfl.r_start_date desc");
+    }
 }
