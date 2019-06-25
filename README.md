@@ -38,6 +38,7 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
     * jaxb-api.jar
 4. Copy the following jar files in this `lib` directory from the download locations
     * [json-20180813.jar](http://central.maven.org/maven2/org/json/json/20180813/json-20180813.jar)
+    * [richtextfx-fat-0.10.1.jar](https://github.com/FXMisc/RichTextFX/releases/download/v0.10.1/richtextfx-fat-0.10.1.jar)    
 5. In the download directory create a sub directory named: `config`
 6. Create a new file called `dfc.properties` in the `config` directory with this content
     ```
