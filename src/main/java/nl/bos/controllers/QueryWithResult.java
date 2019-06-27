@@ -3,11 +3,14 @@ package nl.bos.controllers;
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfAttr;
+
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
@@ -117,6 +120,7 @@ public class QueryWithResult {
         historyStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, historyStatements));
         favoriteStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, favoriteStatements));
         historyStatements.setCellFactory(cellFactory);
+
         historyStatements.setButtonCell(cellFactory.call(null));
         favoriteStatements.setCellFactory(cellFactory);
         favoriteStatements.setButtonCell(cellFactory.call(null));
@@ -175,7 +179,32 @@ public class QueryWithResult {
 
     private void setHistoryItems(List<HistoryItem> statements) {
         ObservableList<HistoryItem> value = FXCollections.observableList(statements);
-        historyStatements.setItems(value);
+        FilteredList<HistoryItem> filteredItems = new FilteredList<>(value, p -> true);
+        historyStatements.setEditable(true);
+        historyStatements.getEditor().textProperty().addListener((obs, oldValue, newValue)-> {
+            final TextField editor = historyStatements.getEditor();
+            final HistoryItem selected = historyStatements.getSelectionModel().getSelectedItem();
+
+            // This needs run on the GUI thread to avoid the error described
+            // here: https://bugs.openjdk.java.net/browse/JDK-8081700.
+            Platform.runLater(() -> {
+                // If the no item in the list is selected or the selected item
+                // isn't equal to the current input, we refilter the list.
+                if (selected == null || !selected.getQuery().equals(editor.getText())) {
+                    filteredItems.setPredicate(item -> {
+                        // We return true for any items that starts with the
+                        // same letters as the input. We use toUpperCase to
+                        // avoid case sensitivity.
+                        if (item.getQuery().toUpperCase().contains(newValue.toUpperCase())) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    });
+                }
+            });
+        });
+        historyStatements.setItems(filteredItems);
     }
 
     private void setFavoriteItems(List<HistoryItem> statements) {
