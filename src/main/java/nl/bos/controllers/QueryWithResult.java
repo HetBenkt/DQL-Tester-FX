@@ -21,22 +21,33 @@ import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfAttr;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.util.Callback;
 import nl.bos.AttributeTableColumn;
 import nl.bos.Repository;
@@ -46,408 +57,511 @@ import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
 import nl.bos.utils.DQLSyntax;
 import nl.bos.utils.Resources;
+import javafx.beans.binding.Bindings;
 
 public class QueryWithResult {
-    private static final Logger LOGGER = Logger.getLogger(QueryWithResult.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(QueryWithResult.class.getName());
 
-    private ContextMenuOnResultTable contextMenuOnResultTable;
+	private ContextMenuOnResultTable contextMenuOnResultTable;
 
-    private JSONObject jsonObject;
+	private JSONObject jsonObject;
 
-    private FXMLLoader connectionWithStatusFxmlLoader;
-    private String[] parsedDescription;
+	private FXMLLoader connectionWithStatusFxmlLoader;
+	private String[] parsedDescription;
 
-    @FXML
-    private ComboBox<HistoryItem> historyStatements;
-    @FXML
-    private ComboBox<HistoryItem> favoriteStatements;
-    @FXML
-    private VBox queryWithResultBox;
-    @FXML
-    private CodeArea statement;
-    @FXML
-    private TableView result;
-    @FXML
-    private ImageView btnDeleteHistoryItem;
-    @FXML
-    private ImageView btnSaveHistoryItem;
-    @FXML
-    private ImageView btnDeleteFavoriteItem;
+	@FXML
+	private ComboBox<HistoryItem> historyStatements;
+	@FXML
+	private ComboBox<HistoryItem> favoriteStatements;
+	
+	private ObservableList<HistoryItem> historyItems;
+	@FXML
+	private VBox queryWithResultBox;
+	@FXML
+	private CodeArea statement;
+	@FXML
+	private TableView result;
+	@FXML
+	private ImageView btnDeleteHistoryItem;
+	@FXML
+	private ImageView btnSaveHistoryItem;
+	@FXML
+	private ImageView btnDeleteFavoriteItem;
 
-    private Instant start;
-    
-    private Subscription subscribeToText;
+	private Instant start;
 
-    ComboBox<HistoryItem> getHistoryStatements() {
-        return historyStatements;
-    }
+	private Subscription subscribeToText;
 
-    CodeArea getStatement() {
-        return statement;
-    }
+	ComboBox<HistoryItem> getHistoryStatements() {
+		return historyStatements;
+	}
 
-    JSONObject getJsonObject() {
-        return jsonObject;
-    }
+	CodeArea getStatement() {
+		return statement;
+	}
 
-    FXMLLoader getConnectionWithStatusFxmlLoader() {
-        return connectionWithStatusFxmlLoader;
-    }
+	JSONObject getJsonObject() {
+		return jsonObject;
+	}
 
-    public Instant getStart() {
-        return start;
-    }
+	FXMLLoader getConnectionWithStatusFxmlLoader() {
+		return connectionWithStatusFxmlLoader;
+	}
 
-    public TableView getResult() {
-        return result;
-    }
+	public Instant getStart() {
+		return start;
+	}
 
-    public void cleanStart() {
-        this.start = null;
-    }
+	public TableView getResult() {
+		return result;
+	}
 
-    @FXML
-    private void initialize() {
-        Controllers.put(this.getClass().getSimpleName(), this);
+	public void cleanStart() {
+		this.start = null;
+	}
 
-        Tooltip.install(btnDeleteHistoryItem, new Tooltip("Delete from history"));
-        Tooltip.install(btnSaveHistoryItem, new Tooltip("Save to favorites"));
-        Tooltip.install(btnDeleteFavoriteItem, new Tooltip("Delete from favorites"));
+	@FXML
+	private void initialize() {
+		Controllers.put(this.getClass().getSimpleName(), this);
 
-        contextMenuOnResultTable = new ContextMenuOnResultTable(result);
-        result.getSelectionModel().setCellSelectionEnabled(true);
-        result.addEventHandler(MouseEvent.MOUSE_CLICKED, contextMenuOnResultTable::onRightMouseClick);
-        result.getSortOrder().addListener((InvalidationListener) change -> {
-            start = Instant.now();
-            LOGGER.info("Start..." + Instant.now());
-        });
-        loadConnectionWithStatusFxml();
+		Tooltip.install(btnDeleteHistoryItem, new Tooltip("Delete from history"));
+		Tooltip.install(btnSaveHistoryItem, new Tooltip("Save to favorites"));
+		Tooltip.install(btnDeleteFavoriteItem, new Tooltip("Delete from favorites"));
+
+		contextMenuOnResultTable = new ContextMenuOnResultTable(result);
+		result.getSelectionModel().setCellSelectionEnabled(true);
+		result.addEventHandler(MouseEvent.MOUSE_CLICKED, contextMenuOnResultTable::onRightMouseClick);
+		result.getSortOrder().addListener((InvalidationListener) change -> {
+			start = Instant.now();
+			LOGGER.info("Start..." + Instant.now());
+		});
+		loadConnectionWithStatusFxml();
 
 		subscribeToText = statement.multiPlainChanges().successionEnds(Duration.ofMillis(500))
 				.subscribe(ignore -> statement.setStyleSpans(0, DQLSyntax.computeHighlighting(statement.getText())));
-        Resources.initHistoryFile();
-        reloadHistory();
+		Resources.initHistoryFile();
+		reloadHistory();
 
-        historyStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, historyStatements));
-        favoriteStatements.getSelectionModel().selectedIndexProperty().addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, favoriteStatements));
-        historyStatements.setCellFactory(cellFactory);
-        historyStatements.setButtonCell(cellFactory.call(null));
-        favoriteStatements.setCellFactory(cellFactory);
-        favoriteStatements.setButtonCell(cellFactory.call(null));
-    }
+		historyStatements.getSelectionModel().selectedIndexProperty().addListener(
+				(observableValue, oldValue, newValue) -> onStatementsSelection(newValue, historyStatements));
+		favoriteStatements.getSelectionModel().selectedIndexProperty().addListener(
+				(observableValue, oldValue, newValue) -> onStatementsSelection(newValue, favoriteStatements));
+		historyStatements.setCellFactory(cellFactory);
 
-    Callback<ListView<HistoryItem>, ListCell<HistoryItem>> cellFactory = lv -> new ListCell<>() {
-        @Override
-        protected void updateItem(HistoryItem item, boolean empty) {
-            super.updateItem(item, empty);
-            if (item != null) {
-                setText(item.getQuery().substring(0, Math.min(item.getQuery().length(), 100)).replaceAll("\n", " "));
-                setTooltip(new Tooltip(item.getQuery()));
-            }
-        }
-    };
-    
-    private void onStatementsSelection(Number newValue, ComboBox<HistoryItem> statements) {
-        if (newValue.intValue() != -1) {
-            String selectedItem = String.valueOf(statements.getItems().get((Integer) newValue));
-            LOGGER.info(selectedItem);
+		historyStatements.setButtonCell(cellFactory.call(null));
+		favoriteStatements.setCellFactory(cellFactory);
+		favoriteStatements.setButtonCell(cellFactory.call(null));
+	}
+
+	@SuppressWarnings("static-access")
+	Callback<ListView<HistoryItem>, ListCell<HistoryItem>> cellFactory = lv -> new ListCell<>() {
+        // This is the node that will display the text and the cross. 
+        // I chose a hyperlink, but you can change to button, image, etc. 
+        private HBox graphic;
+
+        // this is the constructor for the anonymous class.
+        {
+            Label label = new Label();
+            // Bind the label text to the item property. If your ComboBox items are not Strings you should use a converter.
+            //itemProperty().setConverter();
+            label.textProperty().bind(Bindings.convert(itemProperty()));
+            // Set max width to infinity so the cross is all the way to the right. 
+
+            label.setMaxWidth(Double.POSITIVE_INFINITY);
+            // We have to modify the hiding behavior of the ComboBox to allow clicking on the hyperlink, 
+            // so we need to hide the ComboBox when the label is clicked (item selected). 
             
+
+            Hyperlink cross = new Hyperlink("X");
+            cross.setVisited(true); // So it is black, and not blue. 
+            cross.setOnAction(event ->
+                    {
+                        // Since the ListView reuses cells, we need to get the item first, before making changes.  
+                        String item = getItem().getQuery();
+                        System.out.println("Clicked cross on " + item);
+                        // Remove the item from history 
+                        handleDeleteHistoryItem(getItem());
+                    }
+            );
+            // Arrange controls in a HBox, and set display to graphic only (the text is included in the graphic in this implementation). 
+            graphic = new HBox(label, cross);
+            graphic.setHgrow(label, Priority.ALWAYS);
+            setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+        }
+		
+		@Override
+		protected void updateItem(HistoryItem item, boolean empty) {
+			super.updateItem(item, empty);
+			if (!empty && item != null) {
+				//setText(item.getQuery().substring(0, Math.min(item.getQuery().length(), 100)).replaceAll("\n", " "));
+				setGraphic(graphic);
+				setTooltip(new Tooltip(item.getQuery()));
+			} else {
+				setGraphic(null);
+				setTooltip(null);
+			}
+		}
+	};
+
+	private void onStatementsSelection(Number newValue, ComboBox<HistoryItem> statements) {
+		if (newValue.intValue() != -1) {
+			String selectedItem = String.valueOf(statements.getItems().get((Integer) newValue).getQuery());
+			LOGGER.info(selectedItem);
             statement.replaceText(0, statement.getLength(), selectedItem);
-        } else
-            statement.replaceText(0, statement.getLength(),"");
-    }
-
-    private void loadConnectionWithStatusFxml() {
-        Resources resources = new Resources();
-        BorderPane connectionWithStatus = (BorderPane) resources.loadFXML("/nl/bos/views/ConnectionWithStatus.fxml");
-        connectionWithStatusFxmlLoader = resources.getFxmlLoader();
-        queryWithResultBox.getChildren().add(connectionWithStatus);
-    }
-
-    private void reloadHistory() {
-        String history = convertFileToString();
-        List<HistoryItem> statements = makeListFrom(history);
-        setHistoryItems(statements);
-        setFavoriteItems(statements);
-    }
-
-    private String convertFileToString() {
-        String history = new String(Resources.readHistoryJsonBytes(), StandardCharsets.UTF_8);
-        jsonObject = new JSONObject(history);
-        return history;
-    }
-
-    private List<HistoryItem> makeListFrom(String history) {
-        JSONArray historyQueries = (JSONArray) new JSONObject(history).get(QUERIES);
-
-        List<HistoryItem> statements = new ArrayList<>();
-        for (int i = 0; i < historyQueries.length(); i++) {
-            statements.add(histroryItemFromJsonObject(historyQueries.getJSONObject(i)));
-        }
-
-        return statements;
-    }
-
-    private void setHistoryItems(List<HistoryItem> statements) {
-        ObservableList<HistoryItem> value = FXCollections.observableList(statements);
-        historyStatements.setItems(value);
-    }
-
-    private void setFavoriteItems(List<HistoryItem> statements) {
-        List<HistoryItem> result = statements.stream()
-                .filter(HistoryItem::isFavorite)
-                .collect(Collectors.toList());
-        ObservableList<HistoryItem> value = FXCollections.observableList(result);
-        favoriteStatements.setItems(value);
-    }
-
-
-    private HistoryItem histroryItemFromJsonObject(JSONObject jsonObject) {
-        String query = jsonObject.getString("query");
-        String category = jsonObject.getString("category");
-        boolean isFavorite = jsonObject.getBoolean("favorite");
-
-        HistoryItem historyItem = new HistoryItem(query);
-        historyItem.setCategory(category);
-        historyItem.setFavorite(isFavorite);
-
-        return historyItem;
-    }
-
-    @FXML
-    private void handleDeleteHistoryItem() {
-        HistoryItem selectedItem = historyStatements.getSelectionModel().getSelectedItem();
-
-        if (historyStatements.getItems().remove(selectedItem)) {
-            List<HistoryItem> historyItems = makeListFrom(jsonObject.toString());
-            int selectedIndex = 0;
-            for (HistoryItem historyItem : historyItems) {
-                if (historyItem.getQuery().equals(selectedItem.getQuery())) {
-                    break;
-                }
-                selectedIndex++;
-            }
-
-            JSONArray queries = (JSONArray) jsonObject.get(QUERIES);
-            queries.remove(selectedIndex);
-            if (queries.length() > 0) {
-                historyStatements.setValue(historyStatements.getItems().get(0));
-            }
-
-            Resources.writeJsonDataToJsonHistoryFile(jsonObject);
-            reloadHistory();
-        }
-    }
-
-    @FXML
-    private void handleSaveHistoryItem() {
-        HistoryItem selectedItem = historyStatements.getSelectionModel().getSelectedItem();
-
-        if (selectedItem != null) {
-            selectedItem.setFavorite(true);
-
-            updateJSONData(selectedItem);
-            Resources.writeJsonDataToJsonHistoryFile(jsonObject);
-            reloadHistory();
-        }
-    }
-
-    @FXML
-    private void handleDeleteFavoriteItem() {
-        HistoryItem selectedItem = favoriteStatements.getSelectionModel().getSelectedItem();
-
-        if (selectedItem != null) {
-            selectedItem.setFavorite(false);
-
-            updateJSONData(selectedItem);
-            Resources.writeJsonDataToJsonHistoryFile(jsonObject);
-            reloadHistory();
-        }
-    }
-
-    private void updateJSONData(HistoryItem selectedItem) {
-        List<HistoryItem> historyItems = makeListFrom(jsonObject.toString());
-        int selectedIndex = 0;
-        for (HistoryItem historyItem : historyItems) {
-            if (historyItem.getQuery().equals(selectedItem.getQuery())) {
-                break;
-            }
-            selectedIndex++;
-        }
-
-        JSONArray queries = (JSONArray) jsonObject.get("queries");
-        queries.put(selectedIndex, new JSONObject(selectedItem));
-    }
-
-    /**
-     * @noinspection unchecked
-     */
-    int updateResultTable(IDfCollection collection) throws DfException {
-        result.getItems().clear();
-        result.getColumns().clear();
-
-        List<AttributeTableColumn> columns = new ArrayList<>();
-        ObservableList<ObservableList> rows = FXCollections.observableArrayList();
-
-        int rowCount = 0;
-        while (collection.next()) {
-            rowCount++;
-            ObservableList<String> row = FXCollections.observableArrayList();
-            for (int i = 0; i < collection.getAttrCount(); i++) {
-                IDfAttr attr = collection.getAttr(i);
-
-                if (rowCount == 1) {
-                    final int j = i;
-                    AttributeTableColumn column = new AttributeTableColumn(attr.getName());
-                    column.setAttr(attr);
-                    column.setCellValueFactory((Callback<AttributeTableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>) param -> new SimpleStringProperty(param.getValue().get(j).toString()));
-                    columns.add(column);
-                }
-
-                switch (attr.getDataType()) {
-                    case IDfAttr.DM_BOOLEAN:
-                        row.add(String.valueOf(collection.getBoolean(attr.getName())));
-                        break;
-                    case IDfAttr.DM_DOUBLE:
-                        row.add(String.valueOf(collection.getDouble(attr.getName())));
-                        break;
-                    case IDfAttr.DM_ID:
-                        row.add(String.valueOf(collection.getId(attr.getName())));
-                        break;
-                    case IDfAttr.DM_INTEGER:
-                        row.add(String.valueOf(collection.getInt(attr.getName())));
-                        break;
-                    case IDfAttr.DM_STRING:
-                        row.add(String.valueOf(collection.getString(attr.getName())));
-                        break;
-                    case IDfAttr.DM_TIME:
-                        row.add(String.valueOf(collection.getTime(attr.getName())));
-                        break;
-                    default:
-                        LOGGER.finest("Error occurred while displaying the results.");
-                        row.add("N/A");
-                        break;
-                }
-            }
-            rows.add(row);
-        }
-        result.getColumns().addAll(columns);
-        result.setItems(rows);
-
-        return rowCount;
-    }
-
-    /**
-     * @noinspection unchecked
-     */
-    public int updateResultTableWithStringInput(String description, List<String> columnNames) {
-        contextMenuOnResultTable.getMenuItemShowPropertiesAction().setDescription(description);
-
-        result.getItems().clear();
-        result.getColumns().clear();
-
-        List<AttributeTableColumn> columns = new ArrayList<>();
-        ObservableList<ObservableList> rows = FXCollections.observableArrayList();
-
-        int rowCount = 0;
-
-        while (rowCount < getRowSize(description)) {
-            rowCount++;
-            ObservableList<String> row = FXCollections.observableArrayList();
-            for (int i = 0; i < columnNames.size(); i++) {
-
-                if (rowCount == 1) {
-                    final int j = i;
-                    AttributeTableColumn column = new AttributeTableColumn(columnNames.get(j));
-                    column.setCellValueFactory((Callback<AttributeTableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>) param -> new SimpleStringProperty(param.getValue().get(j).toString()));
-                    columns.add(column);
-                }
-
-                row.add(getRowValue(rowCount - 1, i));
-            }
-            rows.add(row);
-        }
-        result.getColumns().addAll(columns);
-        result.setItems(rows);
-
-        return rowCount;
-    }
-
-    private int getRowSize(String description) {
-        String fromColumns;
-        String type = description.substring(0, description.indexOf('\t'));
-
-        if (type.contains("Table")) {
-            fromColumns = description.substring(description.indexOf("Columns:"));
+            statements.hide();
         } else {
-            fromColumns = description.substring(description.indexOf("Attributes:"));
+//            statement.replaceText(0, statement.getLength(),"");
+		}
+	}
+
+	private void loadConnectionWithStatusFxml() {
+		Resources resources = new Resources();
+		BorderPane connectionWithStatus = (BorderPane) resources.loadFXML("/nl/bos/views/ConnectionWithStatus.fxml");
+		connectionWithStatusFxmlLoader = resources.getFxmlLoader();
+		queryWithResultBox.getChildren().add(connectionWithStatus);
+	}
+
+	private void reloadHistory() {
+		String history = convertFileToString();
+		historyItems = FXCollections.observableList(makeListFrom(history));
+		setHistoryItems(historyItems);
+		setFavoriteItems(historyItems);
+	}
+
+	private String convertFileToString() {
+		String history = new String(Resources.readHistoryJsonBytes(), StandardCharsets.UTF_8);
+		jsonObject = new JSONObject(history);
+		return history;
+	}
+
+	private List<HistoryItem> makeListFrom(String history) {
+		JSONArray historyQueries = (JSONArray) new JSONObject(history).get(QUERIES);
+
+		List<HistoryItem> statements = new ArrayList<>();
+		for (int i = 0; i < historyQueries.length(); i++) {
+			statements.add(histroryItemFromJsonObject(historyQueries.getJSONObject(i)));
+		}
+
+		return statements;
+	}
+
+	private void setHistoryItems(List<HistoryItem> statements) {
+		addFilterToComboBox(historyItems, historyStatements);
+	}
+
+	private void addFilterToComboBox(ObservableList<HistoryItem> allItems, ComboBox<HistoryItem> combo) {
+		FilteredList<HistoryItem> filteredItems = new FilteredList<>(allItems, p -> true);
+		
+		// filter the event that will select the current value (and close the combo) on key SPACE 
+		ComboBoxListViewSkin<HistoryItem> comboBoxListViewSkin = new ComboBoxListViewSkin<HistoryItem>(combo);
+		comboBoxListViewSkin.getPopupContent().addEventFilter(KeyEvent.ANY, (event) -> {
+		    if( event.getCode() == KeyCode.SPACE ) {
+		        event.consume();
+		    }
+		});
+		//we don't hide the list on click to be able to handle click event on delete
+		comboBoxListViewSkin.setHideOnClick(false);
+		combo.setSkin(comboBoxListViewSkin);
+		
+		//only enable the editor when the drop down list is shown
+		combo.showingProperty().addListener((obs, oldValue, newValue) -> {
+			if (!oldValue && newValue) {
+				// reset the editor value every time we show the drop down
+				combo.setEditable(true);
+				combo.getEditor().clear();
+			} else if (!newValue) {
+				// when the list gets hidden, reset the filter
+				combo.setEditable(false);
+				filteredItems.setPredicate(p -> true);
+			}
+		});
+		//on editor change, update the filtered list predicate
+		combo.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+			if (!combo.isShowing()) {
+				return;
+			}
+
+			final TextField editor = combo.getEditor();
+			LOGGER.log(Level.INFO, "Editor: " + editor.getText());
+			Platform.runLater(() -> {
+				filteredItems.setPredicate(item -> {
+					// We return true for any items that contains the input.
+					return item.getQuery().toUpperCase().contains(newValue.toUpperCase());
+				});
+			});
+		});
+		combo.setItems(filteredItems);
+	}
+
+	private void setFavoriteItems(List<HistoryItem> statements) {
+		ObservableList<HistoryItem> result = historyItems.filtered(p -> p.isFavorite()) ;//statements.stream().filter(HistoryItem::isFavorite).collect(Collectors.toList());
+		addFilterToComboBox(result, favoriteStatements);
+	}
+
+	private HistoryItem histroryItemFromJsonObject(JSONObject jsonObject) {
+		String query = jsonObject.getString("query");
+		String category = jsonObject.getString("category");
+		boolean isFavorite = jsonObject.getBoolean("favorite");
+
+		HistoryItem historyItem = new HistoryItem(query);
+		historyItem.setCategory(category);
+		historyItem.setFavorite(isFavorite);
+
+		return historyItem;
+	}
+
+	@FXML
+	private void handleDeleteHistoryItem() {
+		HistoryItem selectedItem = historyStatements.getSelectionModel().getSelectedItem();
+		handleDeleteHistoryItem(selectedItem);
+	}
+
+	private void handleDeleteHistoryItem(HistoryItem item) {
+			int selectedIndex = historyItems.indexOf(item);
+			historyItems.remove(item);
+
+			JSONArray queries = (JSONArray) jsonObject.get(QUERIES);
+			queries.remove(selectedIndex);
+			Resources.writeJsonDataToJsonHistoryFile(jsonObject);
+	}
+	
+	@FXML
+	private void handleSaveHistoryItem() {
+		HistoryItem selectedItem = historyStatements.getSelectionModel().getSelectedItem();
+
+		if (selectedItem != null) {
+			selectedItem.setFavorite(true);
+
+			updateJSONData(selectedItem);
+			Resources.writeJsonDataToJsonHistoryFile(jsonObject);
+			reloadHistory();
+		}
+	}
+
+	@FXML
+	private void handleDeleteFavoriteItem() {
+		HistoryItem selectedItem = favoriteStatements.getSelectionModel().getSelectedItem();
+
+		if (selectedItem != null) {
+			selectedItem.setFavorite(false);
+
+			updateJSONData(selectedItem);
+			Resources.writeJsonDataToJsonHistoryFile(jsonObject);
+			reloadHistory();
+		}
+	}
+
+	private void updateJSONData(HistoryItem selectedItem) {
+		List<HistoryItem> historyItems = makeListFrom(jsonObject.toString());
+		int selectedIndex = 0;
+		for (HistoryItem historyItem : historyItems) {
+			if (historyItem.getQuery().equals(selectedItem.getQuery())) {
+				break;
+			}
+			selectedIndex++;
+		}
+
+		JSONArray queries = (JSONArray) jsonObject.get("queries");
+		queries.put(selectedIndex, new JSONObject(selectedItem));
+	}
+
+	/**
+	 * @noinspection unchecked
+	 */
+	int updateResultTable(IDfCollection collection) throws DfException {
+		result.getItems().clear();
+		result.getColumns().clear();
+
+		List<AttributeTableColumn> columns = new ArrayList<>();
+		ObservableList<ObservableList> rows = FXCollections.observableArrayList();
+
+		int rowCount = 0;
+		while (collection.next()) {
+			rowCount++;
+			ObservableList<String> row = FXCollections.observableArrayList();
+			for (int i = 0; i < collection.getAttrCount(); i++) {
+				IDfAttr attr = collection.getAttr(i);
+
+				if (rowCount == 1) {
+					final int j = i;
+					AttributeTableColumn column = new AttributeTableColumn(attr.getName());
+					column.setAttr(attr);
+					column.setCellValueFactory(
+							(Callback<AttributeTableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>) param -> new SimpleStringProperty(
+									param.getValue().get(j).toString()));
+					columns.add(column);
+				}
+
+				switch (attr.getDataType()) {
+				case IDfAttr.DM_BOOLEAN:
+					row.add(String.valueOf(collection.getBoolean(attr.getName())));
+					break;
+				case IDfAttr.DM_DOUBLE:
+					row.add(String.valueOf(collection.getDouble(attr.getName())));
+					break;
+				case IDfAttr.DM_ID:
+					row.add(String.valueOf(collection.getId(attr.getName())));
+					break;
+				case IDfAttr.DM_INTEGER:
+					row.add(String.valueOf(collection.getInt(attr.getName())));
+					break;
+				case IDfAttr.DM_STRING:
+					row.add(String.valueOf(collection.getString(attr.getName())));
+					break;
+				case IDfAttr.DM_TIME:
+					row.add(String.valueOf(collection.getTime(attr.getName())));
+					break;
+				default:
+					LOGGER.finest("Error occurred while displaying the results.");
+					row.add("N/A");
+					break;
+				}
+			}
+			rows.add(row);
+		}
+		result.getColumns().addAll(columns);
+		result.setItems(rows);
+
+		return rowCount;
+	}
+
+	/**
+	 * @noinspection unchecked
+	 */
+	public int updateResultTableWithStringInput(String description, List<String> columnNames) {
+		contextMenuOnResultTable.getMenuItemShowPropertiesAction().setDescription(description);
+
+		result.getItems().clear();
+		result.getColumns().clear();
+
+		List<AttributeTableColumn> columns = new ArrayList<>();
+		ObservableList<ObservableList> rows = FXCollections.observableArrayList();
+
+		int rowCount = 0;
+
+		while (rowCount < getRowSize(description)) {
+			rowCount++;
+			ObservableList<String> row = FXCollections.observableArrayList();
+			for (int i = 0; i < columnNames.size(); i++) {
+
+				if (rowCount == 1) {
+					final int j = i;
+					AttributeTableColumn column = new AttributeTableColumn(columnNames.get(j));
+					column.setCellValueFactory(
+							(Callback<AttributeTableColumn.CellDataFeatures<ObservableList, String>, ObservableValue<String>>) param -> new SimpleStringProperty(
+									param.getValue().get(j).toString()));
+					columns.add(column);
+				}
+
+				row.add(getRowValue(rowCount - 1, i));
+			}
+			rows.add(row);
+		}
+		result.getColumns().addAll(columns);
+		result.setItems(rows);
+
+		return rowCount;
+	}
+
+	private int getRowSize(String description) {
+		String fromColumns;
+		String type = description.substring(0, description.indexOf('\t'));
+
+		if (type.contains("Table")) {
+			fromColumns = description.substring(description.indexOf("Columns:"));
+		} else {
+			fromColumns = description.substring(description.indexOf("Attributes:"));
+		}
+
+		String columnsInfo = fromColumns.substring(0, fromColumns.indexOf("\r\n"));
+		String value = columnsInfo.substring(columnsInfo.indexOf(':') + 1).trim();
+
+		parseDescription(description);
+
+		return Integer.parseInt(value);
+	}
+
+	private String getRowValue(int rowIndex, int columnIndex) {
+		String rowValue = "";
+
+		try {
+			rowValue = parsedDescription[(rowIndex * 3) + columnIndex];
+
+		} catch (ArrayIndexOutOfBoundsException e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+
+		return rowValue;
+	}
+
+	private void parseDescription(String descriptionInput) {
+		String[] split;
+		String type = descriptionInput.substring(0, descriptionInput.indexOf('\t'));
+
+		if (type.contains("Table")) {
+			split = descriptionInput.substring(descriptionInput.indexOf("\r\n", descriptionInput.indexOf("Columns:")))
+					.replace("KEYED\r\n", " KEYED ").replace("\r\n", " NOT_KEYED ").replace(" NOT_KEYED", " FALSE")
+					.replace("KEYED", " TRUE").split(" ");
+		} else {
+			split = descriptionInput
+					.substring(descriptionInput.indexOf("\r\n", descriptionInput.indexOf("Attributes:")))
+					.replace("REPEATING\r\n", " REPEATING ").replace("\r\n", " NOT_REPEATING ")
+					.replace(" NOT_REPEATING", " FALSE").replace("REPEATING", " TRUE").split(" ");
+		}
+
+		split[0] = "";
+		split[1] = "";
+		split[2] = "";
+		split[3] = "";
+		parsedDescription = Arrays.stream(split).filter(value -> !value.equals("")).toArray(String[]::new);
+	}
+
+	public void executeQuery(String query) {
+		ConnectionWithStatus connectionWithStatusController = (ConnectionWithStatus) Controllers
+				.get(ConnectionWithStatus.class.getSimpleName());
+
+		Instant start = Instant.now();
+		IDfCollection collection = Repository.getInstance().query(query);
+		Instant end = Instant.now();
+		connectionWithStatusController.getTimeQuery().setText(Calculations.getDurationInSeconds(start, end));
+
+		if (collection == null) {
+			return;
+		}
+
+		try {
+			Instant startList = Instant.now();
+			int rowCount = updateResultTable(collection);
+			Instant endList = Instant.now();
+			connectionWithStatusController.getTimeList().setText(Calculations.getDurationInSeconds(startList, endList));
+			connectionWithStatusController.getResultCount().setText(String.valueOf(rowCount));
+
+			collection.close();
+		} catch (DfException e) {
+			LOGGER.log(Level.SEVERE, String.format("Error running query: [%s]", query), e);
+		}
+	}
+	
+	public void appendNewQueryToHistory(String statement, JSONObject jsonObject) {
+		if (statementNotExists(historyItems, statement)) {
+		    HistoryItem historyItem = new HistoryItem(statement);
+		    historyItems.add(0, historyItem);
+		    historyStatements.setValue(historyItem);
+		    JSONArray queries = (JSONArray) jsonObject.get("queries");
+		    if (queries.length() > 0) {
+		        queries.put(queries.get(0));
+		    }
+		    queries.put(0, new JSONObject(historyItem));
+
+		    Resources.writeJsonDataToJsonHistoryFile(jsonObject);
+		}
+	}
+	
+    private boolean statementNotExists(ObservableList<HistoryItem> items, String statement) {
+        for (HistoryItem item : items) {
+            if (item.getQuery().equalsIgnoreCase(statement))
+                return false;
         }
-
-        String columnsInfo = fromColumns.substring(0, fromColumns.indexOf("\r\n"));
-        String value = columnsInfo.substring(columnsInfo.indexOf(':') + 1).trim();
-
-        parseDescription(description);
-
-        return Integer.parseInt(value);
-    }
-
-    private String getRowValue(int rowIndex, int columnIndex) {
-        String rowValue = "";
-
-        try {
-            rowValue = parsedDescription[(rowIndex * 3) + columnIndex];
-
-        } catch (ArrayIndexOutOfBoundsException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
-        }
-
-        return rowValue;
-    }
-
-    private void parseDescription(String descriptionInput) {
-        String[] split;
-        String type = descriptionInput.substring(0, descriptionInput.indexOf('\t'));
-
-        if (type.contains("Table")) {
-            split = descriptionInput.substring(descriptionInput.indexOf("\r\n", descriptionInput.indexOf("Columns:")))
-                    .replace("KEYED\r\n", " KEYED ")
-                    .replace("\r\n", " NOT_KEYED ")
-                    .replace(" NOT_KEYED", " FALSE")
-                    .replace("KEYED", " TRUE")
-                    .split(" ");
-        } else {
-            split = descriptionInput.substring(descriptionInput.indexOf("\r\n", descriptionInput.indexOf("Attributes:"))).replace("REPEATING\r\n", " REPEATING ").replace("\r\n", " NOT_REPEATING ").replace(" NOT_REPEATING", " FALSE").replace("REPEATING", " TRUE").split(" ");
-        }
-
-        split[0] = "";
-        split[1] = "";
-        split[2] = "";
-        split[3] = "";
-        parsedDescription = Arrays.stream(split).filter(value -> !value.equals("")).toArray(String[]::new);
-    }
-
-    public void executeQuery(String query) {
-        ConnectionWithStatus connectionWithStatusController = (ConnectionWithStatus) Controllers.get(ConnectionWithStatus.class.getSimpleName());
-
-        Instant start = Instant.now();
-        IDfCollection collection = Repository.getInstance().query(query);
-        Instant end = Instant.now();
-        connectionWithStatusController.getTimeQuery().setText(Calculations.getDurationInSeconds(start, end));
-
-        if (collection == null) {
-            return;
-        }
-
-        try {
-            Instant startList = Instant.now();
-            int rowCount = updateResultTable(collection);
-            Instant endList = Instant.now();
-            connectionWithStatusController.getTimeList().setText(Calculations.getDurationInSeconds(startList, endList));
-            connectionWithStatusController.getResultCount().setText(String.valueOf(rowCount));
-
-            collection.close();
-        } catch (DfException e) {
-            LOGGER.log(Level.SEVERE, String.format("Error running query: [%s]", query), e);
-        }
+        return true;
     }
 }
