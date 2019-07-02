@@ -130,8 +130,6 @@ public class QueryWithResult {
 		});
 		loadConnectionWithStatusFxml();
 
-		subscribeToText = statement.multiPlainChanges().successionEnds(Duration.ofMillis(500))
-				.subscribe(ignore -> statement.setStyleSpans(0, DQLSyntax.computeHighlighting(statement.getText())));
 		Resources.initHistoryFile();
 		reloadHistory();
 
@@ -164,9 +162,9 @@ public class QueryWithResult {
 		if (newValue.intValue() != -1) {
 			String selectedItem = String.valueOf(statements.getItems().get((Integer) newValue).getQuery());
 			LOGGER.info(selectedItem);
-            statement.replaceText(0, statement.getLength(), selectedItem);
-        } else {
-//            statement.replaceText(0, statement.getLength(),"");
+			statement.setText(selectedItem);
+		} else {
+//			statement.setText("");
 		}
 	}
 

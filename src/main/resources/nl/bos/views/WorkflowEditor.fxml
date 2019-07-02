@@ -43,13 +43,13 @@
                     <Insets top="20.0"/>
                 </VBox.margin>
             </Label>
-            <TextField promptText="supervisor_name"/>
+            <TextField fx:id="txtSupervisor" onKeyPressed="#handleSupervisor" promptText="supervisor_name"/>
             <Label text="Filter by Object's Name or ID">
                 <VBox.margin>
                     <Insets top="5.0"/>
                 </VBox.margin>
             </Label>
-            <TextField promptText="object_name or r_object_id"/>
+            <TextField fx:id="txtObject" onKeyPressed="#handleObject" promptText="object_name or r_object_id"/>
         </VBox>
         <TabPane tabClosingPolicy="UNAVAILABLE">
             <padding>

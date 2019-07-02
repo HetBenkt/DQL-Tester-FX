@@ -15,6 +15,8 @@ import org.powermock.reflect.Whitebox;
 
 import static org.powermock.api.mockito.PowerMockito.mock;
 
+import org.fxmisc.richtext.CodeArea;
+
 public class QueryWithResultTest {
 
     @Rule
@@ -44,11 +46,11 @@ public class QueryWithResultTest {
     public void getTaStatement() {
         //given
         final QueryWithResult queryWithResult = new QueryWithResult();
-        TextArea mockedTaStatement = mock(TextArea.class);
+        CodeArea mockedTaStatement = mock(CodeArea.class);
         Whitebox.setInternalState(queryWithResult, "statement", mockedTaStatement);
 
         //when
-        TextArea expected = queryWithResult.getStatement();
+        CodeArea expected = queryWithResult.getStatement();
 
         //then
         Assert.assertEquals(expected, mockedTaStatement);
