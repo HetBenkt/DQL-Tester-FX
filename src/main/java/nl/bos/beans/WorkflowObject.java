@@ -2,6 +2,7 @@ package nl.bos.beans;
 
 public class WorkflowObject {
     private String workflowId;
+    private String workflowName;
     private String workitemId;
     private String processName;
     private String activityName;
@@ -20,8 +21,15 @@ public class WorkflowObject {
     private String processId;
     private String parentId;
     private String queueItemId;
-    private String packageId;
     private String execOsError;
+
+    public String getWorkflowName() {
+        return workflowName;
+    }
+
+    public void setWorkflowName(String workflowName) {
+        this.workflowName = workflowName;
+    }
 
     public String getExecOsError() {
         return execOsError;
@@ -157,14 +165,6 @@ public class WorkflowObject {
 
     public void setQueueItemId(String queueItemId) {
         this.queueItemId = queueItemId;
-    }
-
-    public String getPackageId() {
-        return packageId;
-    }
-
-    public void setPackageId(String packageId) {
-        this.packageId = packageId;
     }
 
     public String getWorkflowId() {

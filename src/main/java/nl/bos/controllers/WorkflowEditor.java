@@ -5,29 +5,37 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 import nl.bos.beans.WorkflowObject;
 import nl.bos.services.WorkflowService;
 
+import java.util.logging.Logger;
+
 
 public class WorkflowEditor {
+    private static final Logger LOGGER = Logger.getLogger(WorkflowEditor.class.getName());
 
     @FXML
     private TableView<WorkflowObject> tvResults;
     @FXML
     private TextArea txaErrorContents;
-
+    @FXML
+    private TextField txtSupervisor;
+    @FXML
+    private TextField txtObject;
 
     private WorkflowService workflowService;
 
     public WorkflowEditor() {
-        this.workflowService = new WorkflowService();
+        this.workflowService = new WorkflowService(WorkflowService.ServiceStates.ALL);
     }
 
     @FXML
     private void initialize() {
         initColumnsResultTableView();
-        tvResults.getItems().addAll(workflowService.getAllWorkflows());
+        tvResults.getItems().addAll(workflowService.getWorkflows());
         tvResults.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue != null) {
                 txaErrorContents.setText(newValue.getExecOsError());
@@ -38,6 +46,9 @@ public class WorkflowEditor {
     private void initColumnsResultTableView() {
         TableColumn workflowId = new TableColumn("workflow_id");
         workflowId.setCellValueFactory(new PropertyValueFactory<>("workflowId"));
+
+        TableColumn workflowName = new TableColumn("workflow_name");
+        workflowName.setCellValueFactory(new PropertyValueFactory<>("workflowName"));
 
         TableColumn workitemId = new TableColumn("workitem_id");
         workitemId.setCellValueFactory(new PropertyValueFactory<>("workitemId"));
@@ -93,27 +104,41 @@ public class WorkflowEditor {
         TableColumn queueItemId = new TableColumn("qid");
         queueItemId.setCellValueFactory(new PropertyValueFactory<>("queueItemId"));
 
-        TableColumn packageId = new TableColumn("pkgid");
-        packageId.setCellValueFactory(new PropertyValueFactory<>("packageId"));
-
-        tvResults.getColumns().addAll(workflowId, workitemId, processName, activityName, activitySeqNo, packageName, objectId, objectName, runtimeState, performerName, supervisorName, event, workqueueName, startDate, creationDae, activityId, processId, parentId, queueItemId, packageId);
+        tvResults.getColumns().addAll(workflowId, workflowName, workitemId, processName, activityName, activitySeqNo, packageName, objectId, objectName, runtimeState, performerName, supervisorName, event, workqueueName, startDate, creationDae, activityId, processId, parentId, queueItemId);
     }
 
     @FXML
     private void handleTodayFlows(ActionEvent actionEvent) {
         tvResults.getItems().clear();
-        tvResults.getItems().addAll(workflowService.getTodayWorkflows());
+        workflowService.setCurrentState(WorkflowService.ServiceStates.TODAY);
+        tvResults.getItems().addAll(workflowService.getWorkflows());
     }
 
     @FXML
     private void handleAllFlows(ActionEvent actionEvent) {
         tvResults.getItems().clear();
-        tvResults.getItems().addAll(workflowService.getAllWorkflows());
+        workflowService.setCurrentState(WorkflowService.ServiceStates.ALL);
+        tvResults.getItems().addAll(workflowService.getWorkflows());
     }
 
     @FXML
     public void handlePausedFlows(ActionEvent actionEvent) {
         tvResults.getItems().clear();
-        tvResults.getItems().addAll(workflowService.getPausedWorkflows());
+        workflowService.setCurrentState(WorkflowService.ServiceStates.PAUSED);
+        tvResults.getItems().addAll(workflowService.getWorkflows());
+    }
+
+    @FXML
+    private void handleSupervisor(KeyEvent keyEvent) {
+        tvResults.getItems().clear();
+        workflowService.setCurrentSupervisor(txtSupervisor.getText() + keyEvent.getText());
+        tvResults.getItems().addAll(workflowService.getWorkflows());
+    }
+
+    @FXML
+    private void handleObject(KeyEvent keyEvent) {
+        tvResults.getItems().clear();
+        workflowService.setCurrentObject(txtObject.getText() + keyEvent.getText());
+        tvResults.getItems().addAll(workflowService.getWorkflows());
     }
 }
