@@ -40,6 +40,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.control.skin.ComboBoxPopupControl;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -204,6 +205,16 @@ public class QueryWithResult {
 	private void setHistoryItems(List<HistoryItem> statements) {
 		ObservableList<HistoryItem> allItems = FXCollections.observableList(statements);
 		FilteredList<HistoryItem> filteredItems = new FilteredList<>(allItems, p -> true);
+		
+		// filter the event that will select the current value (and close the combo) on key SPACE 
+		ComboBoxListViewSkin<HistoryItem> comboBoxListViewSkin = new ComboBoxListViewSkin<HistoryItem>(historyStatements);
+		comboBoxListViewSkin.getPopupContent().addEventFilter(KeyEvent.ANY, (event) -> {
+		    if( event.getCode() == KeyCode.SPACE ) {
+		        event.consume();
+		    }
+		});
+		historyStatements.setSkin(comboBoxListViewSkin);
+		
 		//only enable the editor when the drop down list is shown
 		historyStatements.showingProperty().addListener((obs, oldValue, newValue) -> {
 			if (!oldValue && newValue) {
@@ -221,6 +232,7 @@ public class QueryWithResult {
 			if (!historyStatements.isShowing()) {
 				return;
 			}
+
 			final TextField editor = historyStatements.getEditor();
 			LOGGER.log(Level.INFO, "Editor: " + editor.getText());
 			Platform.runLater(() -> {
