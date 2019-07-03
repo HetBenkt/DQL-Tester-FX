@@ -34,11 +34,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.ComboBoxListViewSkin;
-import javafx.scene.control.skin.ComboBoxPopupControl;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -204,36 +202,40 @@ public class QueryWithResult {
 
 	private void setHistoryItems(List<HistoryItem> statements) {
 		ObservableList<HistoryItem> allItems = FXCollections.observableList(statements);
+		addFilterToComboBox(allItems, historyStatements);
+	}
+
+	private void addFilterToComboBox(ObservableList<HistoryItem> allItems, ComboBox<HistoryItem> combo) {
 		FilteredList<HistoryItem> filteredItems = new FilteredList<>(allItems, p -> true);
 		
 		// filter the event that will select the current value (and close the combo) on key SPACE 
-		ComboBoxListViewSkin<HistoryItem> comboBoxListViewSkin = new ComboBoxListViewSkin<HistoryItem>(historyStatements);
+		ComboBoxListViewSkin<HistoryItem> comboBoxListViewSkin = new ComboBoxListViewSkin<HistoryItem>(combo);
 		comboBoxListViewSkin.getPopupContent().addEventFilter(KeyEvent.ANY, (event) -> {
 		    if( event.getCode() == KeyCode.SPACE ) {
 		        event.consume();
 		    }
 		});
-		historyStatements.setSkin(comboBoxListViewSkin);
+		combo.setSkin(comboBoxListViewSkin);
 		
 		//only enable the editor when the drop down list is shown
-		historyStatements.showingProperty().addListener((obs, oldValue, newValue) -> {
+		combo.showingProperty().addListener((obs, oldValue, newValue) -> {
 			if (!oldValue && newValue) {
 				// reset the editor value every time we show the drop down
-				historyStatements.setEditable(true);
-				historyStatements.getEditor().clear();
+				combo.setEditable(true);
+				combo.getEditor().clear();
 			} else if (!newValue) {
 				// when the list gets hidden, reset the filter
-				historyStatements.setEditable(false);
+				combo.setEditable(false);
 				filteredItems.setPredicate(p -> true);
 			}
 		});
 		//on editor change, update the filtered list predicate
-		historyStatements.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-			if (!historyStatements.isShowing()) {
+		combo.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+			if (!combo.isShowing()) {
 				return;
 			}
 
-			final TextField editor = historyStatements.getEditor();
+			final TextField editor = combo.getEditor();
 			LOGGER.log(Level.INFO, "Editor: " + editor.getText());
 			Platform.runLater(() -> {
 				filteredItems.setPredicate(item -> {
@@ -242,13 +244,14 @@ public class QueryWithResult {
 				});
 			});
 		});
-		historyStatements.setItems(filteredItems);
+		combo.setItems(filteredItems);
 	}
 
 	private void setFavoriteItems(List<HistoryItem> statements) {
 		List<HistoryItem> result = statements.stream().filter(HistoryItem::isFavorite).collect(Collectors.toList());
 		ObservableList<HistoryItem> value = FXCollections.observableList(result);
 		favoriteStatements.setItems(value);
+		addFilterToComboBox(value, favoriteStatements);
 	}
 
 	private HistoryItem histroryItemFromJsonObject(JSONObject jsonObject) {
