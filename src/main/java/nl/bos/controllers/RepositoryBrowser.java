@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.*;
@@ -203,6 +204,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 	private void triggerCancelCheckout(ActionEvent actionEvent) {
 		try {
 			repository.cancelCheckout((IDfSysObject) selected.getValue().getObject());
+			((MyTreeNode)selected.getParent()).refresh();
 		} catch (DfException e) {
 			AppAlert.error("Error during cancel checkout", e.getMessage());
 
@@ -223,6 +225,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 		controller.initialize();
 		controller.checkinDialog(selectedId);
 		checkinStage.showAndWait();
+		((MyTreeNode)selected.getParent()).refresh();
 	}
 
 	private void triggerRenditions(ActionEvent actionEvent) {
@@ -508,6 +511,10 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 				super.getChildren().setAll(buildChildren(this));
 			}
 			return super.getChildren();
+		}
+		
+		public void refresh() {
+			this.getChildren().setAll(buildChildren(this)); 
 		}
 
 		@Override
