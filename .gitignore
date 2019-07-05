@@ -7,3 +7,4 @@ history.json
 checkout.json
 trace.log
 log4j.log
+settings.properties
