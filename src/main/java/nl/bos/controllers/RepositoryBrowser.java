@@ -1,24 +1,51 @@
 package nl.bos.controllers;
 
+import static nl.bos.Constants.ATTR_ACL_NAME;
+import static nl.bos.Constants.ATTR_A_CONTENT_TYPE;
+import static nl.bos.Constants.ATTR_IS_PRIVATE;
+import static nl.bos.Constants.ATTR_OWNER_PERMIT;
+import static nl.bos.Constants.ATTR_R_CONTENT_SIZE;
+import static nl.bos.Constants.ATTR_R_CREATION_DATE;
+import static nl.bos.Constants.ATTR_R_LOCK_DATE;
+import static nl.bos.Constants.ATTR_R_LOCK_MACHINE;
+import static nl.bos.Constants.ATTR_R_LOCK_OWNER;
+import static nl.bos.Constants.ATTR_R_MODIFY_DATE;
+import static nl.bos.Constants.ATTR_R_VERSION_LABEL;
+import static nl.bos.Constants.TYPE_CABINET;
+import static nl.bos.Constants.TYPE_DOCUMENT;
+import static nl.bos.Constants.TYPE_REPOSITORY;
+
+import java.awt.Desktop;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.documentum.fc.client.DfACL;
 import com.documentum.fc.client.IDfFolder;
 import com.documentum.fc.client.IDfPersistentObject;
 import com.documentum.fc.client.IDfSysObject;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfId;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -32,16 +59,6 @@ import nl.bos.Constants;
 import nl.bos.Repository;
 import nl.bos.utils.AppAlert;
 import nl.bos.utils.Resources;
-
-import java.awt.*;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static nl.bos.Constants.*;
 
 public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeItem>> {
 	private static final Logger LOGGER = Logger.getLogger(RepositoryBrowser.class.getName());
@@ -93,13 +110,14 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 	private MenuItem miVersions;
 	private MenuItem miRenditions;
 
-    private MenuItem miOpenContent;
-    private MenuItem miExportContent;
+	private MenuItem miOpenContent;
+	private MenuItem miExportContent;
 	private MenuItem miCheckout;
 	private MenuItem miCheckin;
 	private MenuItem miCancelCheckout;
-	
-	private Image imgLockedDocument = new Image(resources.getResourceStream("nl/bos/icons/type/t_dm_document_lock_16.gif"));
+
+	private Image imgLockedDocument = new Image(
+			resources.getResourceStream("nl/bos/icons/type/t_dm_document_lock_16.gif"));
 
 	@FXML
 	private void initialize() {
@@ -121,24 +139,24 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 		MenuItem miDump = new MenuItem("Get Attributes");
 		miDump.setOnAction(this::triggerGetAttributes);
 
-        miOpenContent = new MenuItem("Open Content");
-        miOpenContent.setDisable(true);
-        miOpenContent.setOnAction(this::triggerOpenContent);
+		miOpenContent = new MenuItem("Open Content");
+		miOpenContent.setDisable(true);
+		miOpenContent.setOnAction(this::triggerOpenContent);
 
-        miExportContent = new MenuItem("Export Content");
-        miExportContent.setDisable(true);
-        miExportContent.setOnAction(this::triggerExportContent);
+		miExportContent = new MenuItem("Export Content");
+		miExportContent.setDisable(true);
+		miExportContent.setOnAction(this::triggerExportContent);
 
-        miCheckout = new MenuItem("Check Out Document");
-        miCheckout.setDisable(true);
+		miCheckout = new MenuItem("Check Out Document");
+		miCheckout.setDisable(true);
 		miCheckout.setOnAction(this::triggerCheckout);
 
-        miCheckin = new MenuItem("Check In Document");
-        miCheckin.setDisable(true);
+		miCheckin = new MenuItem("Check In Document");
+		miCheckin.setDisable(true);
 		miCheckin.setOnAction(this::triggerCheckin);
 
 		miCancelCheckout = new MenuItem("Cancel Checkout");
-        miCancelCheckout.setDisable(true);
+		miCancelCheckout.setDisable(true);
 		miCancelCheckout.setOnAction(this::triggerCancelCheckout);
 
 		miVersions = new MenuItem("Versions");
@@ -152,8 +170,9 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 		MenuItem miFindItem = new MenuItem("Find item <F3>");
 		miFindItem.setOnAction(this::triggerFindItem);
 
-        rootContextMenu.getItems().addAll(miOpenContent, new SeparatorMenuItem(), miCheckout, miCheckin, miCancelCheckout,
-                new SeparatorMenuItem(), miDump, new SeparatorMenuItem(), miExportContent, new SeparatorMenuItem(), miVersions, miRenditions, new SeparatorMenuItem(), miFindItem);
+		rootContextMenu.getItems().addAll(miOpenContent, new SeparatorMenuItem(), miCheckout, miCheckin,
+				miCancelCheckout, new SeparatorMenuItem(), miDump, new SeparatorMenuItem(), miExportContent,
+				new SeparatorMenuItem(), miVersions, miRenditions, new SeparatorMenuItem(), miFindItem);
 	}
 
 	private void triggerGetAttributes(ActionEvent actionEvent) {
@@ -172,24 +191,24 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 		dumpAttributes.showAndWait();
 	}
 
-    private void triggerOpenContent(ActionEvent actionEvent) {
+	private void triggerOpenContent(ActionEvent actionEvent) {
 		try {
-            String path = repository.downloadContent((IDfSysObject) selected.getValue().getObject());
-            if (Desktop.isDesktopSupported()) {
-                Resources.openFile(new File(path));
-            }
+			String path = repository.downloadContent((IDfSysObject) selected.getValue().getObject());
+			if (Desktop.isDesktopSupported()) {
+				Resources.openFile(new File(path));
+			}
 		} catch (DfException e) {
-            AppAlert.error("Error during opening content", e.getMessage());
+			AppAlert.error("Error during opening content", e.getMessage());
 		}
 	}
 
-    private void triggerExportContent(ActionEvent actionEvent) {
-        try {
-            repository.downloadContent((IDfSysObject) selected.getValue().getObject());
-        } catch (DfException e) {
-            AppAlert.error("Error during export content", e.getMessage());
-        }
-    }
+	private void triggerExportContent(ActionEvent actionEvent) {
+		try {
+			repository.downloadContent((IDfSysObject) selected.getValue().getObject());
+		} catch (DfException e) {
+			AppAlert.error("Error during export content", e.getMessage());
+		}
+	}
 
 	private void triggerCheckout(ActionEvent actionEvent) {
 		try {
@@ -204,7 +223,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 	private void triggerCancelCheckout(ActionEvent actionEvent) {
 		try {
 			repository.cancelCheckout((IDfSysObject) selected.getValue().getObject());
-			((MyTreeNode)selected.getParent()).refresh();
+			((MyTreeNode) selected.getParent()).refresh();
 		} catch (DfException e) {
 			AppAlert.error("Error during cancel checkout", e.getMessage());
 
@@ -225,7 +244,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 		controller.initialize();
 		controller.checkinDialog(selectedId);
 		checkinStage.showAndWait();
-		((MyTreeNode)selected.getParent()).refresh();
+		((MyTreeNode) selected.getParent()).refresh();
 	}
 
 	private void triggerRenditions(ActionEvent actionEvent) {
@@ -283,11 +302,11 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 			// open context contextmenu on current screen position
 			IDfPersistentObject selectedObject = selected.getValue().getObject();
 			boolean isDocumentType = repository.isDocumentType(selectedObject);
-            miOpenContent.setDisable(!isDocumentType);
-            miExportContent.setDisable(!isDocumentType);
-            miCheckout.setDisable(!repository.canCheckOut(selectedObject));
-            miCancelCheckout.setDisable(!repository.isCheckedOut(selectedObject));
-            miCheckin.setDisable(!repository.isCheckedOut(selectedObject));
+			miOpenContent.setDisable(!isDocumentType);
+			miExportContent.setDisable(!isDocumentType);
+			miCheckout.setDisable(!repository.canCheckOut(selectedObject));
+			miCancelCheckout.setDisable(!repository.isCheckedOut(selectedObject));
+			miCheckin.setDisable(!repository.isCheckedOut(selectedObject));
 			miVersions.setDisable(!isDocumentType);
 			miRenditions.setDisable(!isDocumentType);
 			rootContextMenu.show(treeView, mouseEvent.getScreenX(), mouseEvent.getScreenY());
@@ -300,7 +319,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 	}
 
 	private void searchForTreeItem(String searchId) {
-        if (repository.isObjectId(searchId)) {
+		if (repository.isObjectId(searchId)) {
 			AppAlert.error("No object ID", "The given input is not a valid object ID");
 			return;
 		}
@@ -470,7 +489,7 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 		treeItemBrowser.setExpanded(true);
 		treeView.setRoot(treeItemBrowser);
 		Resources.setBrowserAllCabinet(ckbShowAllCabinets.isSelected());
-		
+
 	}
 
 	private void triggerFindItem(ActionEvent actionEvent) {
@@ -512,9 +531,9 @@ public class RepositoryBrowser implements ChangeListener<TreeItem<BrowserTreeIte
 			}
 			return super.getChildren();
 		}
-		
+
 		public void refresh() {
-			this.getChildren().setAll(buildChildren(this)); 
+			this.getChildren().setAll(buildChildren(this));
 		}
 
 		@Override
