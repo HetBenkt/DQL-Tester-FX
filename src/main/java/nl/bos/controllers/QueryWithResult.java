@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import org.fxmisc.richtext.CodeArea;
 import org.json.JSONArray;
@@ -162,8 +161,7 @@ public class QueryWithResult {
         // this is the constructor for the anonymous class.
         {
             Label label = new Label();
-            // Bind the label text to the item property. If your ComboBox items are not Strings you should use a converter.
-            //itemProperty().setConverter();
+            // Bind the label text to the item property using a converter.
             label.textProperty().bind(Bindings.convert(itemProperty()));
             // Set max width to infinity so the cross is all the way to the right. 
 
@@ -171,20 +169,26 @@ public class QueryWithResult {
             // We have to modify the hiding behavior of the ComboBox to allow clicking on the hyperlink, 
             // so we need to hide the ComboBox when the label is clicked (item selected). 
             
-
+            Hyperlink star = new Hyperlink("☆");
+            star.setVisited(true); // So it is black, and not blue. 
+            star.setOnAction(event ->
+                    {
+                        // Remove the item from history 
+                        handleFavoriteHistoryItem(getItem(), !getItem().isFavorite());
+                    }
+            );
+            
             Hyperlink cross = new Hyperlink("X");
             cross.setVisited(true); // So it is black, and not blue. 
             cross.setOnAction(event ->
                     {
                         // Since the ListView reuses cells, we need to get the item first, before making changes.  
-                        String item = getItem().getQuery();
-                        System.out.println("Clicked cross on " + item);
                         // Remove the item from history 
                         handleDeleteHistoryItem(getItem());
                     }
             );
             // Arrange controls in a HBox, and set display to graphic only (the text is included in the graphic in this implementation). 
-            graphic = new HBox(label, cross);
+            graphic = new HBox(star, label, cross);
             graphic.setHgrow(label, Priority.ALWAYS);
             setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
         }
@@ -237,12 +241,12 @@ public class QueryWithResult {
 	private List<HistoryItem> makeListFrom(String history) {
 		JSONArray historyQueries = (JSONArray) new JSONObject(history).get(QUERIES);
 
-		List<HistoryItem> statements = new ArrayList<>();
+		List<HistoryItem> histItems = new ArrayList<>();
 		for (int i = 0; i < historyQueries.length(); i++) {
-			statements.add(histroryItemFromJsonObject(historyQueries.getJSONObject(i)));
+			histItems.add(historyItemFromJsonObject(historyQueries.getJSONObject(i)));
 		}
 
-		return statements;
+		return histItems;
 	}
 
 	private void setHistoryItems(List<HistoryItem> statements) {
@@ -298,7 +302,7 @@ public class QueryWithResult {
 		addFilterToComboBox(result, favoriteStatements);
 	}
 
-	private HistoryItem histroryItemFromJsonObject(JSONObject jsonObject) {
+	private HistoryItem historyItemFromJsonObject(JSONObject jsonObject) {
 		String query = jsonObject.getString("query");
 		String category = jsonObject.getString("category");
 		boolean isFavorite = jsonObject.getBoolean("favorite");
@@ -328,39 +332,27 @@ public class QueryWithResult {
 	@FXML
 	private void handleSaveHistoryItem() {
 		HistoryItem selectedItem = historyStatements.getSelectionModel().getSelectedItem();
-
-		if (selectedItem != null) {
-			selectedItem.setFavorite(true);
-
-			updateJSONData(selectedItem);
-			Resources.writeJsonDataToJsonHistoryFile(jsonObject);
-			reloadHistory();
-		}
+		handleFavoriteHistoryItem(selectedItem, true);
 	}
 
+	private void handleFavoriteHistoryItem(HistoryItem item, boolean isFavorite) {
+		if (item != null) {
+			item.setFavorite(isFavorite);
+
+			updateJSONData(item);
+			Resources.writeJsonDataToJsonHistoryFile(jsonObject);
+			//reloadHistory();
+		}
+	}
+	
 	@FXML
 	private void handleDeleteFavoriteItem() {
 		HistoryItem selectedItem = favoriteStatements.getSelectionModel().getSelectedItem();
-
-		if (selectedItem != null) {
-			selectedItem.setFavorite(false);
-
-			updateJSONData(selectedItem);
-			Resources.writeJsonDataToJsonHistoryFile(jsonObject);
-			reloadHistory();
-		}
+		handleFavoriteHistoryItem(selectedItem, false);
 	}
 
 	private void updateJSONData(HistoryItem selectedItem) {
-		List<HistoryItem> historyItems = makeListFrom(jsonObject.toString());
-		int selectedIndex = 0;
-		for (HistoryItem historyItem : historyItems) {
-			if (historyItem.getQuery().equals(selectedItem.getQuery())) {
-				break;
-			}
-			selectedIndex++;
-		}
-
+		int selectedIndex = historyItems.indexOf(selectedItem);
 		JSONArray queries = (JSONArray) jsonObject.get("queries");
 		queries.put(selectedIndex, new JSONObject(selectedItem));
 	}

@@ -38,6 +38,6 @@ public class HistoryItem {
 
     @Override
     public String toString() {
-        return query;
+        return getQuery().substring(0, Math.min(getQuery().length(), 200)).replaceAll("\n", " ");
     }
 }
