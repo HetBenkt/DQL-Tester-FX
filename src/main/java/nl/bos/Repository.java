@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static nl.bos.Constants.MSG_TITLE_INFO_DIALOG;
 
@@ -104,9 +102,6 @@ public class Repository {
         this.passkey = passkey;
         this.domain = domain;
         switch (secureMode == null ? "" : secureMode) {
-            case "default":
-                this.secureMode = null;
-                break;
             case "native":
                 this.secureMode = IDfLoginInfo.SECURITY_MODE_NATIVE;
                 break;
@@ -119,6 +114,7 @@ public class Repository {
             case "try_secure_first":
                 this.secureMode = IDfLoginInfo.SECURITY_MODE_TRY_SECURE_FIRST;
                 break;
+			case "default":
             default:
                 this.secureMode = null;
         }
@@ -235,13 +231,7 @@ public class Repository {
     }
 
     public boolean isObjectId(String id) {
-        if (id == null) {
-            return false;
-        }
-        String regex = "[0-9a-f]{16}";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(id);
-        return !matcher.matches();
+    	return new DfId(id).isObjectId();
     }
 
     public boolean isConnected() {

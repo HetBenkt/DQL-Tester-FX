@@ -172,35 +172,31 @@ public class ContextMenuOnResultTable {
 	}
 
 	private boolean selectionIsNotAnDocumentType(String id) {
-		if (id == null || repository.isObjectId(id)) {
-			return true;
-		} else {
+		if (repository.isObjectId(id)) {
             return !repository.isDocumentType(repository.getObjectById(id));
 		}
+
+		return true;
 	}
 
 	private boolean selectionIsNotAnObjectId(String id) {
-		if (id == null || repository.isObjectId(id)) {
-			return true;
-		} else {
-			return repository.isObjectId(id);
-		}
+		return !repository.isObjectId(id);
 	}
 
 	private boolean selectionCanBeCheckedOut(String id) {
-		if (id == null || repository.isObjectId(id)) {
-			return true;
-		} else {
+		if (repository.isObjectId(id)) {
 			return !repository.canCheckOut(id);
 		}
+
+		return true;
 	}
 
 	private boolean selectionIsCheckedOut(String id) {
-		if (id == null || repository.isObjectId(id)) {
-			return true;
-		} else {
+		if (repository.isObjectId(id)) {
 			return !repository.isCheckedOut(id);
 		}
+
+		return true;
 	}
 
 	public MenuItemShowPropertiesAction getMenuItemShowPropertiesAction() {

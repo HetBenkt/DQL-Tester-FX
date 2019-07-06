@@ -149,15 +149,15 @@ public class ResultTable {
             selectedCell = String.valueOf(cellData);
         }
 
-        openContent.setDisable(selectedCell == null || repository.isObjectId(selectedCell));
+        openContent.setDisable(!repository.isObjectId(selectedCell));
         destroyObject.setVisible(stage.getTitle().contains("Versions"));
-        destroyObject.setDisable(selectedCell == null || repository.isObjectId(selectedCell));
+        destroyObject.setDisable(!repository.isObjectId(selectedCell));
         importContent.setVisible(stage.getTitle().contains("Renditions"));
         importContent.setDisable(true);
-        exportContent.setDisable(selectedCell == null || repository.isObjectId(selectedCell));
+        exportContent.setDisable(!repository.isObjectId(selectedCell));
         removeContent.setVisible(stage.getTitle().contains("Renditions"));
         removeContent.setDisable(true);
-        getAttributes.setDisable(selectedCell == null || repository.isObjectId(selectedCell));
+        getAttributes.setDisable(!repository.isObjectId(selectedCell));
     }
 
     private void getRenditions(String id) {
