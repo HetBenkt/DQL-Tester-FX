@@ -8,9 +8,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import nl.bos.Repository;
+import nl.bos.actions.GetAttributesAction;
 import nl.bos.utils.AppAlert;
 
 import java.util.ArrayList;
@@ -42,12 +45,21 @@ public class GetAttributes {
 	@FXML
 	private VBox vboxGetAttributes;
 
-	/**
-	 * @noinspection EmptyMethod
-	 */
 	@FXML
 	private void initialize() {
-		// No implementation needed
+		txaAttributes.setOnMouseClicked(this::handleMouseClickEvent);
+	}
+
+	private void handleMouseClickEvent(MouseEvent mouseEvent) {
+		String selectedText = txaAttributes.getSelectedText();
+
+		if (isDoubleClick(mouseEvent) && repository.isObjectId(selectedText)) {
+			new GetAttributesAction(selectedText);
+		}
+	}
+
+	private boolean isDoubleClick(MouseEvent mouseEvent) {
+		return mouseEvent.getButton() == MouseButton.PRIMARY && mouseEvent.getClickCount() == 2;
 	}
 
 	@FXML
