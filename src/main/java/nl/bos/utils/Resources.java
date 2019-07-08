@@ -4,6 +4,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.awt.*;
@@ -134,7 +135,13 @@ public class Resources {
 
 	public static String getContentPathFromCheckoutFile(String objectId) {
 		JSONObject currentJson = readCheckoutFile();
-		return Objects.requireNonNull(currentJson).getString(objectId);
+		String contentPath = null;
+		try {
+			contentPath = Objects.requireNonNull(currentJson).getString(objectId);
+		} catch (JSONException je) {
+			LOGGER.warning("ID not found");
+		}
+		return contentPath;
 	}
 
 	public static File createTempFile(String prefix, String suffic) {
@@ -201,7 +208,7 @@ public class Resources {
 		LOGGER.info(getClass().getClassLoader().getName());
 		return getClass().getResource(name).toExternalForm();
 	}
-	
+
 	public Pane loadFXML(String fxml) {
 		fxmlLoader = new FXMLLoader(getClass().getResource(fxml));
 		Pane pane = null;
@@ -220,7 +227,7 @@ public class Resources {
 	private static void setSettingProperty(String property, String value) {
 		getSettings().setProperty(property, value);
 
-        File settingsFile = new File("settings.properties");
+    File settingsFile = new File("settings.properties");
 		try {
 			if (!settingsFile.exists() || !settingsFile.isFile()) {
 				if (settingsFile.createNewFile())
@@ -276,7 +283,7 @@ public class Resources {
 		isBrowserAllCabinet = Boolean.valueOf(allCabinet);
 		setSettingProperty("browser.allcabinet", isBrowserAllCabinet.toString());
 	}
-	
+
 	public static void setExportPath(String path) {
 		setSettingProperty("export.path", path);
 	}
