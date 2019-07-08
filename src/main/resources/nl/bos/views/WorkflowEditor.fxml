@@ -57,22 +57,22 @@
             </padding>
             <Tab text="Process variable">
                 <AnchorPane>
-                    <TextArea prefWidth="650.0"/>
+                    <TreeTableView prefHeight="200.0" prefWidth="650.0"/>
                 </AnchorPane>
             </Tab>
             <Tab text="Process packages">
                 <AnchorPane>
-                    <TextArea prefWidth="650.0"/>
+                    <TableView prefHeight="200.0" prefWidth="650.0"/>
                 </AnchorPane>
             </Tab>
             <Tab text="Process attachments">
                 <AnchorPane>
-                    <TextArea prefWidth="650.0"/>
+                    <TableView prefHeight="200.0" prefWidth="650.0"/>
                 </AnchorPane>
             </Tab>
             <Tab text="Process ErrorContents">
                 <AnchorPane>
-                    <TextArea fx:id="txaErrorContents" prefWidth="650.0"/>
+                    <TextArea fx:id="txaErrorContents" prefHeight="200.0" prefWidth="650.0"/>
                 </AnchorPane>
             </Tab>
         </TabPane>

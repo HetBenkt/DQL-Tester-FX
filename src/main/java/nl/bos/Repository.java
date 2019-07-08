@@ -610,7 +610,7 @@ public class Repository {
             stringBuilder.append(String.format("and wfl.supervisor_name like '%s%s' ", supervisor, "%"));
         }
         if (object.length() > 0) {
-            stringBuilder.append(String.format("and (wfl.r_object_id like '%s%s' or wfl.object_name like '%s%s') ", object, "%", object, "%"));
+            stringBuilder.append(String.format("and (wfl.r_object_id like '%s%s' or wfl.object_name like '%s%s' or pkgr.r_component_id like '%s%s' or sys.object_name like '%s%s') ", object, "%", object, "%", object, "%", object, "%"));
         }
         stringBuilder.append("order by wfl.r_start_date desc");
 
@@ -637,7 +637,7 @@ public class Repository {
             stringBuilder.append(String.format("and wfl.supervisor_name like '%s%s' ", supervisor, "%"));
         }
         if (object.length() > 0) {
-            stringBuilder.append(String.format("and (wfl.r_object_id like '%s%s' or wfl.object_name like '%s%s') ", object, "%", object, "%"));
+            stringBuilder.append(String.format("and (wfl.r_object_id like '%s%s' or wfl.object_name like '%s%s' or pkgr.r_component_id like '%s%s' or sys.object_name like '%s%s') ", object, "%", object, "%", object, "%", object, "%"));
         }
         stringBuilder.append("order by wfl.r_start_date desc");
 
@@ -664,7 +664,7 @@ public class Repository {
             stringBuilder.append(String.format("and wfl.supervisor_name like '%s%s' ", supervisor, "%"));
         }
         if (object.length() > 0) {
-            stringBuilder.append(String.format("and (wfl.r_object_id like '%s%s' or wfl.object_name like '%s%s') ", object, "%", object, "%"));
+            stringBuilder.append(String.format("and (wfl.r_object_id like '%s%s' or wfl.object_name like '%s%s' or pkgr.r_component_id like '%s%s' or sys.object_name like '%s%s') ", object, "%", object, "%", object, "%", object, "%"));
         }
         stringBuilder.append("order by wfl.r_start_date desc");
 
