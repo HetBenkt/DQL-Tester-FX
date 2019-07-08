@@ -4,6 +4,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import nl.bos.Repository;
+import nl.bos.actions.GetAttributesAction;
 import nl.bos.contextmenu.menuitem.action.*;
 import nl.bos.controllers.ConnectionWithStatus;
 import nl.bos.controllers.QueryWithResult;
@@ -102,11 +103,11 @@ public class ContextMenuOnResultTable {
 				checkout, checkin, cancelcheckout, new SeparatorMenuItem(), exportContent);
 	}
 
-	public void onRightMouseClick(MouseEvent t) {
-		if (t.getButton() == MouseButton.PRIMARY) {
+	public void onRightMouseClick(MouseEvent mouseEvent) {
+		if (mouseEvent.getButton() == MouseButton.PRIMARY) {
 			contextMenu.hide();
 
-			if (t.getTarget().getClass().getName().contains("TableColumnHeader")) {
+			if (mouseEvent.getTarget().getClass().getName().contains("TableColumnHeader")) {
 				QueryWithResult queryWithResultController = (QueryWithResult) Controllers
 						.get(QueryWithResult.class.getSimpleName());
 				ConnectionWithStatus connectionWithStatusController = (ConnectionWithStatus) Controllers
@@ -123,13 +124,20 @@ public class ContextMenuOnResultTable {
 
 				queryWithResultController.cleanStart();
 			}
-		} else if (t.getButton() == MouseButton.SECONDARY) {
+
+			boolean isLeftDoubleClick = mouseEvent.getClickCount() == 2;
+			String cellText = getSelectedCellValue();
+			if (isLeftDoubleClick && repository.isObjectId(cellText)) {
+				new GetAttributesAction(cellText);
+			}
+
+		} else if (mouseEvent.getButton() == MouseButton.SECONDARY) {
 			validateMenuItems();
-			contextMenu.show(result, t.getScreenX(), t.getScreenY());
+			contextMenu.show(result, mouseEvent.getScreenX(), mouseEvent.getScreenY());
 		}
 	}
 
-	private void validateMenuItems() {
+	private String getSelectedCellValue() {
 		String selectedCell = null;
 		if (result.getSelectionModel().getSelectedCells().size() > 0) {
 			TablePosition focusedCell = (TablePosition) result.getSelectionModel().getSelectedCells().get(0);
@@ -137,6 +145,11 @@ public class ContextMenuOnResultTable {
 			selectedCell = String.valueOf(cellData);
 		}
 
+		return selectedCell;
+	}
+
+	private void validateMenuItems() {
+		String selectedCell = getSelectedCellValue();
 		exportToCsv.setDisable(hasNoRowsInResultTable());
 
 		showProperties.setDisable(hasNoSelectedCellsInResultTable());
@@ -172,35 +185,31 @@ public class ContextMenuOnResultTable {
 	}
 
 	private boolean selectionIsNotAnDocumentType(String id) {
-		if (id == null || repository.isObjectId(id)) {
-			return true;
-		} else {
+		if (repository.isObjectId(id)) {
             return !repository.isDocumentType(repository.getObjectById(id));
 		}
+
+		return true;
 	}
 
 	private boolean selectionIsNotAnObjectId(String id) {
-		if (id == null || repository.isObjectId(id)) {
-			return true;
-		} else {
-			return repository.isObjectId(id);
-		}
+		return !repository.isObjectId(id);
 	}
 
 	private boolean selectionCanBeCheckedOut(String id) {
-		if (id == null || repository.isObjectId(id)) {
-			return true;
-		} else {
+		if (repository.isObjectId(id)) {
 			return !repository.canCheckOut(id);
 		}
+
+		return true;
 	}
 
 	private boolean selectionIsCheckedOut(String id) {
-		if (id == null || repository.isObjectId(id)) {
-			return true;
-		} else {
+		if (repository.isObjectId(id)) {
 			return !repository.isCheckedOut(id);
 		}
+
+		return true;
 	}
 
 	public MenuItemShowPropertiesAction getMenuItemShowPropertiesAction() {

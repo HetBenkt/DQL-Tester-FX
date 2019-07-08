@@ -227,7 +227,7 @@ public class Resources {
 	private static void setSettingProperty(String property, String value) {
 		getSettings().setProperty(property, value);
 
-		File settingsFile = new File("config", "settings.properties");
+    File settingsFile = new File("settings.properties");
 		try {
 			if (!settingsFile.exists() || !settingsFile.isFile()) {
 				if (settingsFile.createNewFile())
@@ -246,7 +246,7 @@ public class Resources {
 	 */
 	private static Properties getSettings() {
 		if (settings == null) {
-			File settingsFile = new File("config", "settings.properties");
+            File settingsFile = new File("settings.properties");
 
 			try {
 				if (!settingsFile.exists() || !settingsFile.isFile()) {
