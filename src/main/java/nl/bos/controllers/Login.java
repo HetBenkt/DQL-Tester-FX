@@ -56,8 +56,6 @@ public class Login {
     private Tooltip ttSecureMode;
     @FXML
     private CheckBox chkSaveLoginData;
-    @FXML
-    private CheckBox chkUseWindowsLogin;
 
     @FXML
     void initialize() {
@@ -110,7 +108,6 @@ public class Login {
         txtDomain.setDisable(connected);
         chbSecureMode.setDisable(connected);
         chkSaveLoginData.setDisable(connected);
-        chkUseWindowsLogin.setDisable(connected);
     }
 
 
