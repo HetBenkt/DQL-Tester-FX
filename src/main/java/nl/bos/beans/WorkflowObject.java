@@ -7,9 +7,6 @@ public class WorkflowObject {
     private String processName;
     private String activityName;
     private String activitySeqNo;
-    private String packageName;
-    private String objectId;
-    private String objectName;
     private String runtimeState;
     private String performerName;
     private String supervisorName;
@@ -53,30 +50,6 @@ public class WorkflowObject {
 
     public void setActivitySeqNo(String activitySeqNo) {
         this.activitySeqNo = activitySeqNo;
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
-    }
-
-    public String getObjectId() {
-        return objectId;
-    }
-
-    public void setObjectId(String objectId) {
-        this.objectId = objectId;
-    }
-
-    public String getObjectName() {
-        return objectName;
-    }
-
-    public void setObjectName(String objectName) {
-        this.objectName = objectName;
     }
 
     public String getRuntimeState() {

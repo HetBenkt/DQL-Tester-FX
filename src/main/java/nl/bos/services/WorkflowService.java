@@ -1,6 +1,7 @@
 package nl.bos.services;
 
 import nl.bos.Repository;
+import nl.bos.beans.PackageObject;
 import nl.bos.beans.WorkflowObject;
 
 import java.util.List;
@@ -44,6 +45,10 @@ public class WorkflowService {
                 LOGGER.info("No valid input");
                 return null;
         }
+    }
+
+    public List<PackageObject> getPackages(String workitemId) {
+        return repository.getPackages(workitemId);
     }
 
     public enum ServiceStates {TODAY, ALL, PAUSED}

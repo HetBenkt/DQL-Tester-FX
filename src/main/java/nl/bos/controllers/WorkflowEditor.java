@@ -36,9 +36,10 @@ public class WorkflowEditor {
     private void initialize() {
         initColumnsResultTableView();
         tvResults.getItems().addAll(workflowService.getWorkflows());
-        tvResults.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            if (newValue != null) {
-                txaErrorContents.setText(newValue.getExecOsError());
+        tvResults.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, workflowObject) -> {
+            if (workflowObject != null) {
+                txaErrorContents.setText(workflowObject.getExecOsError());
+                workflowService.getPackages(workflowObject.getWorkitemId());
             }
         });
     }
@@ -61,15 +62,6 @@ public class WorkflowEditor {
 
         TableColumn activitySeqNo = new TableColumn("act_seqno");
         activitySeqNo.setCellValueFactory(new PropertyValueFactory<>("activitySeqNo"));
-
-        TableColumn packageName = new TableColumn("pkgname");
-        packageName.setCellValueFactory(new PropertyValueFactory<>("packageName"));
-
-        TableColumn objectId = new TableColumn("objid");
-        objectId.setCellValueFactory(new PropertyValueFactory<>("objectId"));
-
-        TableColumn objectName = new TableColumn("object_name");
-        objectName.setCellValueFactory(new PropertyValueFactory<>("objectName"));
 
         TableColumn runtimeState = new TableColumn("rs");
         runtimeState.setCellValueFactory(new PropertyValueFactory<>("runtimeState"));
@@ -104,7 +96,7 @@ public class WorkflowEditor {
         TableColumn queueItemId = new TableColumn("qid");
         queueItemId.setCellValueFactory(new PropertyValueFactory<>("queueItemId"));
 
-        tvResults.getColumns().addAll(workflowId, workflowName, workitemId, processName, activityName, activitySeqNo, packageName, objectId, objectName, runtimeState, performerName, supervisorName, event, workqueueName, startDate, creationDae, activityId, processId, parentId, queueItemId);
+        tvResults.getColumns().addAll(workflowId, workflowName, workitemId, processName, activityName, activitySeqNo, runtimeState, performerName, supervisorName, event, workqueueName, startDate, creationDae, activityId, processId, parentId, queueItemId);
     }
 
     @FXML
