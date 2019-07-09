@@ -159,6 +159,7 @@ public class QueryWithResult {
 		// This is the node that will display the text and the cross.
 		// I chose private HBox graphic;
 		private HBox graphic;
+		private Hyperlink star;
 		// this is the constructor for the anonymous class.
 		{
 			Label label = new Label();
@@ -171,25 +172,17 @@ public class QueryWithResult {
 			// the hyperlink,
 			// so we need to hide the ComboBox when the label is clicked (item selected).
 
-			Hyperlink star = new Hyperlink("☆");
-//			star.textProperty().bind(Bindings.createStringBinding(() -> {
-//				if (getItem().isFavorite()) {
-//					return "⭐";
-//				} else {
-//					return "☆";
-//				}
-//			}, getItem().favoriteProperty()));
-			star.setVisited(true); // So it is black, and not blue.
+			star = new Hyperlink("☆");
+
+			star.setVisited(true);
 			star.setOnAction(event -> {
-				// Remove the item from history
+				// switch the favorite flag
 				handleFavoriteHistoryItem(getItem(), !getItem().isFavorite());
 			});
 
 			Hyperlink cross = new Hyperlink("X");
-			cross.setVisited(true); // So it is black, and not blue.
+			cross.setVisited(true);
 			cross.setOnAction(event -> {
-				// Since the ListView reuses cells, we need to get the item first, before making
-				// changes.
 				// Remove the item from history
 				handleDeleteHistoryItem(getItem());
 			});
@@ -204,6 +197,13 @@ public class QueryWithResult {
 		protected void updateItem(HistoryItem item, boolean empty) {
 			super.updateItem(item, empty);
 			if (!empty && item != null) {
+				star.textProperty().bind(Bindings.createStringBinding(() -> {
+					if (item.isFavorite()) {
+						return "★";
+					} else {
+						return "☆";
+					}
+				}, item.favoriteProperty()));
 				setGraphic(graphic);
 				setTooltip(new Tooltip(item.getQuery()));
 			} else {
