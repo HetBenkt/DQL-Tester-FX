@@ -48,6 +48,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 import nl.bos.AttributeTableColumn;
 import nl.bos.Repository;
 import nl.bos.beans.HistoryItem;
@@ -143,6 +144,7 @@ public class QueryWithResult {
 
 		historyStatements.getSelectionModel().selectedIndexProperty().addListener(
 				(observableValue, oldValue, newValue) -> onStatementsSelection(newValue, historyStatements));
+
 		favoriteStatements.getSelectionModel().selectedIndexProperty().addListener(
 				(observableValue, oldValue, newValue) -> onStatementsSelection(newValue, favoriteStatements));
 		historyStatements.setCellFactory(cellFactory);
@@ -155,9 +157,8 @@ public class QueryWithResult {
 	@SuppressWarnings("static-access")
 	Callback<ListView<HistoryItem>, ListCell<HistoryItem>> cellFactory = lv -> new ListCell<>() {
 		// This is the node that will display the text and the cross.
-		// I chose a hyperlink, but you can change to button, image, etc.
+		// I chose private HBox graphic;
 		private HBox graphic;
-
 		// this is the constructor for the anonymous class.
 		{
 			Label label = new Label();
@@ -203,8 +204,6 @@ public class QueryWithResult {
 		protected void updateItem(HistoryItem item, boolean empty) {
 			super.updateItem(item, empty);
 			if (!empty && item != null) {
-				// setText(item.getQuery().substring(0, Math.min(item.getQuery().length(),
-				// 100)).replaceAll("\n", " "));
 				setGraphic(graphic);
 				setTooltip(new Tooltip(item.getQuery()));
 			} else {
@@ -212,16 +211,15 @@ public class QueryWithResult {
 				setTooltip(null);
 			}
 		}
+
 	};
 
 	private void onStatementsSelection(Number newValue, ComboBox<HistoryItem> statements) {
-		if (newValue.intValue() != -1) {
-			String selectedItem = String.valueOf(statements.getItems().get((Integer) newValue).getQuery());
-			LOGGER.info(selectedItem);
-			statement.replaceText(0, statement.getLength(), selectedItem);
+		if (newValue.intValue() >= 0) {
+			statement.replaceText(0, statement.getLength(), statements.getValue().getQuery());
 			statements.hide();
 		} else {
-//            statement.replaceText(0, statement.getLength(),"");
+//            statement.replaceTerxt(0, statement.getLength(),"");
 		}
 	}
 
@@ -281,10 +279,10 @@ public class QueryWithResult {
 				// reset the editor value every time we show the drop down
 				combo.setEditable(true);
 				combo.getEditor().clear();
-			} else if (!newValue) {
-				// when the list gets hidden, reset the filter
-				combo.setEditable(false);
 				filteredItems.setPredicate(p -> true);
+			} else if (!newValue) {
+				// when the list gets hidden, disable editor
+				combo.setEditable(false);
 			}
 		});
 		// on editor change, update the filtered list predicate
@@ -293,11 +291,12 @@ public class QueryWithResult {
 				return;
 			}
 
-			final TextField editor = combo.getEditor();
-			LOGGER.log(Level.INFO, "Editor: " + editor.getText());
 			Platform.runLater(() -> {
 				filteredItems.setPredicate(item -> {
 					// We return true for any items that contains the input.
+					if (item == null) {
+						return true;
+					}
 					return item.getQuery().toUpperCase().contains(newValue.toUpperCase());
 				});
 			});
@@ -332,7 +331,7 @@ public class QueryWithResult {
 		handleDeleteHistoryItem(selectedItem);
 	}
 
-	private void handleDeleteHistoryItem(HistoryItem item) {
+	public void handleDeleteHistoryItem(HistoryItem item) {
 		int selectedIndex = historyItems.indexOf(item);
 		historyItems.remove(item);
 
@@ -347,7 +346,7 @@ public class QueryWithResult {
 		handleFavoriteHistoryItem(selectedItem, true);
 	}
 
-	private void handleFavoriteHistoryItem(HistoryItem item, boolean isFavorite) {
+	public void handleFavoriteHistoryItem(HistoryItem item, boolean isFavorite) {
 		if (item != null) {
 			item.setFavorite(isFavorite);
 
