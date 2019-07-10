@@ -35,23 +35,6 @@
 			<Label text="DQL/SQL History" />
 			<HBox>
 				<ComboBox fx:id="historyStatements" />
-				<ImageView fx:id="btnDeleteHistoryItem" fitHeight="24.0"
-					fitWidth="24.0" onMouseClicked="#handleDeleteHistoryItem"
-					pickOnBounds="true" preserveRatio="true">
-					<HBox.margin>
-						<Insets left="5.0" />
-					</HBox.margin>
-					<Image url="@../icons/delete.gif" />
-				</ImageView>
-				<ImageView fx:id="btnSaveHistoryItem" fitHeight="24.0"
-					fitWidth="24.0" layoutX="65.0" layoutY="10.0"
-					onMouseClicked="#handleSaveHistoryItem" pickOnBounds="true"
-					preserveRatio="true">
-					<HBox.margin>
-						<Insets left="5.0" />
-					</HBox.margin>
-					<Image url="@../icons/save.gif" />
-				</ImageView>
 			</HBox>
 			<Label layoutX="15.0" layoutY="206.0" text="DQL/SQL Favorites">
 				<VBox.margin>
@@ -66,14 +49,6 @@
 					<Insets />
 				</VBox.margin>
 				<ComboBox fx:id="favoriteStatements" />
-				<ImageView fx:id="btnDeleteFavoriteItem" fitHeight="24.0"
-					fitWidth="24.0" onMouseClicked="#handleDeleteFavoriteItem"
-					pickOnBounds="true" preserveRatio="true">
-					<HBox.margin>
-						<Insets left="5.0" />
-					</HBox.margin>
-					<Image url="@../icons/delete.gif" />
-				</ImageView>
 			</HBox>
 		</VBox>
 	</SplitPane>

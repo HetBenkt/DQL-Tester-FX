@@ -30,25 +30,15 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.ComboBoxListViewSkin;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.util.Callback;
-import javafx.util.StringConverter;
 import nl.bos.AttributeTableColumn;
 import nl.bos.Repository;
 import nl.bos.beans.HistoryItem;
@@ -56,8 +46,8 @@ import nl.bos.contextmenu.ContextMenuOnResultTable;
 import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
 import nl.bos.utils.DQLSyntax;
+import nl.bos.utils.HistoryListCell;
 import nl.bos.utils.Resources;
-import javafx.beans.binding.Bindings;
 
 public class QueryWithResult {
 	private static final Logger LOGGER = Logger.getLogger(QueryWithResult.class.getName());
@@ -81,12 +71,6 @@ public class QueryWithResult {
 	private CodeArea statement;
 	@FXML
 	private TableView result;
-	@FXML
-	private ImageView btnDeleteHistoryItem;
-	@FXML
-	private ImageView btnSaveHistoryItem;
-	@FXML
-	private ImageView btnDeleteFavoriteItem;
 
 	private Instant start;
 
@@ -124,10 +108,6 @@ public class QueryWithResult {
 	private void initialize() {
 		Controllers.put(this.getClass().getSimpleName(), this);
 
-		Tooltip.install(btnDeleteHistoryItem, new Tooltip("Delete from history"));
-		Tooltip.install(btnSaveHistoryItem, new Tooltip("Save to favorites"));
-		Tooltip.install(btnDeleteFavoriteItem, new Tooltip("Delete from favorites"));
-
 		contextMenuOnResultTable = new ContextMenuOnResultTable(result);
 		result.getSelectionModel().setCellSelectionEnabled(true);
 		result.addEventHandler(MouseEvent.MOUSE_CLICKED, contextMenuOnResultTable::onRightMouseClick);
@@ -140,86 +120,20 @@ public class QueryWithResult {
 		subscribeToText = statement.multiPlainChanges().successionEnds(Duration.ofMillis(500))
 				.subscribe(ignore -> statement.setStyleSpans(0, DQLSyntax.computeHighlighting(statement.getText())));
 		Resources.initHistoryFile();
+
 		loadHistory();
-
-		historyStatements.getSelectionModel().selectedIndexProperty().addListener(
-				(observableValue, oldValue, newValue) -> onStatementsSelection(newValue, historyStatements));
-
-		favoriteStatements.getSelectionModel().selectedIndexProperty().addListener(
-				(observableValue, oldValue, newValue) -> onStatementsSelection(newValue, favoriteStatements));
-		historyStatements.setCellFactory(cellFactory);
-
-		historyStatements.setButtonCell(cellFactory.call(null));
-		favoriteStatements.setCellFactory(cellFactory);
-		favoriteStatements.setButtonCell(cellFactory.call(null));
 	}
 
-	@SuppressWarnings("static-access")
-	Callback<ListView<HistoryItem>, ListCell<HistoryItem>> cellFactory = lv -> new ListCell<>() {
-		// This is the node that will display the text and the cross.
-		// I chose private HBox graphic;
-		private HBox graphic;
-		private Hyperlink star;
-		// this is the constructor for the anonymous class.
-		{
-			Label label = new Label();
-			// Bind the label text to the item property using a converter.
-			label.textProperty().bind(Bindings.convert(itemProperty()));
-			// Set max width to infinity so the cross is all the way to the right.
-
-			label.setMaxWidth(Double.POSITIVE_INFINITY);
-			// We have to modify the hiding behavior of the ComboBox to allow clicking on
-			// the hyperlink,
-			// so we need to hide the ComboBox when the label is clicked (item selected).
-
-			star = new Hyperlink("☆");
-
-			star.setVisited(true);
-			star.setOnAction(event -> {
-				// switch the favorite flag
-				handleFavoriteHistoryItem(getItem(), !getItem().isFavorite());
-			});
-
-			Hyperlink cross = new Hyperlink("X");
-			cross.setVisited(true);
-			cross.setOnAction(event -> {
-				// Remove the item from history
-				handleDeleteHistoryItem(getItem());
-			});
-			// Arrange controls in a HBox, and set display to graphic only (the text is
-			// included in the graphic in this implementation).
-			graphic = new HBox(star, label, cross);
-			graphic.setHgrow(label, Priority.ALWAYS);
-			setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-		}
-
-		@Override
-		protected void updateItem(HistoryItem item, boolean empty) {
-			super.updateItem(item, empty);
-			if (!empty && item != null) {
-				star.textProperty().bind(Bindings.createStringBinding(() -> {
-					if (item.isFavorite()) {
-						return "★";
-					} else {
-						return "☆";
-					}
-				}, item.favoriteProperty()));
-				setGraphic(graphic);
-				setTooltip(new Tooltip(item.getQuery()));
-			} else {
-				setGraphic(null);
-				setTooltip(null);
-			}
-		}
-
-	};
-
-	private void onStatementsSelection(Number newValue, ComboBox<HistoryItem> statements) {
-		if (newValue.intValue() >= 0) {
-			statement.replaceText(0, statement.getLength(), statements.getValue().getQuery());
-			statements.hide();
+	private void onStatementsSelection(HistoryItem newValue, ComboBox<HistoryItem> combo) {
+		if (newValue != null && combo.isShowing()) {
+			statement.replaceText(0, statement.getLength(), newValue.getQuery());
+			LOGGER.log(Level.INFO, "Statement selected");
+			//combo.hide();
 		} else {
-//            statement.replaceTerxt(0, statement.getLength(),"");
+			// for some reasons, statement selection is called multiple times, the second
+			// and fourth with empty values...
+			// statement.replaceText(0, statement.getLength(),"");
+			LOGGER.log(Level.INFO, "No statement selected");
 		}
 	}
 
@@ -258,9 +172,12 @@ public class QueryWithResult {
 		addFilterToComboBox(historyItems, historyStatements);
 	}
 
+	@SuppressWarnings("unchecked")
 	private void addFilterToComboBox(ObservableList<HistoryItem> allItems, ComboBox<HistoryItem> combo) {
 		FilteredList<HistoryItem> filteredItems = allItems.filtered(p -> true);
-
+		combo.setCellFactory((ListView<HistoryItem> listView) -> new HistoryListCell(null));
+		combo.setButtonCell(new HistoryListCell(null));
+		HistoryItem[] selectedValue = new HistoryItem[1];
 		// filter the event that will select the current value (and close the combo) on
 		// key SPACE
 		ComboBoxListViewSkin<HistoryItem> comboBoxListViewSkin = new ComboBoxListViewSkin<HistoryItem>(combo);
@@ -269,7 +186,7 @@ public class QueryWithResult {
 				event.consume();
 			}
 		});
-		// we don't hide the list on click to be able to handle click event on delete
+		// we don't hide the list on click to be able to handle click event on favorite/delete
 		comboBoxListViewSkin.setHideOnClick(false);
 		combo.setSkin(comboBoxListViewSkin);
 
@@ -277,20 +194,38 @@ public class QueryWithResult {
 		combo.showingProperty().addListener((obs, oldValue, newValue) -> {
 			if (!oldValue && newValue) {
 				// reset the editor value every time we show the drop down
+				LOGGER.log(Level.INFO, "show listener");
 				combo.setEditable(true);
+				((ListView<HistoryItem>)comboBoxListViewSkin.getPopupContent()).scrollTo(combo.getValue());
 				combo.getEditor().clear();
-				filteredItems.setPredicate(p -> true);
-			} else if (!newValue) {
-				// when the list gets hidden, disable editor
+				selectedValue[0] = null;
+			} else if (!newValue && oldValue) {
+				LOGGER.log(Level.INFO, "hide listener");
 				combo.setEditable(false);
+				HistoryItem value = combo.getValue();
+                if(value != null) {
+                	selectedValue[0] = value;
+                }
+
+                combo.setEditable(false);
+                if(value != null) {
+                Platform.runLater(() ->
+                {
+                    combo.getSelectionModel().select(selectedValue[0]);
+                    combo.setValue(selectedValue[0]);
+                    //statement.replaceText(0, statement.getLength(), selectedValue[0].getQuery());
+                });				
+                }
 			}
+			
 		});
 		// on editor change, update the filtered list predicate
 		combo.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
 			if (!combo.isShowing()) {
+				LOGGER.log(Level.INFO, "Text on not showing");
 				return;
 			}
-
+			LOGGER.log(Level.INFO, "Text listener");
 			Platform.runLater(() -> {
 				filteredItems.setPredicate(item -> {
 					// We return true for any items that contains the input.
@@ -301,7 +236,10 @@ public class QueryWithResult {
 				});
 			});
 		});
+		
 		combo.setItems(filteredItems);
+		combo.valueProperty().addListener(
+				(observableValue, oldValue, newValue) -> onStatementsSelection(newValue, combo));
 	}
 
 	private void setFavoriteItems(List<HistoryItem> statements) {
@@ -325,12 +263,6 @@ public class QueryWithResult {
 		return historyItem;
 	}
 
-	@FXML
-	private void handleDeleteHistoryItem() {
-		HistoryItem selectedItem = historyStatements.getSelectionModel().getSelectedItem();
-		handleDeleteHistoryItem(selectedItem);
-	}
-
 	public void handleDeleteHistoryItem(HistoryItem item) {
 		int selectedIndex = historyItems.indexOf(item);
 		historyItems.remove(item);
@@ -338,12 +270,6 @@ public class QueryWithResult {
 		JSONArray queries = (JSONArray) jsonObject.get(QUERIES);
 		queries.remove(selectedIndex);
 		Resources.writeJsonDataToJsonHistoryFile(jsonObject);
-	}
-
-	@FXML
-	private void handleSaveHistoryItem() {
-		HistoryItem selectedItem = historyStatements.getSelectionModel().getSelectedItem();
-		handleFavoriteHistoryItem(selectedItem, true);
 	}
 
 	public void handleFavoriteHistoryItem(HistoryItem item, boolean isFavorite) {
@@ -354,12 +280,6 @@ public class QueryWithResult {
 			Resources.writeJsonDataToJsonHistoryFile(jsonObject);
 			// reloadHistory();
 		}
-	}
-
-	@FXML
-	private void handleDeleteFavoriteItem() {
-		HistoryItem selectedItem = favoriteStatements.getSelectionModel().getSelectedItem();
-		handleFavoriteHistoryItem(selectedItem, false);
 	}
 
 	private void updateJSONData(HistoryItem selectedItem) {

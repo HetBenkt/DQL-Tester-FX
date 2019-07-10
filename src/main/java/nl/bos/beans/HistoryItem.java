@@ -45,6 +45,6 @@ public class HistoryItem {
 
     @Override
     public String toString() {
-        return getQuery().substring(0, Math.min(getQuery().length(), 200)).replaceAll("\n", " ");
+        return getQuery().substring(0, Math.min(getQuery().length(), 128)).replaceAll("\n", " ");
     }
 }
