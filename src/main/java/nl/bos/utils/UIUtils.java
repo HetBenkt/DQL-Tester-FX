@@ -8,7 +8,9 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -68,12 +70,45 @@ public final class UIUtils {
         //Add expandable stacktrace box to the dialog pane.
         alert.getDialogPane().setExpandableContent(expContent);
 
-        //Add icon to alert
-        final Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-        stage.getIcons().add(new Image(Thread.currentThread().getContextClassLoader().
-                getResourceAsStream("connector/img/amplexor-icon.jpg")));
-
         alert.showAndWait();
+    }
+
+    /**
+     * Loads and opens a new window. This method should only be used when you explicitly want to open a new window.
+     * When you want to open a new window and close the current one, use the loadAndShowInCurrentWindow method.
+     *
+     * @param fxmlPath    The path to the fxml file with the resource directory as root
+     * @param windowTitle The title to be used for the window
+     * @param modality    The modality to initialize the stage with. Owner should be set when the modality is
+     *                    WINDOW_MODAL
+     * @param owner       The owner window of the window to create. This is only needed when setting the modality to
+     *                    WINDOW_MODAL
+     * @throws IOException Thrown if something goes wrong while loading the fxml window
+     */
+    public static void loadAndShowNewWindow(String fxmlPath, String windowTitle, Modality modality,
+                                            Window owner) throws IOException {
+        final FXMLLoader fxmlLoader = new FXMLLoader(Thread.currentThread().getContextClassLoader().getResource(fxmlPath));
+        final Parent root = fxmlLoader.load();
+        final Stage stage = new Stage();
+        stage.initOwner(owner);
+        stage.initModality(modality);
+        stage.setTitle(windowTitle);
+        stage.setScene(new Scene(root));
+        stage.show();
+    }
+
+    /**
+     * Loads and opens a new window. This method should only be used when you explicitly want to open a new window.
+     * When you want to open a new window and close the current one, use the loadAndShowInCurrentWindow method.
+     *
+     * @param fxmlPath    The path to the fxml file with the resource directory as root
+     * @param windowTitle The title to be used for the window
+     * @param modality    The modality to initialize the stage with. Owner should be set when the modality is
+     *                    WINDOW_MODAL, else it will be treated if set to NONE
+     * @throws IOException Thrown if something goes wrong while loading the fxml window
+     */
+    public static void loadAndShowNewWindow(String fxmlPath, String windowTitle, Modality modality) throws IOException {
+        loadAndShowNewWindow(fxmlPath, windowTitle, modality, null);
     }
 
     /**
@@ -84,16 +119,8 @@ public final class UIUtils {
      * @param windowTitle The title to be used for the window
      * @throws IOException Thrown if something goes wrong while loading the fxml window
      */
-    @Deprecated
     public static void loadAndShowNewWindow(String fxmlPath, String windowTitle) throws IOException {
-        final FXMLLoader fxmlLoader = new FXMLLoader(Thread.currentThread().getContextClassLoader().getResource(fxmlPath));
-        final Parent root = fxmlLoader.load();
-        final Stage stage = new Stage();
-        stage.setTitle(windowTitle);
-        stage.setScene(new Scene(root));
-        stage.getIcons().add(new Image(
-                Thread.currentThread().getContextClassLoader().getResourceAsStream("connector/img/amplexor-icon.jpg")));
-        stage.show();
+        loadAndShowNewWindow(fxmlPath, windowTitle, Modality.NONE, null);
     }
 
     /**
