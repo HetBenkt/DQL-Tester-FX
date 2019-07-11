@@ -16,6 +16,7 @@ import nl.bos.controllers.QueryWithResult;
 
 /**
  * TODO refactor QueryWithResult to extact this class
+ * 
  * @author loherve
  *
  */
@@ -23,10 +24,11 @@ public class HistoryListCell extends ListCell<HistoryItem> {
 	private static final Logger LOGGER = Logger.getLogger(HistoryListCell.class.getName());
 	private HBox graphic;
 	private Hyperlink star;
-	
+
 	@SuppressWarnings("static-access")
 	public HistoryListCell(final Style style) {
-        QueryWithResult queryWithResultController = (QueryWithResult) Controllers.get(QueryWithResult.class.getSimpleName());
+		QueryWithResult queryWithResultController = (QueryWithResult) Controllers
+				.get(QueryWithResult.class.getSimpleName());
 		Label label = new Label();
 		// Bind the label text to the item property using a converter.
 		label.textProperty().bind(Bindings.convert(itemProperty()));
@@ -53,7 +55,6 @@ public class HistoryListCell extends ListCell<HistoryItem> {
 		graphic = new HBox(star, label, cross);
 		graphic.setHgrow(label, Priority.ALWAYS);
 		setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
 	}
 
 	protected void updateItem(HistoryItem item, boolean empty) {

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -124,11 +125,11 @@ public class QueryWithResult {
 		loadHistory();
 	}
 
-	private void onStatementsSelection(HistoryItem newValue, ComboBox<HistoryItem> combo) {
-		if (newValue != null && combo.isShowing()) {
+	public void onStatementsSelection(HistoryItem newValue, ComboBox<HistoryItem> combo) {
+		if (newValue != null) {
+			combo.hide();
 			statement.replaceText(0, statement.getLength(), newValue.getQuery());
 			LOGGER.log(Level.INFO, "Statement selected");
-			//combo.hide();
 		} else {
 			// for some reasons, statement selection is called multiple times, the second
 			// and fourth with empty values...
@@ -172,53 +173,46 @@ public class QueryWithResult {
 		addFilterToComboBox(historyItems, historyStatements);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void addFilterToComboBox(ObservableList<HistoryItem> allItems, ComboBox<HistoryItem> combo) {
 		FilteredList<HistoryItem> filteredItems = allItems.filtered(p -> true);
 		combo.setCellFactory((ListView<HistoryItem> listView) -> new HistoryListCell(null));
-		combo.setButtonCell(new HistoryListCell(null));
-		HistoryItem[] selectedValue = new HistoryItem[1];
-		// filter the event that will select the current value (and close the combo) on
-		// key SPACE
+
+
+		// filter the event that will select the current value 
+		// and close the combo on key SPACE
 		ComboBoxListViewSkin<HistoryItem> comboBoxListViewSkin = new ComboBoxListViewSkin<HistoryItem>(combo);
 		comboBoxListViewSkin.getPopupContent().addEventFilter(KeyEvent.ANY, (event) -> {
 			if (event.getCode() == KeyCode.SPACE) {
 				event.consume();
 			}
 		});
-		// we don't hide the list on click to be able to handle click event on favorite/delete
+
+		// we don't hide the list on click to be able to handle click event on
+		// favorite/delete
 		comboBoxListViewSkin.setHideOnClick(false);
 		combo.setSkin(comboBoxListViewSkin);
 
+		combo.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+			if (!combo.isShowing())
+				return;
+			// set the combo editable on key press if the combo list is showed
+			combo.setEditable(true);
+			// we remove the selected object
+			combo.setValue(null);
+			// clear the previous values
+			combo.getEditor().clear();
+		});
+
 		// only enable the editor when the drop down list is shown
 		combo.showingProperty().addListener((obs, oldValue, newValue) -> {
-			if (!oldValue && newValue) {
-				// reset the editor value every time we show the drop down
-				LOGGER.log(Level.INFO, "show listener");
-				combo.setEditable(true);
-				((ListView<HistoryItem>)comboBoxListViewSkin.getPopupContent()).scrollTo(combo.getValue());
-				combo.getEditor().clear();
-				selectedValue[0] = null;
-			} else if (!newValue && oldValue) {
+			// On hide combo list, set the combo to non editable
+			if (!newValue && oldValue) {
 				LOGGER.log(Level.INFO, "hide listener");
 				combo.setEditable(false);
-				HistoryItem value = combo.getValue();
-                if(value != null) {
-                	selectedValue[0] = value;
-                }
-
-                combo.setEditable(false);
-                if(value != null) {
-                Platform.runLater(() ->
-                {
-                    combo.getSelectionModel().select(selectedValue[0]);
-                    combo.setValue(selectedValue[0]);
-                    //statement.replaceText(0, statement.getLength(), selectedValue[0].getQuery());
-                });				
-                }
 			}
-			
+
 		});
+		combo.setOnHidden(event -> filteredItems.setPredicate(item -> true));
 		// on editor change, update the filtered list predicate
 		combo.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
 			if (!combo.isShowing()) {
@@ -227,19 +221,21 @@ public class QueryWithResult {
 			}
 			LOGGER.log(Level.INFO, "Text listener");
 			Platform.runLater(() -> {
-				filteredItems.setPredicate(item -> {
-					// We return true for any items that contains the input.
-					if (item == null) {
-						return true;
-					}
-					return item.getQuery().toUpperCase().contains(newValue.toUpperCase());
-				});
+				if (combo.getValue() == null) {
+					filteredItems.setPredicate(item -> {
+						// We return true for any items that contains the input.
+						if (item == null) {
+							return true;
+						}
+						return item.getQuery().toUpperCase().contains(newValue.toUpperCase());
+					});
+				} 
 			});
 		});
-		
+
 		combo.setItems(filteredItems);
-		combo.valueProperty().addListener(
-				(observableValue, oldValue, newValue) -> onStatementsSelection(newValue, combo));
+		combo.valueProperty()
+				.addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, combo));
 	}
 
 	private void setFavoriteItems(List<HistoryItem> statements) {
