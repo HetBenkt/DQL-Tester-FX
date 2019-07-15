@@ -8,6 +8,7 @@ import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfLoginInfo;
 import nl.bos.Constants.Version;
+import nl.bos.beans.AttachmentObject;
 import nl.bos.beans.PackageObject;
 import nl.bos.beans.WorkflowObject;
 import nl.bos.utils.AppAlert;
@@ -683,7 +684,19 @@ public class Repository {
                 String packageName = packagesCollection.getString("r_package_name");
                 String packageType = packagesCollection.getString("r_package_type");
                 String componentName = packagesCollection.getString("r_component_name");
-                packages.add(new PackageObject(packageName, packageType, componentId, componentName));
+                PackageObject packageObject = new PackageObject();
+                packageObject.setPackageName(packageName);
+                packageObject.setPackageType(packageType);
+                packageObject.setComponentId(componentId);
+                packageObject.setComponentName(componentName);
+                if (repository.getObjectById(componentId) != null) {
+                    packageObject.setPackageExists(true);
+                    packageObject.setPackageIsLocked(((IDfSysObject) repository.getObjectById(componentId)).isCheckedOut());
+                } else {
+                    packageObject.setPackageExists(false);
+                    packageObject.setPackageIsLocked(false);
+                }
+                packages.add(packageObject);
             }
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -698,5 +711,45 @@ public class Repository {
         }
 
         return packages;
+    }
+
+    public List<AttachmentObject> getAttachments(String workitemId) {
+        List<AttachmentObject> attachments = new ArrayList<>();
+
+        IDfCollection attachmentsCollection = null;
+
+        try {
+            IDfWorkitem workitem = (IDfWorkitem) repository.getObjectById(workitemId);
+            attachmentsCollection = workitem.getAttachments();
+            while (attachmentsCollection.next()) {
+                String componentId = attachmentsCollection.getString("r_component_id");
+                String componentName = attachmentsCollection.getString("r_component_name");
+                String componentType = attachmentsCollection.getString("r_component_type");
+                AttachmentObject attachmentObject = new AttachmentObject();
+                attachmentObject.setName(componentName);
+                attachmentObject.setType(componentType);
+                attachmentObject.setId(componentId);
+                if (repository.getObjectById(componentId) != null) {
+                    attachmentObject.setExists(true);
+                    attachmentObject.setLocked(((IDfSysObject) repository.getObjectById(componentId)).isCheckedOut());
+                } else {
+                    attachmentObject.setExists(false);
+                    attachmentObject.setLocked(false);
+                }
+                attachments.add(attachmentObject);
+            }
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        } finally {
+            if (attachmentsCollection != null) {
+                try {
+                    attachmentsCollection.close();
+                } catch (DfException e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }
+            }
+        }
+
+        return attachments;
     }
 }

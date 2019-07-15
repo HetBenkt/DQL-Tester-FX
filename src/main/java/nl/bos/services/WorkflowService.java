@@ -1,6 +1,7 @@
 package nl.bos.services;
 
 import nl.bos.Repository;
+import nl.bos.beans.AttachmentObject;
 import nl.bos.beans.PackageObject;
 import nl.bos.beans.WorkflowObject;
 
@@ -49,6 +50,10 @@ public class WorkflowService {
 
     public List<PackageObject> getPackages(String workitemId) {
         return repository.getPackages(workitemId);
+    }
+
+    public List<AttachmentObject> getAttachments(String workitemId) {
+        return repository.getAttachments(workitemId);
     }
 
     public enum ServiceStates {TODAY, ALL, PAUSED}
