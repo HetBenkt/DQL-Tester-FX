@@ -18,10 +18,14 @@ import javafx.stage.WindowEvent;
 import nl.bos.Repository;
 import nl.bos.utils.AppAlert;
 import nl.bos.utils.Resources;
+import nl.bos.utils.UIUtils;
 
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static nl.bos.Constants.ERROR_TITLE;
+import static nl.bos.Constants.MSG_TITLE_INFO_DIALOG;
 
 public class Login {
     private static final Logger LOGGER = Logger.getLogger(Login.class.getName());
@@ -62,7 +66,7 @@ public class Login {
         try {
 
             ObservableList<String> secureModes = FXCollections.observableArrayList();
-            secureModes.addAll("default","native","secure","try_native_first","try_secure_first");
+            secureModes.addAll("default", "native", "secure", "try_native_first", "try_secure_first");
             chbSecureMode.setItems(secureModes);
             chbSecureMode.setValue(chbSecureMode.getItems().get(0));
 
@@ -111,7 +115,6 @@ public class Login {
     }
 
 
-
     @FXML
     private void handleLogin(ActionEvent actionEvent) {
         LOGGER.info(String.valueOf(actionEvent.getSource()));
@@ -144,9 +147,15 @@ public class Login {
         String selectedRepository = chbRepository.getValue();
         try {
             IDfTypedObject serverMap = repository.obtainServerMap(selectedRepository);
-            AppAlert.informationWithPanel("Info", formatContent(serverMap));
+            if (serverMap == null) {
+                AppAlert.information(MSG_TITLE_INFO_DIALOG, "No servermap found!");
+            } else {
+                AppAlert.informationWithPanel("Info", formatContent(serverMap));
+            }
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            UIUtils.showExpendableExceptionAlert(ERROR_TITLE,
+                    "Something went wrong fetching the server map.", e.getMessage(), e);
         }
     }
 
@@ -196,9 +205,15 @@ public class Login {
 
         try {
             IDfDocbaseMap repositoryMap = repository.obtainRepositoryMap();
-            AppAlert.informationWithPanel("Info", formatContent(repositoryMap));
+            if (repositoryMap == null) {
+                AppAlert.information(MSG_TITLE_INFO_DIALOG, "No connection broker map found!");
+            } else {
+                AppAlert.informationWithPanel("Info", formatContent(repositoryMap));
+            }
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            UIUtils.showExpendableExceptionAlert(ERROR_TITLE,
+                    "Something went wrong fetching the connection broker map.", e.getMessage(), e);
         }
     }
 

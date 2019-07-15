@@ -8,6 +8,8 @@ import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfLoginInfo;
 import nl.bos.Constants.Version;
+import nl.bos.beans.AttachmentObject;
+import nl.bos.beans.PackageObject;
 import nl.bos.beans.WorkflowObject;
 import nl.bos.utils.AppAlert;
 import nl.bos.utils.Resources;
@@ -114,7 +116,7 @@ public class Repository {
             case "try_secure_first":
                 this.secureMode = IDfLoginInfo.SECURITY_MODE_TRY_SECURE_FIRST;
                 break;
-			case "default":
+            case "default":
             default:
                 this.secureMode = null;
         }
@@ -231,7 +233,7 @@ public class Repository {
     }
 
     public boolean isObjectId(String id) {
-    	return new DfId(id).isObjectId();
+        return new DfId(id).isObjectId();
     }
 
     public boolean isConnected() {
@@ -558,8 +560,10 @@ public class Repository {
 
     private List<WorkflowObject> getWorkflows(String query) {
         List<WorkflowObject> workflows = new ArrayList<>();
+        IDfCollection collection = null;
+
         try {
-            IDfCollection collection = repository.query(query);
+            collection = repository.query(query);
             while (collection.next()) {
                 WorkflowObject workflowObject = new WorkflowObject();
                 workflowObject.setWorkflowId(collection.getString("workflow_id"));
@@ -568,9 +572,6 @@ public class Repository {
                 workflowObject.setProcessName(collection.getString("pname"));
                 workflowObject.setActivityName(collection.getString("actname"));
                 workflowObject.setActivitySeqNo(collection.getString("act_seqno"));
-                workflowObject.setPackageName(collection.getString("pkgname"));
-                workflowObject.setObjectId(collection.getString("objid"));
-                workflowObject.setObjectName(collection.getString("object_name"));
                 workflowObject.setRuntimeState(collection.getString("rs"));
                 workflowObject.setPerformerName(collection.getString("r_performer_name"));
                 workflowObject.setSupervisorName(collection.getString("supervisor_name"));
@@ -587,6 +588,14 @@ public class Repository {
             }
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        } finally {
+            if (collection != null) {
+                try {
+                    collection.close();
+                } catch (DfException e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }
+            }
         }
         return workflows;
     }
@@ -595,15 +604,12 @@ public class Repository {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("select distinct ");
-        stringBuilder.append("wfl.r_object_id as workflow_id, wfl.object_name as workflow_name, wi.r_object_id as workitem_id, pr.object_name as pname, qi.task_name as actname, qi.task_number as act_seqno, pkg.r_package_name as pkgname, pkgr.r_component_id as objid, sys.object_name, wi.r_runtime_state as rs, wi.r_performer_name, wfl.supervisor_name, qi.event, wi.a_wq_name, wfl.r_start_date, wi.r_creation_date, act.r_object_id as actid, pr.r_object_id as pid, wfl.parent_id, qi.r_object_id as qid, wi.r_exec_os_error ");
-        stringBuilder.append("from dm_workflow wfl, dm_process pr, dmi_workitem wi, dmi_queue_item qi, dmi_package pkg, dmi_package_r pkgr, dm_sysobject sys, dm_activity act ");
+        stringBuilder.append("wfl.r_object_id as workflow_id, wfl.object_name as workflow_name, wi.r_object_id as workitem_id, pr.object_name as pname, qi.task_name as actname, qi.task_number as act_seqno, wi.r_runtime_state as rs, wi.r_performer_name, wfl.supervisor_name, qi.event, wi.a_wq_name, wfl.r_start_date, wi.r_creation_date, act.r_object_id as actid, pr.r_object_id as pid, wfl.parent_id, qi.r_object_id as qid, wi.r_exec_os_error ");
+        stringBuilder.append("from dm_workflow wfl, dm_process pr, dmi_workitem wi, dmi_queue_item qi, dm_activity act ");
         stringBuilder.append("where pr.r_object_id = wfl.process_id ");
         stringBuilder.append("and wi.r_workflow_id = wfl.r_object_id ");
         stringBuilder.append("and qi.router_id = wfl.r_object_id ");
-        stringBuilder.append("and pkg.r_workflow_id = wfl.r_object_id ");
         stringBuilder.append("and qi.item_id = wi.r_object_id ");
-        stringBuilder.append("and pkg.r_object_id = pkgr.r_object_id ");
-        stringBuilder.append("and pkgr.r_component_id = sys.r_object_id ");
         stringBuilder.append("and act.r_object_id = wi.r_act_def_id ");
         stringBuilder.append("and qi.delete_flag = FALSE ");
         if (supervisor.length() > 0) {
@@ -621,15 +627,12 @@ public class Repository {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("select distinct ");
-        stringBuilder.append("wfl.r_object_id as workflow_id, wfl.object_name as workflow_name, wi.r_object_id as workitem_id, pr.object_name as pname, qi.task_name as actname, qi.task_number as act_seqno, pkg.r_package_name as pkgname, pkgr.r_component_id as objid, sys.object_name, wi.r_runtime_state as rs, wi.r_performer_name, wfl.supervisor_name, qi.event, wi.a_wq_name, wfl.r_start_date, wi.r_creation_date, act.r_object_id as actid, pr.r_object_id as pid, wfl.parent_id, qi.r_object_id as qid, wi.r_exec_os_error ");
-        stringBuilder.append("from dm_workflow wfl, dm_process pr, dmi_workitem wi, dmi_queue_item qi, dmi_package pkg, dmi_package_r pkgr, dm_sysobject sys, dm_activity act ");
+        stringBuilder.append("wfl.r_object_id as workflow_id, wfl.object_name as workflow_name, wi.r_object_id as workitem_id, pr.object_name as pname, qi.task_name as actname, qi.task_number as act_seqno, wi.r_runtime_state as rs, wi.r_performer_name, wfl.supervisor_name, qi.event, wi.a_wq_name, wfl.r_start_date, wi.r_creation_date, act.r_object_id as actid, pr.r_object_id as pid, wfl.parent_id, qi.r_object_id as qid, wi.r_exec_os_error ");
+        stringBuilder.append("from dm_workflow wfl, dm_process pr, dmi_workitem wi, dmi_queue_item qi, dm_activity act ");
         stringBuilder.append("where pr.r_object_id = wfl.process_id ");
         stringBuilder.append("and wi.r_workflow_id = wfl.r_object_id ");
         stringBuilder.append("and qi.router_id = wfl.r_object_id ");
-        stringBuilder.append("and pkg.r_workflow_id = wfl.r_object_id ");
         stringBuilder.append("and qi.item_id = wi.r_object_id ");
-        stringBuilder.append("and pkg.r_object_id = pkgr.r_object_id ");
-        stringBuilder.append("and pkgr.r_component_id = sys.r_object_id ");
         stringBuilder.append("and act.r_object_id = wi.r_act_def_id ");
         stringBuilder.append("and qi.delete_flag = FALSE ");
         stringBuilder.append("and wfl.r_start_date > date(today) ");
@@ -648,15 +651,12 @@ public class Repository {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("select distinct ");
-        stringBuilder.append("wfl.r_object_id as workflow_id, wfl.object_name as workflow_name, wi.r_object_id as workitem_id, pr.object_name as pname, qi.task_name as actname, qi.task_number as act_seqno, pkg.r_package_name as pkgname, pkgr.r_component_id as objid, sys.object_name, wi.r_runtime_state as rs, wi.r_performer_name, wfl.supervisor_name, qi.event, wi.a_wq_name, wfl.r_start_date, wi.r_creation_date, act.r_object_id as actid, pr.r_object_id as pid, wfl.parent_id, qi.r_object_id as qid, wi.r_exec_os_error ");
-        stringBuilder.append("from dm_workflow wfl, dm_process pr, dmi_workitem wi, dmi_queue_item qi, dmi_package pkg, dmi_package_r pkgr, dm_sysobject sys, dm_activity act ");
+        stringBuilder.append("wfl.r_object_id as workflow_id, wfl.object_name as workflow_name, wi.r_object_id as workitem_id, pr.object_name as pname, qi.task_name as actname, qi.task_number as act_seqno, wi.r_runtime_state as rs, wi.r_performer_name, wfl.supervisor_name, qi.event, wi.a_wq_name, wfl.r_start_date, wi.r_creation_date, act.r_object_id as actid, pr.r_object_id as pid, wfl.parent_id, qi.r_object_id as qid, wi.r_exec_os_error ");
+        stringBuilder.append("from dm_workflow wfl, dm_process pr, dmi_workitem wi, dmi_queue_item qi, dm_activity act ");
         stringBuilder.append("where pr.r_object_id = wfl.process_id ");
         stringBuilder.append("and wi.r_workflow_id = wfl.r_object_id ");
         stringBuilder.append("and qi.router_id = wfl.r_object_id ");
-        stringBuilder.append("and pkg.r_workflow_id = wfl.r_object_id ");
         stringBuilder.append("and qi.item_id = wi.r_object_id ");
-        stringBuilder.append("and pkg.r_object_id = pkgr.r_object_id ");
-        stringBuilder.append("and pkgr.r_component_id = sys.r_object_id ");
         stringBuilder.append("and act.r_object_id = wi.r_act_def_id ");
         stringBuilder.append("and qi.delete_flag = FALSE ");
         stringBuilder.append("and wi.r_runtime_state = 5 ");
@@ -669,5 +669,87 @@ public class Repository {
         stringBuilder.append("order by wfl.r_start_date desc");
 
         return getWorkflows(stringBuilder.toString());
+    }
+
+    public List<PackageObject> getPackages(String workitemId) {
+        List<PackageObject> packages = new ArrayList<>();
+
+        IDfCollection packagesCollection = null;
+
+        try {
+            IDfWorkitem workitem = (IDfWorkitem) repository.getObjectById(workitemId);
+            packagesCollection = workitem.getPackages("r_component_name");
+            while (packagesCollection.next()) {
+                String componentId = packagesCollection.getString("r_component_id");
+                String packageName = packagesCollection.getString("r_package_name");
+                String packageType = packagesCollection.getString("r_package_type");
+                String componentName = packagesCollection.getString("r_component_name");
+                PackageObject packageObject = new PackageObject();
+                packageObject.setPackageName(packageName);
+                packageObject.setPackageType(packageType);
+                packageObject.setComponentId(componentId);
+                packageObject.setComponentName(componentName);
+                if (repository.getObjectById(componentId) != null) {
+                    packageObject.setPackageExists(true);
+                    packageObject.setPackageIsLocked(((IDfSysObject) repository.getObjectById(componentId)).isCheckedOut());
+                } else {
+                    packageObject.setPackageExists(false);
+                    packageObject.setPackageIsLocked(false);
+                }
+                packages.add(packageObject);
+            }
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        } finally {
+            if (packagesCollection != null) {
+                try {
+                    packagesCollection.close();
+                } catch (DfException e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }
+            }
+        }
+
+        return packages;
+    }
+
+    public List<AttachmentObject> getAttachments(String workitemId) {
+        List<AttachmentObject> attachments = new ArrayList<>();
+
+        IDfCollection attachmentsCollection = null;
+
+        try {
+            IDfWorkitem workitem = (IDfWorkitem) repository.getObjectById(workitemId);
+            attachmentsCollection = workitem.getAttachments();
+            while (attachmentsCollection.next()) {
+                String componentId = attachmentsCollection.getString("r_component_id");
+                String componentName = attachmentsCollection.getString("r_component_name");
+                String componentType = attachmentsCollection.getString("r_component_type");
+                AttachmentObject attachmentObject = new AttachmentObject();
+                attachmentObject.setName(componentName);
+                attachmentObject.setType(componentType);
+                attachmentObject.setId(componentId);
+                if (repository.getObjectById(componentId) != null) {
+                    attachmentObject.setExists(true);
+                    attachmentObject.setLocked(((IDfSysObject) repository.getObjectById(componentId)).isCheckedOut());
+                } else {
+                    attachmentObject.setExists(false);
+                    attachmentObject.setLocked(false);
+                }
+                attachments.add(attachmentObject);
+            }
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        } finally {
+            if (attachmentsCollection != null) {
+                try {
+                    attachmentsCollection.close();
+                } catch (DfException e) {
+                    LOGGER.log(Level.SEVERE, e.getMessage(), e);
+                }
+            }
+        }
+
+        return attachments;
     }
 }

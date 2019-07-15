@@ -8,14 +8,15 @@ public final class Constants {
 	}
 
 	//General
-    static final String APP_TITLE = "DQL Tester FX";
+    public static final String APP_TITLE = "DQL Tester FX";
+    public static final String ERROR_TITLE = "An error occurred!";
 
     //Messages
-    static final String MSG_DEV_CONNECTION_CREATED = "Developer connection created";
-    static final String MSG_USE_CONNECT_BUTTON = "Login with connect button";
-    static final String MSG_SHUTDOWN_HOOK = "Shutdown with disconnect from repository";
-    static final String MSG_TITLE_INFO_DIALOG = "Information Dialog";
-    static final String MSG_JOB_STARTED = "STARTED";
+    public static final String MSG_DEV_CONNECTION_CREATED = "Developer connection created";
+    public static final String MSG_USE_CONNECT_BUTTON = "Login with connect button";
+    public static final String MSG_SHUTDOWN_HOOK = "Shutdown with disconnect from repository";
+    public static final String MSG_TITLE_INFO_DIALOG = "Information Dialog";
+    public static final String MSG_JOB_STARTED = "STARTED";
 
     //Types
     public static final String TYPE_REPOSITORY = "repository";

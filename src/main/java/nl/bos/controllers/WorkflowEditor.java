@@ -8,9 +8,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
+import nl.bos.beans.AttachmentObject;
+import nl.bos.beans.PackageObject;
 import nl.bos.beans.WorkflowObject;
 import nl.bos.services.WorkflowService;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -19,6 +22,10 @@ public class WorkflowEditor {
 
     @FXML
     private TableView<WorkflowObject> tvResults;
+    @FXML
+    private TableView<PackageObject> tvPackages;
+    @FXML
+    private TableView<AttachmentObject> tvAttachments;
     @FXML
     private TextArea txaErrorContents;
     @FXML
@@ -35,12 +42,65 @@ public class WorkflowEditor {
     @FXML
     private void initialize() {
         initColumnsResultTableView();
+        initColumnsProcessPackagesTableView();
+        initColumnsProcessAttachmentsTableView();
         tvResults.getItems().addAll(workflowService.getWorkflows());
-        tvResults.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-            if (newValue != null) {
-                txaErrorContents.setText(newValue.getExecOsError());
+        tvResults.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, workflowObject) -> {
+            if (workflowObject != null) {
+                txaErrorContents.setText(workflowObject.getExecOsError());
+
+                List<PackageObject> packages = workflowService.getPackages(workflowObject.getWorkitemId());
+                tvPackages.getItems().clear();
+                tvPackages.getItems().addAll(packages);
+
+                List<AttachmentObject> attachments = workflowService.getAttachments(workflowObject.getWorkitemId());
+                tvAttachments.getItems().clear();
+                tvAttachments.getItems().addAll(attachments);
+
+
             }
         });
+    }
+
+    private void initColumnsProcessAttachmentsTableView() {
+        TableColumn componentType = new TableColumn("r_component_type");
+        componentType.setCellValueFactory(new PropertyValueFactory<>("type"));
+
+        TableColumn componentId = new TableColumn("r_component_id");
+        componentId.setCellValueFactory(new PropertyValueFactory<>("id"));
+
+        TableColumn componentName = new TableColumn("r_component_name");
+        componentName.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        TableColumn exists = new TableColumn("exists");
+        exists.setCellValueFactory(new PropertyValueFactory<>("exists"));
+
+        TableColumn locked = new TableColumn("locked");
+        locked.setCellValueFactory(new PropertyValueFactory<>("locked"));
+
+        tvAttachments.getColumns().addAll(componentType, componentId, componentName, exists, locked);
+    }
+
+    private void initColumnsProcessPackagesTableView() {
+        TableColumn packageName = new TableColumn("r_package_name");
+        packageName.setCellValueFactory(new PropertyValueFactory<>("packageName"));
+
+        TableColumn packageType = new TableColumn("r_package_type");
+        packageType.setCellValueFactory(new PropertyValueFactory<>("packageType"));
+
+        TableColumn componentId = new TableColumn("r_component_id");
+        componentId.setCellValueFactory(new PropertyValueFactory<>("componentId"));
+
+        TableColumn componentName = new TableColumn("r_component_name");
+        componentName.setCellValueFactory(new PropertyValueFactory<>("componentName"));
+
+        TableColumn packageExists = new TableColumn("pkg_exists");
+        packageExists.setCellValueFactory(new PropertyValueFactory<>("packageExists"));
+
+        TableColumn packageIsLocked = new TableColumn("pkg_is_locked");
+        packageIsLocked.setCellValueFactory(new PropertyValueFactory<>("packageIsLocked"));
+
+        tvPackages.getColumns().addAll(packageName, packageType, componentId, componentName, packageExists, packageIsLocked);
     }
 
     private void initColumnsResultTableView() {
@@ -61,15 +121,6 @@ public class WorkflowEditor {
 
         TableColumn activitySeqNo = new TableColumn("act_seqno");
         activitySeqNo.setCellValueFactory(new PropertyValueFactory<>("activitySeqNo"));
-
-        TableColumn packageName = new TableColumn("pkgname");
-        packageName.setCellValueFactory(new PropertyValueFactory<>("packageName"));
-
-        TableColumn objectId = new TableColumn("objid");
-        objectId.setCellValueFactory(new PropertyValueFactory<>("objectId"));
-
-        TableColumn objectName = new TableColumn("object_name");
-        objectName.setCellValueFactory(new PropertyValueFactory<>("objectName"));
 
         TableColumn runtimeState = new TableColumn("rs");
         runtimeState.setCellValueFactory(new PropertyValueFactory<>("runtimeState"));
@@ -104,7 +155,7 @@ public class WorkflowEditor {
         TableColumn queueItemId = new TableColumn("qid");
         queueItemId.setCellValueFactory(new PropertyValueFactory<>("queueItemId"));
 
-        tvResults.getColumns().addAll(workflowId, workflowName, workitemId, processName, activityName, activitySeqNo, packageName, objectId, objectName, runtimeState, performerName, supervisorName, event, workqueueName, startDate, creationDae, activityId, processId, parentId, queueItemId);
+        tvResults.getColumns().addAll(workflowId, workflowName, workitemId, processName, activityName, activitySeqNo, runtimeState, performerName, supervisorName, event, workqueueName, startDate, creationDae, activityId, processId, parentId, queueItemId);
     }
 
     @FXML

@@ -3,8 +3,8 @@ documentum/
 target/
 src/main/resources/dfc.properties
 src/main/resources/log4j.properties
+config/settings.properties
 history.json
 checkout.json
 trace.log
 log4j.log
-settings.properties
