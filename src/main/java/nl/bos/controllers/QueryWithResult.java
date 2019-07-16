@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang.StringUtils;
 import org.fxmisc.richtext.CodeArea;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,12 +32,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 import javafx.util.Callback;
 import nl.bos.AttributeTableColumn;
 import nl.bos.Repository;
@@ -175,6 +176,7 @@ public class QueryWithResult {
 
 	private void addFilterToComboBox(ObservableList<HistoryItem> allItems, ComboBox<HistoryItem> combo) {
 		FilteredList<HistoryItem> filteredItems = allItems.filtered(p -> true);
+		Tooltip comboFilterTip = new Tooltip("Start typing to filter list");		
 		combo.setCellFactory((ListView<HistoryItem> listView) -> new HistoryListCell(null));
 
 
@@ -201,6 +203,7 @@ public class QueryWithResult {
 			combo.setValue(null);
 			// clear the previous values
 			combo.getEditor().clear();
+			comboFilterTip.hide();
 		});
 
 		// only enable the editor when the drop down list is shown
@@ -209,6 +212,15 @@ public class QueryWithResult {
 			if (!newValue && oldValue) {
 				LOGGER.log(Level.INFO, "hide listener");
 				combo.setEditable(false);
+				comboFilterTip.hide();
+			} else {
+				//add a tooltip when the combo is shown
+				LOGGER.log(Level.INFO, "show listener");
+
+				Window stage = combo.getScene().getWindow();
+				double posX = stage.getX() + combo.localToScene(combo.getBoundsInLocal()).getMinX();
+				double posY = stage.getY() + combo.localToScene(combo.getBoundsInLocal()).getMinY();
+				comboFilterTip.show(stage, posX, posY);
 			}
 
 		});
