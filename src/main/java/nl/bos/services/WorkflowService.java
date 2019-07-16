@@ -15,11 +15,17 @@ public class WorkflowService {
     private Repository repository = Repository.getInstance();
     private String currentSupervisor;
     private String currentObject;
+    private boolean oneRowPerWflSeqNo;
 
     public WorkflowService(ServiceStates currentState) {
         this.currentState = currentState;
         this.currentSupervisor = "";
         this.currentObject = "";
+        this.oneRowPerWflSeqNo = true;
+    }
+
+    public void setOneRowPerWflSeqNo(boolean oneRowPerWflSeqNo) {
+        this.oneRowPerWflSeqNo = oneRowPerWflSeqNo;
     }
 
     public void setCurrentSupervisor(String currentSupervisor) {
@@ -37,11 +43,11 @@ public class WorkflowService {
     public List<WorkflowObject> getWorkflows() {
         switch (currentState) {
             case ALL:
-                return repository.getAllWorkflows(currentSupervisor, currentObject);
+                return repository.getAllWorkflows(currentSupervisor, currentObject, oneRowPerWflSeqNo);
             case TODAY:
-                return repository.getTodayWorkflows(currentSupervisor, currentObject);
+                return repository.getTodayWorkflows(currentSupervisor, currentObject, oneRowPerWflSeqNo);
             case PAUSED:
-                return repository.getPausedWorkflows(currentSupervisor, currentObject);
+                return repository.getPausedWorkflows(currentSupervisor, currentObject, oneRowPerWflSeqNo);
             default:
                 LOGGER.info("No valid input");
                 return null;

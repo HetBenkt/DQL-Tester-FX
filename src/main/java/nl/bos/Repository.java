@@ -600,7 +600,7 @@ public class Repository {
         return workflows;
     }
 
-    public List<WorkflowObject> getAllWorkflows(String supervisor, String object) {
+    public List<WorkflowObject> getAllWorkflows(String supervisor, String object, boolean oneRowPerWflSeqNo) {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("select distinct ");
@@ -611,19 +611,21 @@ public class Repository {
         stringBuilder.append("and qi.router_id = wfl.r_object_id ");
         stringBuilder.append("and qi.item_id = wi.r_object_id ");
         stringBuilder.append("and act.r_object_id = wi.r_act_def_id ");
-        stringBuilder.append("and qi.delete_flag = FALSE ");
+        if (oneRowPerWflSeqNo) {
+            stringBuilder.append("and qi.delete_flag = FALSE ");
+        }
         if (supervisor.length() > 0) {
             stringBuilder.append(String.format("and wfl.supervisor_name like '%s%s' ", supervisor, "%"));
         }
         if (object.length() > 0) {
             stringBuilder.append(String.format("and (wfl.r_object_id like '%s%s' or wfl.object_name like '%s%s') ", object, "%", object, "%"));
         }
-        stringBuilder.append("order by wfl.r_start_date desc");
+        stringBuilder.append("order by wfl.r_start_date desc, qi.task_number desc");
 
         return getWorkflows(stringBuilder.toString());
     }
 
-    public List<WorkflowObject> getTodayWorkflows(String supervisor, String object) {
+    public List<WorkflowObject> getTodayWorkflows(String supervisor, String object, boolean oneRowPerWflSeqNo) {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("select distinct ");
@@ -634,7 +636,9 @@ public class Repository {
         stringBuilder.append("and qi.router_id = wfl.r_object_id ");
         stringBuilder.append("and qi.item_id = wi.r_object_id ");
         stringBuilder.append("and act.r_object_id = wi.r_act_def_id ");
-        stringBuilder.append("and qi.delete_flag = FALSE ");
+        if (oneRowPerWflSeqNo) {
+            stringBuilder.append("and qi.delete_flag = FALSE ");
+        }
         stringBuilder.append("and wfl.r_start_date > date(today) ");
         if (supervisor.length() > 0) {
             stringBuilder.append(String.format("and wfl.supervisor_name like '%s%s' ", supervisor, "%"));
@@ -642,12 +646,12 @@ public class Repository {
         if (object.length() > 0) {
             stringBuilder.append(String.format("and (wfl.r_object_id like '%s%s' or wfl.object_name like '%s%s') ", object, "%", object, "%"));
         }
-        stringBuilder.append("order by wfl.r_start_date desc");
+        stringBuilder.append("order by wfl.r_start_date desc, qi.task_number desc");
 
         return getWorkflows(stringBuilder.toString());
     }
 
-    public List<WorkflowObject> getPausedWorkflows(String supervisor, String object) {
+    public List<WorkflowObject> getPausedWorkflows(String supervisor, String object, boolean oneRowPerWflSeqNo) {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("select distinct ");
@@ -658,7 +662,9 @@ public class Repository {
         stringBuilder.append("and qi.router_id = wfl.r_object_id ");
         stringBuilder.append("and qi.item_id = wi.r_object_id ");
         stringBuilder.append("and act.r_object_id = wi.r_act_def_id ");
-        stringBuilder.append("and qi.delete_flag = FALSE ");
+        if (oneRowPerWflSeqNo) {
+            stringBuilder.append("and qi.delete_flag = FALSE ");
+        }
         stringBuilder.append("and wi.r_runtime_state = 5 ");
         if (supervisor.length() > 0) {
             stringBuilder.append(String.format("and wfl.supervisor_name like '%s%s' ", supervisor, "%"));
@@ -666,7 +672,7 @@ public class Repository {
         if (object.length() > 0) {
             stringBuilder.append(String.format("and (wfl.r_object_id like '%s%s' or wfl.object_name like '%s%s') ", object, "%", object, "%"));
         }
-        stringBuilder.append("order by wfl.r_start_date desc");
+        stringBuilder.append("order by wfl.r_start_date desc, qi.task_number desc");
 
         return getWorkflows(stringBuilder.toString());
     }
