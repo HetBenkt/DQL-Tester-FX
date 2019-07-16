@@ -28,12 +28,13 @@
                     <Insets top="5.0"/>
                 </VBox.margin>
             </RadioButton>
-            <CheckBox mnemonicParsing="false" text="monitor">
+            <CheckBox fx:id="chbMonitor" mnemonicParsing="false" onAction="#handleMonitor" text="monitor">
                 <VBox.margin>
                     <Insets top="20.0"/>
                 </VBox.margin>
             </CheckBox>
-            <CheckBox mnemonicParsing="false" selected="true" text="oneRowPerWorkflowSeqNo">
+            <CheckBox fx:id="chbOneRowPerWflSeqNo" mnemonicParsing="false" onAction="#handleOneRowPerWflSeqNo"
+                      selected="true" text="oneRowPerWorkflowSeqNo">
                 <VBox.margin>
                     <Insets top="5.0"/>
                 </VBox.margin>
@@ -86,8 +87,8 @@
         <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
         </padding>
-        <TextField editable="false"/>
-        <TextField editable="false">
+        <TextField fx:id="txtMonitoringState" editable="false" text="Monitoring OFF"/>
+        <TextField fx:id="txtRowCount" editable="false">
             <HBox.margin>
                 <Insets left="5.0"/>
             </HBox.margin>

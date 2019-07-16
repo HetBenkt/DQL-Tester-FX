@@ -2,10 +2,7 @@ package nl.bos.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import nl.bos.beans.AttachmentObject;
@@ -32,6 +29,14 @@ public class WorkflowEditor {
     private TextField txtSupervisor;
     @FXML
     private TextField txtObject;
+    @FXML
+    private CheckBox chbOneRowPerWflSeqNo;
+    @FXML
+    private CheckBox chbMonitor;
+    @FXML
+    private TextField txtMonitoringState;
+    @FXML
+    private TextField txtRowCount;
 
     private WorkflowService workflowService;
 
@@ -45,6 +50,8 @@ public class WorkflowEditor {
         initColumnsProcessPackagesTableView();
         initColumnsProcessAttachmentsTableView();
         tvResults.getItems().addAll(workflowService.getWorkflows());
+        txtRowCount.setText(String.format("Row count: %s", tvResults.getItems().size()));
+
         tvResults.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, workflowObject) -> {
             if (workflowObject != null) {
                 txaErrorContents.setText(workflowObject.getExecOsError());
@@ -163,6 +170,7 @@ public class WorkflowEditor {
         tvResults.getItems().clear();
         workflowService.setCurrentState(WorkflowService.ServiceStates.TODAY);
         tvResults.getItems().addAll(workflowService.getWorkflows());
+        txtRowCount.setText(String.format("Row count: %s", tvResults.getItems().size()));
     }
 
     @FXML
@@ -170,6 +178,7 @@ public class WorkflowEditor {
         tvResults.getItems().clear();
         workflowService.setCurrentState(WorkflowService.ServiceStates.ALL);
         tvResults.getItems().addAll(workflowService.getWorkflows());
+        txtRowCount.setText(String.format("Row count: %s", tvResults.getItems().size()));
     }
 
     @FXML
@@ -177,6 +186,7 @@ public class WorkflowEditor {
         tvResults.getItems().clear();
         workflowService.setCurrentState(WorkflowService.ServiceStates.PAUSED);
         tvResults.getItems().addAll(workflowService.getWorkflows());
+        txtRowCount.setText(String.format("Row count: %s", tvResults.getItems().size()));
     }
 
     @FXML
@@ -184,6 +194,7 @@ public class WorkflowEditor {
         tvResults.getItems().clear();
         workflowService.setCurrentSupervisor(txtSupervisor.getText() + keyEvent.getText());
         tvResults.getItems().addAll(workflowService.getWorkflows());
+        txtRowCount.setText(String.format("Row count: %s", tvResults.getItems().size()));
     }
 
     @FXML
@@ -191,5 +202,23 @@ public class WorkflowEditor {
         tvResults.getItems().clear();
         workflowService.setCurrentObject(txtObject.getText() + keyEvent.getText());
         tvResults.getItems().addAll(workflowService.getWorkflows());
+        txtRowCount.setText(String.format("Row count: %s", tvResults.getItems().size()));
+    }
+
+    @FXML
+    private void handleMonitor(ActionEvent actionEvent) {
+        if (chbMonitor.isSelected()) {
+            txtMonitoringState.setText("Monitoring ON");
+        } else {
+            txtMonitoringState.setText("Monitoring OFF");
+        }
+    }
+
+    @FXML
+    private void handleOneRowPerWflSeqNo(ActionEvent actionEvent) {
+        tvResults.getItems().clear();
+        workflowService.setOneRowPerWflSeqNo(chbOneRowPerWflSeqNo.isSelected());
+        tvResults.getItems().addAll(workflowService.getWorkflows());
+        txtRowCount.setText(String.format("Row count: %s", tvResults.getItems().size()));
     }
 }
