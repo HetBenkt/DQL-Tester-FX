@@ -291,30 +291,8 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
                 LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
 
-            ComboBox<HistoryItem> cmbHistory = queryWithResultController.getHistoryStatements();
-            ObservableList<HistoryItem> items = cmbHistory.getItems();
-            if (statementNotExists(items, statement)) {
-                HistoryItem historyItem = new HistoryItem(statement);
-                items.add(0, historyItem);
-                cmbHistory.setValue(historyItem);
-                JSONArray queries = (JSONArray) jsonObject.get("queries");
-                if (queries.length() > 0) {
-                    queries.put(queries.get(0));
-                }
-                queries.put(0, new JSONObject(historyItem));
-
-                Resources.writeJsonDataToJsonHistoryFile(jsonObject);
-                cmbHistory.setItems(items);
-            }
+            queryWithResultController.appendNewQueryToHistory(statement, jsonObject);
         }
-    }
-
-    private boolean statementNotExists(ObservableList<HistoryItem> items, String statement) {
-        for (HistoryItem item : items) {
-            if (item.getQuery().equalsIgnoreCase(statement))
-                return false;
-        }
-        return true;
     }
 
     @FXML

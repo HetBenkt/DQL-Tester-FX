@@ -1,15 +1,18 @@
 package nl.bos.beans;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+
 public class HistoryItem {
     private String query;
     private String category;
-    private boolean isFavorite;
+    private BooleanProperty favorite = new SimpleBooleanProperty();
 
 
     public HistoryItem(String query) {
         this.query = query;
         category = "none";
-        isFavorite = false;
+        this.favoriteProperty().set(false);
     }
 
     public String getQuery() {
@@ -29,15 +32,19 @@ public class HistoryItem {
     }
 
     public boolean isFavorite() {
-        return isFavorite;
+        return this.favoriteProperty().get();
     }
 
     public void setFavorite(boolean isFavorite) {
-        this.isFavorite = isFavorite;
+        this.favoriteProperty().set(isFavorite);
+    }
+    
+    public BooleanProperty favoriteProperty() {
+    	return favorite;
     }
 
     @Override
     public String toString() {
-        return query;
+        return getQuery().substring(0, Math.min(getQuery().length(), 128)).replaceAll("\n", " ");
     }
 }
