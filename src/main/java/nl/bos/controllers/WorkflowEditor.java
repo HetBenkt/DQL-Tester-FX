@@ -5,6 +5,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
+import nl.bos.Repository;
+import nl.bos.WorkflowMonitor;
 import nl.bos.beans.AttachmentObject;
 import nl.bos.beans.PackageObject;
 import nl.bos.beans.WorkflowObject;
@@ -16,6 +19,8 @@ import java.util.logging.Logger;
 
 public class WorkflowEditor {
     private static final Logger LOGGER = Logger.getLogger(WorkflowEditor.class.getName());
+
+    private final Repository repository = Repository.getInstance();
 
     @FXML
     private TableView<WorkflowObject> tvResults;
@@ -39,6 +44,7 @@ public class WorkflowEditor {
     private TextField txtRowCount;
 
     private WorkflowService workflowService;
+    private WorkflowMonitor workflowMonitor;
 
     public WorkflowEditor() {
         this.workflowService = new WorkflowService(WorkflowService.ServiceStates.ALL);
@@ -63,8 +69,6 @@ public class WorkflowEditor {
                 List<AttachmentObject> attachments = workflowService.getAttachments(workflowObject.getWorkitemId());
                 tvAttachments.getItems().clear();
                 tvAttachments.getItems().addAll(attachments);
-
-
             }
         });
     }
@@ -209,8 +213,15 @@ public class WorkflowEditor {
     private void handleMonitor(ActionEvent actionEvent) {
         if (chbMonitor.isSelected()) {
             txtMonitoringState.setText("Monitoring ON");
+            Stage stage = (Stage) tvResults.getScene().getWindow();
+            stage.setTitle(String.format("Workflow Editor - %s [Watch Mode]", repository.getRepositoryName()));
+            workflowMonitor = new WorkflowMonitor(this);
+            new Thread(workflowMonitor).start();
         } else {
             txtMonitoringState.setText("Monitoring OFF");
+            Stage stage = (Stage) tvResults.getScene().getWindow();
+            stage.setTitle(String.format("Workflow Editor - %s", repository.getRepositoryName()));
+            workflowMonitor.stop();
         }
     }
 
@@ -218,6 +229,12 @@ public class WorkflowEditor {
     private void handleOneRowPerWflSeqNo(ActionEvent actionEvent) {
         tvResults.getItems().clear();
         workflowService.setOneRowPerWflSeqNo(chbOneRowPerWflSeqNo.isSelected());
+        tvResults.getItems().addAll(workflowService.getWorkflows());
+        txtRowCount.setText(String.format("Row count: %s", tvResults.getItems().size()));
+    }
+
+    public void updateFields() {
+        tvResults.getItems().clear();
         tvResults.getItems().addAll(workflowService.getWorkflows());
         txtRowCount.setText(String.format("Row count: %s", tvResults.getItems().size()));
     }
