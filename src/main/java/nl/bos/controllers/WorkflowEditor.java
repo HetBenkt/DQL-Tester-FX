@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import nl.bos.Repository;
@@ -11,6 +12,7 @@ import nl.bos.WorkflowMonitor;
 import nl.bos.beans.AttachmentObject;
 import nl.bos.beans.PackageObject;
 import nl.bos.beans.WorkflowObject;
+import nl.bos.beans.WorkflowVariable;
 import nl.bos.services.WorkflowService;
 
 import java.util.List;
@@ -42,6 +44,8 @@ public class WorkflowEditor {
     private TextField txtMonitoringState;
     @FXML
     private TextField txtRowCount;
+    @FXML
+    private TreeTableView ttvVariables;
 
     private WorkflowService workflowService;
     private WorkflowMonitor workflowMonitor;
@@ -55,6 +59,7 @@ public class WorkflowEditor {
         initColumnsResultTableView();
         initColumnsProcessPackagesTableView();
         initColumnsProcessAttachmentsTableView();
+        initColumnsProcessVariablesTreeTableView();
         tvResults.getItems().addAll(workflowService.getWorkflows());
         txtRowCount.setText(String.format("Row count: %s", tvResults.getItems().size()));
 
@@ -69,8 +74,22 @@ public class WorkflowEditor {
                 List<AttachmentObject> attachments = workflowService.getAttachments(workflowObject.getWorkitemId());
                 tvAttachments.getItems().clear();
                 tvAttachments.getItems().addAll(attachments);
+
+                TreeItem variables = workflowService.getVariables(workflowObject.getWorkflowId(), workflowObject.getProcessName());
+                ttvVariables.setRoot(variables);
             }
         });
+    }
+
+    private void initColumnsProcessVariablesTreeTableView() {
+        TreeTableColumn<WorkflowVariable, String> treeTableColumnName = new TreeTableColumn<>("Name");
+        TreeTableColumn<WorkflowVariable, String> treeTableColumnValue = new TreeTableColumn<>("Value");
+
+        treeTableColumnName.setCellValueFactory(new TreeItemPropertyValueFactory<>("name"));
+        treeTableColumnValue.setCellValueFactory(new TreeItemPropertyValueFactory<>("value"));
+
+        ttvVariables.getColumns().add(treeTableColumnName);
+        ttvVariables.getColumns().add(treeTableColumnValue);
     }
 
     private void initColumnsProcessAttachmentsTableView() {

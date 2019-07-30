@@ -1,5 +1,6 @@
 package nl.bos;
 
+import com.documentum.bpm.IDfWorkflowEx;
 import com.documentum.com.DfClientX;
 import com.documentum.com.IDfClientX;
 import com.documentum.fc.client.*;
@@ -7,10 +8,12 @@ import com.documentum.fc.client.content.IDfContent;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.DfId;
 import com.documentum.fc.common.IDfLoginInfo;
+import javafx.scene.control.TreeItem;
 import nl.bos.Constants.Version;
 import nl.bos.beans.AttachmentObject;
 import nl.bos.beans.PackageObject;
 import nl.bos.beans.WorkflowObject;
+import nl.bos.beans.WorkflowVariable;
 import nl.bos.utils.AppAlert;
 import nl.bos.utils.Resources;
 
@@ -757,5 +760,34 @@ public class Repository {
         }
 
         return attachments;
+    }
+
+    public TreeItem getVariables(String workflowId, String processName) {
+        try {
+            IDfPersistentObject object = session.getObject(new DfId(workflowId));
+            if (object instanceof IDfWorkflowEx) {
+                IDfWorkflowEx workflow = (IDfWorkflowEx) object;
+                IDfCollection variablesColl = repository.query(String.format("SELECT v.object_name AS variable_name, p.object_name AS process_name FROM dmc_wfsd_element v, dm_process p WHERE v.process_id = p.r_object_id AND p.object_name ='%s'", processName));
+                while (variablesColl.next()) {
+                    Object variable = workflow.getPrimitiveVariableValue(variablesColl.getString("variable_name"));
+                }
+            }
+        } catch (DfException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
+
+        //String, Integer, Float, Date, Boolean, SDT
+        TreeItem integerVariables = new TreeItem(new WorkflowVariable("Integer variables", "..."));
+        integerVariables.setExpanded(true);
+        TreeItem integerVariableStateNo = new TreeItem(new WorkflowVariable("state_no", "0"));
+        TreeItem integerVariableCounter = new TreeItem(new WorkflowVariable("counter", "0"));
+        integerVariables.getChildren().addAll(integerVariableStateNo, integerVariableCounter);
+
+
+        TreeItem variables = new TreeItem(new WorkflowVariable("Variables", "..."));
+        variables.getChildren().add(integerVariables);
+        variables.setExpanded(true);
+
+        return variables;
     }
 }

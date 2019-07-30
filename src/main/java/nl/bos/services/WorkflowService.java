@@ -1,5 +1,6 @@
 package nl.bos.services;
 
+import javafx.scene.control.TreeItem;
 import nl.bos.Repository;
 import nl.bos.beans.AttachmentObject;
 import nl.bos.beans.PackageObject;
@@ -60,6 +61,10 @@ public class WorkflowService {
 
     public List<AttachmentObject> getAttachments(String workitemId) {
         return repository.getAttachments(workitemId);
+    }
+
+    public TreeItem getVariables(String workflowId, String processName) {
+        return repository.getVariables(workflowId, processName);
     }
 
     public enum ServiceStates {TODAY, ALL, PAUSED}
