@@ -23,7 +23,7 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
 * A Java Runtime Environment (JRE) (e.g. [OpenJDK Runtime Environment 18.9 (build 11.0.1+13)](https://jdk.java.net/))
 * JavaFX libraries (as they are not included in OpenJDK!). Downloadable fom [JavaFX SDK](https://gluonhq.com/products/javafx/)
 * A runnable OpenText Documentum environment that can be pinged by hostname or IP-address from the machine where this application will be executed
-* DFC libraries. These can be downloaded from [OpenText My Support](https://mysupport.opentext.com)
+* DFC and BPM/PE libraries. These can be downloaded from [OpenText My Support](https://mysupport.opentext.com)
 
 ### How to run the application:
 1. Download the latest [release](https://github.com/HetBenkt/DQL-Tester-FX/releases) to the local drive from
@@ -35,7 +35,7 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
     * cryptoj.jar
     * dfc.jar
     * log4j.jar
-    * jaxb-api.jar
+    * bpm_infra.jar (BPM / Process Engine)
 4. Copy the following jar files in this `lib` directory from the download locations
     * [json-20180813.jar](http://central.maven.org/maven2/org/json/json/20180813/json-20180813.jar)
     * [richtextfx-fat-0.10.1.jar](https://github.com/FXMisc/RichTextFX/releases/download/v0.10.1/richtextfx-fat-0.10.1.jar)    
