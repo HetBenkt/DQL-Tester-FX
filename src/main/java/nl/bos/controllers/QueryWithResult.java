@@ -131,12 +131,7 @@ public class QueryWithResult {
 			combo.hide();
 			statement.replaceText(0, statement.getLength(), newValue.getQuery());
 			LOGGER.log(Level.INFO, "Statement selected");
-		} else {
-			// for some reasons, statement selection is called multiple times, the second
-			// and fourth with empty values...
-			// statement.replaceText(0, statement.getLength(),"");
-			LOGGER.log(Level.INFO, "No statement selected");
-		}
+		} 
 	}
 
 	private void loadConnectionWithStatusFxml() {
@@ -148,7 +143,10 @@ public class QueryWithResult {
 
 	private void loadHistory() {
 		String history = convertFileToString();
-		historyItems = FXCollections.observableList(makeListFrom(history));
+		historyItems = FXCollections
+				.observableArrayList(item -> new ObservableValue[] { item.favoriteProperty() }); 
+		historyItems.addAll(makeListFrom(history));		
+
 		setHistoryItems(historyItems);
 		setFavoriteItems(historyItems);
 	}
@@ -250,11 +248,8 @@ public class QueryWithResult {
 				.addListener((observableValue, oldValue, newValue) -> onStatementsSelection(newValue, combo));
 	}
 
-	private void setFavoriteItems(List<HistoryItem> statements) {
-		ObservableList<HistoryItem> favoritesItems = FXCollections
-				.observableArrayList(item -> new ObservableValue[] { item.favoriteProperty() });
-		favoritesItems.addAll(historyItems);
-		FilteredList<HistoryItem> favItems = favoritesItems.filtered(p -> p.isFavorite());
+	private void setFavoriteItems(ObservableList<HistoryItem> statements) {
+		FilteredList<HistoryItem> favItems = new FilteredList<>(statements, t -> t.isFavorite());
 
 		addFilterToComboBox(favItems, favoriteStatements);
 	}
@@ -286,13 +281,12 @@ public class QueryWithResult {
 
 			updateJSONData(item);
 			Resources.writeJsonDataToJsonHistoryFile(jsonObject);
-			// reloadHistory();
 		}
 	}
 
 	private void updateJSONData(HistoryItem selectedItem) {
 		int selectedIndex = historyItems.indexOf(selectedItem);
-		JSONArray queries = (JSONArray) jsonObject.get("queries");
+		JSONArray queries = (JSONArray) jsonObject.get(QUERIES);
 		queries.put(selectedIndex, new JSONObject(selectedItem));
 	}
 
