@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
-<?import org.fxmisc.richtext.CodeArea?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import org.fxmisc.flowless.VirtualizedScrollPane?>
+<?import org.fxmisc.richtext.CodeArea?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1"
-	fx:id="queryWithResultBox" BorderPane.alignment="CENTER"
-	xmlns="http://javafx.com/javafx/8.0.121"
+<VBox fx:id="queryWithResultBox" BorderPane.alignment="CENTER"
+	xmlns="http://javafx.com/javafx/11.0.1"
+	xmlns:fx="http://javafx.com/fxml/1"
 	fx:controller="nl.bos.controllers.QueryWithResult">
 	<SplitPane dividerPositions="0.6" orientation="VERTICAL"
 		VBox.vgrow="ALWAYS">
@@ -28,7 +31,7 @@
 			<Label text="DQL/SQL Statement" />
 			<VirtualizedScrollPane VBox.vgrow="ALWAYS">
 				<content>
-					<CodeArea fx:id="statement" VBox.vgrow="ALWAYS"></CodeArea>
+					<CodeArea fx:id="statement" VBox.vgrow="ALWAYS" />
 				</content>
 			</VirtualizedScrollPane>
 
@@ -36,18 +39,8 @@
 			<HBox>
 				<ComboBox fx:id="historyStatements" />
 			</HBox>
-			<Label layoutX="15.0" layoutY="206.0" text="DQL/SQL Favorites">
-				<VBox.margin>
-					<Insets top="5.0" />
-				</VBox.margin>
-			</Label>
-			<HBox layoutX="15.0" layoutY="241.0">
-				<opaqueInsets>
-					<Insets />
-				</opaqueInsets>
-				<VBox.margin>
-					<Insets />
-				</VBox.margin>
+			<Label text="DQL/SQL Favorites" />
+			<HBox>
 				<ComboBox fx:id="favoriteStatements" />
 			</HBox>
 		</VBox>
