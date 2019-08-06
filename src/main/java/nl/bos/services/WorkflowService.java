@@ -63,8 +63,8 @@ public class WorkflowService {
         return repository.getAttachments(workitemId);
     }
 
-    public TreeItem getVariables(String workflowId, String processName) {
-        return repository.getVariables(workflowId, processName);
+    public TreeItem getVariables(String workflowId) {
+        return repository.getVariables(workflowId);
     }
 
     public enum ServiceStates {TODAY, ALL, PAUSED}

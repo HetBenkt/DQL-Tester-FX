@@ -762,31 +762,44 @@ public class Repository {
         return attachments;
     }
 
-    public TreeItem getVariables(String workflowId, String processName) {
+    public TreeItem getVariables(String workflowId) {
+        //String, Integer, Float, Date, Boolean, SDT
+        TreeItem variables = new TreeItem(new WorkflowVariable("Variables", "..."));
+        variables.setExpanded(true);
+
         try {
             IDfPersistentObject object = session.getObject(new DfId(workflowId));
             if (object instanceof IDfWorkflowEx) {
-                IDfWorkflowEx workflow = (IDfWorkflowEx) object;
-                IDfCollection variablesColl = repository.query(String.format("SELECT v.object_name AS variable_name, p.object_name AS process_name FROM dmc_wfsd_element v, dm_process p WHERE v.process_id = p.r_object_id AND p.object_name ='%s'", processName));
-                while (variablesColl.next()) {
-                    Object variable = workflow.getPrimitiveVariableValue(variablesColl.getString("variable_name"));
+                //String
+                TreeItem stringVariables = new TreeItem(new WorkflowVariable("String variables", "..."));
+                stringVariables.setExpanded(true);
+
+                IDfCollection variablesCollString = repository.query(String.format("SELECT object_name, string_value as var_value FROM dm_dbo.dmc_wfsd_element_string_lsp where workflow_id = '%s' and string_value is not nullstring;", workflowId));
+                while (variablesCollString.next()) {
+                    String varName = variablesCollString.getString("object_name");
+                    String varValue = variablesCollString.getString("var_value");
+                    TreeItem stringVariable = new TreeItem(new WorkflowVariable(varName, varValue));
+                    stringVariables.getChildren().add(stringVariable);
                 }
+
+                //Integer
+                TreeItem integerVariables = new TreeItem(new WorkflowVariable("Integer variables", "..."));
+                integerVariables.setExpanded(true);
+
+                IDfCollection variablesCollInteger = repository.query(String.format("SELECT object_name, int_value as var_value FROM dm_dbo.dmc_wfsd_element_integer_lsp where workflow_id = '%s' and int_value is not nullstring;", workflowId));
+                while (variablesCollInteger.next()) {
+                    String varName = variablesCollInteger.getString("object_name");
+                    String varValue = variablesCollInteger.getString("var_value");
+                    TreeItem integerVariable = new TreeItem(new WorkflowVariable(varName, varValue));
+                    integerVariables.getChildren().add(integerVariable);
+                }
+
+
+                variables.getChildren().addAll(stringVariables, integerVariables);
             }
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
-
-        //String, Integer, Float, Date, Boolean, SDT
-        TreeItem integerVariables = new TreeItem(new WorkflowVariable("Integer variables", "..."));
-        integerVariables.setExpanded(true);
-        TreeItem integerVariableStateNo = new TreeItem(new WorkflowVariable("state_no", "0"));
-        TreeItem integerVariableCounter = new TreeItem(new WorkflowVariable("counter", "0"));
-        integerVariables.getChildren().addAll(integerVariableStateNo, integerVariableCounter);
-
-
-        TreeItem variables = new TreeItem(new WorkflowVariable("Variables", "..."));
-        variables.getChildren().add(integerVariables);
-        variables.setExpanded(true);
 
         return variables;
     }

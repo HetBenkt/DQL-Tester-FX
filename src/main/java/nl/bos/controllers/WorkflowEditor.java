@@ -75,7 +75,7 @@ public class WorkflowEditor {
                 tvAttachments.getItems().clear();
                 tvAttachments.getItems().addAll(attachments);
 
-                TreeItem variables = workflowService.getVariables(workflowObject.getWorkflowId(), workflowObject.getProcessName());
+                TreeItem variables = workflowService.getVariables(workflowObject.getWorkflowId());
                 ttvVariables.setRoot(variables);
             }
         });
