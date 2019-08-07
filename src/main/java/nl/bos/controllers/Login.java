@@ -87,6 +87,7 @@ public class Login {
                 LOGGER.info(MessageFormat.format("Repositories for Connection Broker: {0}", hostName));
                 LOGGER.info(MessageFormat.format("Total number of Repositories: {0}", repositoryMap.getDocbaseCount()));
 
+                chbRepository.getItems().clear();
                 for (int i = 0; i < repositoryMap.getDocbaseCount(); i++) {
                     LOGGER.info(MessageFormat.format("Repository {0}: {1}", i + 1, repositoryMap.getDocbaseName(i)));
                     chbRepository.getItems().add(repositoryMap.getDocbaseName(i));
