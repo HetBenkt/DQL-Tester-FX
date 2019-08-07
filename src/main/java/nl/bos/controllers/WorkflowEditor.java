@@ -83,7 +83,9 @@ public class WorkflowEditor {
 
     private void initColumnsProcessVariablesTreeTableView() {
         TreeTableColumn<WorkflowVariable, String> treeTableColumnName = new TreeTableColumn<>("Name");
+        treeTableColumnName.setPrefWidth(200);
         TreeTableColumn<WorkflowVariable, String> treeTableColumnValue = new TreeTableColumn<>("Value");
+        treeTableColumnValue.setPrefWidth(200);
 
         treeTableColumnName.setCellValueFactory(new TreeItemPropertyValueFactory<>("name"));
         treeTableColumnValue.setCellValueFactory(new TreeItemPropertyValueFactory<>("value"));

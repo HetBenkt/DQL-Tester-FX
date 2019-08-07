@@ -763,44 +763,39 @@ public class Repository {
     }
 
     public TreeItem getVariables(String workflowId) {
-        //String, Integer, Float, Date, Boolean, SDT
         TreeItem variables = new TreeItem(new WorkflowVariable("Variables", "..."));
         variables.setExpanded(true);
 
         try {
             IDfPersistentObject object = session.getObject(new DfId(workflowId));
             if (object instanceof IDfWorkflowEx) {
-                //String
-                TreeItem stringVariables = new TreeItem(new WorkflowVariable("String variables", "..."));
-                stringVariables.setExpanded(true);
+                TreeItem stringVariables = makeTreeItem("String", String.format("SELECT object_name, string_value as var_value FROM dm_dbo.dmc_wfsd_element_string_lsp where workflow_id = '%s' and string_value is not nullstring", workflowId));
+                TreeItem integerVariables = makeTreeItem("Integer", String.format("SELECT object_name, int_value as var_value FROM dm_dbo.dmc_wfsd_element_integer_lsp where workflow_id = '%s' and int_value is not nullstring", workflowId));
+                TreeItem dateVariables = makeTreeItem("Date", String.format("SELECT object_name, date_value as var_value FROM dm_dbo.dmc_wfsd_element_date_lsp where workflow_id = '%s' and date_value is not nulldate", workflowId));
+                TreeItem doubleVariables = makeTreeItem("Double", String.format("SELECT object_name, double_value as var_value FROM dm_dbo.dmc_wfsd_element_double_lsp where workflow_id = '%s' and double_value is not nullstring", workflowId));
+                TreeItem booleanVariables = makeTreeItem("Boolean", String.format("SELECT object_name, boolean_value as var_value FROM dm_dbo.dmc_wfsd_element_boolean_lsp where workflow_id = '%s' and boolean_value is not nullstring", workflowId));
 
-                IDfCollection variablesCollString = repository.query(String.format("SELECT object_name, string_value as var_value FROM dm_dbo.dmc_wfsd_element_string_lsp where workflow_id = '%s' and string_value is not nullstring;", workflowId));
-                while (variablesCollString.next()) {
-                    String varName = variablesCollString.getString("object_name");
-                    String varValue = variablesCollString.getString("var_value");
-                    TreeItem stringVariable = new TreeItem(new WorkflowVariable(varName, varValue));
-                    stringVariables.getChildren().add(stringVariable);
-                }
-
-                //Integer
-                TreeItem integerVariables = new TreeItem(new WorkflowVariable("Integer variables", "..."));
-                integerVariables.setExpanded(true);
-
-                IDfCollection variablesCollInteger = repository.query(String.format("SELECT object_name, int_value as var_value FROM dm_dbo.dmc_wfsd_element_integer_lsp where workflow_id = '%s' and int_value is not nullstring;", workflowId));
-                while (variablesCollInteger.next()) {
-                    String varName = variablesCollInteger.getString("object_name");
-                    String varValue = variablesCollInteger.getString("var_value");
-                    TreeItem integerVariable = new TreeItem(new WorkflowVariable(varName, varValue));
-                    integerVariables.getChildren().add(integerVariable);
-                }
-
-
-                variables.getChildren().addAll(stringVariables, integerVariables);
+                variables.getChildren().addAll(stringVariables, integerVariables, dateVariables, doubleVariables, booleanVariables);
             }
         } catch (DfException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
 
         return variables;
+    }
+
+    private TreeItem makeTreeItem(String type, String query) throws DfException {
+        TreeItem treeItem = new TreeItem(new WorkflowVariable(String.format("%s variables", type), "..."));
+        treeItem.setExpanded(true);
+
+        IDfCollection variablesColl = repository.query(query);
+        while (variablesColl.next()) {
+            String varName = variablesColl.getString("object_name");
+            String varValue = variablesColl.getString("var_value");
+            TreeItem item = new TreeItem(new WorkflowVariable(varName, varValue));
+            treeItem.getChildren().add(item);
+        }
+
+        return treeItem;
     }
 }
