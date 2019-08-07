@@ -52,12 +52,14 @@ public class CheckinDialog {
 
 	@FXML
 	private void loadFile() {
-		checkinFile = Resources.selectFileFromFileChooser("Select Content", Resources.getExportPath());
+		checkinFile = Resources.selectFileFromFileChooser("Select Content", Resources.getExportPath(), this.checkinStage);
 		getCheckinFile();
 	}
 
 	private void getCheckinFile() {
-		filepath.setText(checkinFile.getAbsolutePath());
+		if(checkinFile!=null) {
+			filepath.setText(checkinFile.getAbsolutePath());
+		}
 		if (checkinFile == null || !checkinFile.exists() || !checkinFile.canRead()) {
 			btnOK.setDisable(true);
 			return;

@@ -1,14 +1,18 @@
 package nl.bos.utils;
 
-import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.Pane;
-import javafx.stage.FileChooser;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import static nl.bos.Constants.CHECKOUT_JSON;
+import static nl.bos.Constants.HISTORY_JSON;
+import static nl.bos.Constants.QUERIES;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Desktop;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -22,7 +26,14 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static nl.bos.Constants.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
 public class Resources {
     private static final Logger LOGGER = Logger.getLogger(Resources.class.getName());
@@ -41,11 +52,11 @@ public class Resources {
         return fileChooser.showOpenDialog(null);
     }
 
-    public static File selectFileFromFileChooser(String title, File path) {
+    public static File selectFileFromFileChooser(String title, File path, Window owner) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(path);
         fileChooser.setTitle(title);
-        return fileChooser.showOpenDialog(null);
+        return fileChooser.showOpenDialog(owner);
     }
 
     public static List<String> readLines(File file) {
