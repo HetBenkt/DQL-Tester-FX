@@ -26,11 +26,9 @@ public class MyApplication extends Application {
         Resources resources = new Resources();
         BorderPane rootPane = (BorderPane) resources.loadFXML("/nl/bos/views/Menu.fxml");
         VBox bodyLayout = (VBox) resources.loadFXML("/nl/bos/views/QueryWithResult.fxml");
-
         rootPane.setCenter(bodyLayout);
 
         Image image = new Image(resources.getResourceStream("nl/bos/icons/logo_16.gif"));
-
         primaryStage.setScene(new Scene(rootPane));
         primaryStage.getScene().getStylesheets()
                 .add(resources.getResourceExternalForm("/nl/bos/themes/dql-keywords.css"));
@@ -38,10 +36,14 @@ public class MyApplication extends Application {
 
         primaryStage.setTitle(APP_TITLE);
         primaryStage.sizeToScene();
+
         primaryStage.show();
         primaryStage.setMinWidth(primaryStage.getWidth());
         primaryStage.setMinHeight(primaryStage.getHeight());
         primaryStage.toFront();
+
+        SplashScreenLoader splashScreenLoader = SplashScreenLoader.getInstance();
+        splashScreenLoader.getStage().hide();
     }
 
     private void shutdown() {
