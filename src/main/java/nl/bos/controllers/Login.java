@@ -80,20 +80,22 @@ public class Login {
 
             if (repository.getClient() != null) {
                 IDfDocbaseMap repositoryMap = repository.obtainRepositoryMap();
-                //noinspection deprecation
-                String hostName = repositoryMap.getHostName();
-                lblServer.setText(hostName);
+                if (repositoryMap != null) {
+                    //noinspection deprecation
+                    String hostName = repositoryMap.getHostName();
+                    lblServer.setText(hostName);
 
-                LOGGER.info(MessageFormat.format("Repositories for Connection Broker: {0}", hostName));
-                LOGGER.info(MessageFormat.format("Total number of Repositories: {0}", repositoryMap.getDocbaseCount()));
+                    LOGGER.info(MessageFormat.format("Repositories for Connection Broker: {0}", hostName));
+                    LOGGER.info(MessageFormat.format("Total number of Repositories: {0}", repositoryMap.getDocbaseCount()));
 
-                chbRepository.getItems().clear();
-                for (int i = 0; i < repositoryMap.getDocbaseCount(); i++) {
-                    LOGGER.info(MessageFormat.format("Repository {0}: {1}", i + 1, repositoryMap.getDocbaseName(i)));
-                    chbRepository.getItems().add(repositoryMap.getDocbaseName(i));
+                    chbRepository.getItems().clear();
+                    for (int i = 0; i < repositoryMap.getDocbaseCount(); i++) {
+                        LOGGER.info(MessageFormat.format("Repository {0}: {1}", i + 1, repositoryMap.getDocbaseName(i)));
+                        chbRepository.getItems().add(repositoryMap.getDocbaseName(i));
+                    }
+
+                    chbRepository.setValue(chbRepository.getItems().get(0));
                 }
-
-                chbRepository.setValue(chbRepository.getItems().get(0));
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);

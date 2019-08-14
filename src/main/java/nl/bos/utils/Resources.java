@@ -1,18 +1,15 @@
 package nl.bos.utils;
 
-import static nl.bos.Constants.CHECKOUT_JSON;
-import static nl.bos.Constants.HISTORY_JSON;
-import static nl.bos.Constants.QUERIES;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.Pane;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.awt.Desktop;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+import java.awt.*;
+import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -26,14 +23,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.Pane;
-import javafx.stage.FileChooser;
-import javafx.stage.Window;
+import static nl.bos.Constants.*;
 
 public class Resources {
     private static final Logger LOGGER = Logger.getLogger(Resources.class.getName());
@@ -282,7 +272,6 @@ public class Resources {
     }
 
     public String getResourceExternalForm(String name) {
-        LOGGER.info(getClass().getClassLoader().getName());
         return getClass().getResource(name).toExternalForm();
     }
 

@@ -1,6 +1,7 @@
 package nl.bos;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
@@ -16,22 +17,33 @@ import static nl.bos.Constants.*;
 public class MyApplication extends Application {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
-    private final Repository repository = Repository.getInstance();
+    private String externalForm;
+    private Repository repository;
+    private Resources resources;
+    private BorderPane rootPane;
+    private Image image;
+
+    @Override
+    public void init() {
+        repository = Repository.getInstance();
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
+        tryDevModeConnection();
+        resources = new Resources();
+        Platform.runLater(() -> {
+            rootPane = (BorderPane) resources.loadFXML("/nl/bos/views/Menu.fxml");
+            VBox bodyLayout = (VBox) resources.loadFXML("/nl/bos/views/QueryWithResult.fxml");
+            rootPane.setCenter(bodyLayout);
+
+            image = new Image(resources.getResourceStream("nl/bos/icons/logo_16.gif"));
+            externalForm = resources.getResourceExternalForm("/nl/bos/themes/dql-keywords.css");
+        });
+    }
 
     @Override
     public void start(Stage primaryStage) {
-        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
-        tryDevModeConnection();
-
-        Resources resources = new Resources();
-        BorderPane rootPane = (BorderPane) resources.loadFXML("/nl/bos/views/Menu.fxml");
-        VBox bodyLayout = (VBox) resources.loadFXML("/nl/bos/views/QueryWithResult.fxml");
-        rootPane.setCenter(bodyLayout);
-
-        Image image = new Image(resources.getResourceStream("nl/bos/icons/logo_16.gif"));
         primaryStage.setScene(new Scene(rootPane));
         primaryStage.getScene().getStylesheets()
-                .add(resources.getResourceExternalForm("/nl/bos/themes/dql-keywords.css"));
+                .add(externalForm);
         primaryStage.getIcons().add(image);
 
         primaryStage.setTitle(APP_TITLE);
@@ -41,9 +53,6 @@ public class MyApplication extends Application {
         primaryStage.setMinWidth(primaryStage.getWidth());
         primaryStage.setMinHeight(primaryStage.getHeight());
         primaryStage.toFront();
-
-        SplashScreenLoader splashScreenLoader = SplashScreenLoader.getInstance();
-        splashScreenLoader.getStage().hide();
     }
 
     private void shutdown() {
