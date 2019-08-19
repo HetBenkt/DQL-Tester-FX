@@ -34,7 +34,7 @@
             <BorderPane.margin>
                 <Insets top="5.0"/>
             </BorderPane.margin>
-            <Label text="Command"/>
+            <Label styleClass="rootLabel" text="Command"/>
             <HBox alignment="TOP_CENTER" disable="true" spacing="5.0">
                 <VBox.margin>
                     <Insets bottom="20.0"/>
@@ -53,16 +53,16 @@
                 <RadioButton mnemonicParsing="false" text="CacheQuery" toggleGroup="$tgCommand"/>
                 <RadioButton mnemonicParsing="false" text="ODBC" toggleGroup="$tgCommand"/>
             </HBox>
-            <Label text="Timings"/>
+            <Label styleClass="rootLabel" text="Timings"/>
             <HBox alignment="TOP_CENTER" spacing="5.0">
                 <padding>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                 </padding>
-                <Label text="Query"/>
+                <Label styleClass="rootLabel" text="Query"/>
                 <TextField id="txtQuery" fx:id="timeQuery" alignment="CENTER" editable="false"/>
-                <Label text="List"/>
+                <Label styleClass="rootLabel" text="List"/>
                 <TextField id="txtList" fx:id="timeList" alignment="CENTER" editable="false"/>
-                <Label text="Sort"/>
+                <Label styleClass="rootLabel" text="Sort"/>
                 <TextField id="txtSort" fx:id="timeSort" alignment="CENTER" editable="false"/>
             </HBox>
         </VBox>

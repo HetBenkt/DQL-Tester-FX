@@ -1,45 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import org.fxmisc.flowless.VirtualizedScrollPane?>
 <?import org.fxmisc.richtext.CodeArea?>
-
-<VBox fx:id="queryWithResultBox" BorderPane.alignment="CENTER"
-	xmlns="http://javafx.com/javafx/11.0.1"
-	xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="nl.bos.controllers.QueryWithResult">
-	<SplitPane dividerPositions="0.6" orientation="VERTICAL"
-		VBox.vgrow="ALWAYS">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="queryWithResultBox" BorderPane.alignment="CENTER"
+	  xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.QueryWithResult">
+	<SplitPane dividerPositions="0.6" orientation="VERTICAL" VBox.vgrow="ALWAYS">
 		<VBox>
 			<padding>
 				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 			</padding>
-			<Label text="Result" />
+			<Label styleClass="rootLabel" text="Result"/>
 			<TableView fx:id="result" VBox.vgrow="ALWAYS" />
 		</VBox>
 		<VBox>
 			<padding>
 				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 			</padding>
-			<Label text="DQL/SQL Statement" />
+			<Label styleClass="rootLabel" text="DQL/SQL Statement"/>
 			<VirtualizedScrollPane VBox.vgrow="ALWAYS">
 				<content>
 					<CodeArea fx:id="statement" VBox.vgrow="ALWAYS" />
 				</content>
 			</VirtualizedScrollPane>
 
-			<Label text="DQL/SQL History" />
+			<Label styleClass="rootLabel" text="DQL/SQL History"/>
 			<HBox>
 				<ComboBox fx:id="historyStatements" />
 			</HBox>
-			<Label text="DQL/SQL Favorites" />
+			<Label styleClass="rootLabel" text="DQL/SQL Favorites"/>
 			<HBox>
 				<ComboBox fx:id="favoriteStatements" />
 			</HBox>
