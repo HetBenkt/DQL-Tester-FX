@@ -12,9 +12,12 @@ import javafx.stage.StageStyle;
 
 public class SplashScreenLoader extends Preloader {
     private ProgressBar bar;
+    private Stage stage;
+
 
     @Override
     public void start(Stage stage) {
+        this.stage = stage;
         stage.setResizable(false);
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setScene(createPreloaderScene());
@@ -35,5 +38,12 @@ public class SplashScreenLoader extends Preloader {
                 BackgroundPosition.CENTER,
                 BackgroundSize.DEFAULT)));
         return new Scene(borderPane, 875, 875);
+    }
+
+    @Override
+    public void handleStateChangeNotification(StateChangeNotification stateChangeNotification) {
+        if (stateChangeNotification.getType().equals(StateChangeNotification.Type.BEFORE_START)) {
+            stage.close();
+        }
     }
 }
