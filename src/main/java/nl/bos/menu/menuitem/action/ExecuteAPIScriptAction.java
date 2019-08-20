@@ -8,6 +8,8 @@ import nl.bos.utils.Resources;
 
 import java.util.logging.Logger;
 
+import static nl.bos.Constants.ROOT_SCENE_CSS;
+
 public class ExecuteAPIScriptAction {
     private static final Logger LOGGER = Logger.getLogger(ExecuteAPIScriptAction.class.getName());
 
@@ -20,6 +22,9 @@ public class ExecuteAPIScriptAction {
         VBox apiScriptPane = (VBox) resources.loadFXML("/nl/bos/views/ExecuteAPIScript.fxml");
 
         apiScriptStage.setScene(new Scene(apiScriptPane));
+        apiScriptStage.getScene().getStylesheets()
+                .addAll(ROOT_SCENE_CSS);
+
         apiScriptStage.showAndWait();
     }
 }

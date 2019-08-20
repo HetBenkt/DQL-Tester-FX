@@ -14,6 +14,8 @@ import nl.bos.utils.Resources;
 
 import java.util.logging.Logger;
 
+import static nl.bos.Constants.ROOT_SCENE_CSS;
+
 public class MenuItemResultTableAction implements EventHandler<ActionEvent> {
     private static final Logger LOGGER = Logger.getLogger(MenuItemResultTableAction.class.getName());
 
@@ -39,8 +41,10 @@ public class MenuItemResultTableAction implements EventHandler<ActionEvent> {
         resultStage.setTitle(String.format("%s - %s (%s)", label, repository.getObjectName(id), repository.getRepositoryName()));
         Resources resources = new Resources();
         VBox resultPane = (VBox) resources.loadFXML("/nl/bos/views/ResultTable.fxml");
-        Scene scene = new Scene(resultPane);
-        resultStage.setScene(scene);
+        resultStage.setScene(new Scene(resultPane));
+        resultStage.getScene().getStylesheets()
+                .addAll(ROOT_SCENE_CSS);
+
         ResultTable controller = resources.getFxmlLoader().getController();
         controller.loadResult(id);
         resultStage.showAndWait();

@@ -8,6 +8,8 @@ import nl.bos.utils.Resources;
 
 import java.util.logging.Logger;
 
+import static nl.bos.Constants.ROOT_SCENE_CSS;
+
 public class ManageWorkflowsAction {
     private static final Logger LOGGER = Logger.getLogger(ManageWorkflowsAction.class.getName());
 
@@ -19,6 +21,9 @@ public class ManageWorkflowsAction {
         Resources resources = new Resources();
         VBox workflowEditor = (VBox) resources.loadFXML("/nl/bos/views/WorkflowEditor.fxml");
         manageWorkflowsStage.setScene(new Scene(workflowEditor));
+        manageWorkflowsStage.getScene().getStylesheets()
+                .addAll(ROOT_SCENE_CSS);
+
         manageWorkflowsStage.showAndWait();
     }
 }

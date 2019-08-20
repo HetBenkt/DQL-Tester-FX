@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static nl.bos.Constants.ROOT_SCENE_CSS;
+
 public class UserEditor implements DialogCallbackInterface {
 	private static final Logger LOGGER = Logger.getLogger(UserEditor.class.getName());
 	private final Repository repository = Repository.getInstance();
@@ -311,14 +313,18 @@ public class UserEditor implements DialogCallbackInterface {
 
 	@Override
 	public void returnValue(String returnValue, String callbackMessage) {
-		if (callbackMessage.equals("defaultGroup")) {
-			default_group.setText(returnValue);
+		switch (callbackMessage) {
+			case "defaultGroup":
+				default_group.setText(returnValue);
 
-		} else if (callbackMessage.equals("userDelegation")) {
-			user_delegation.setText(returnValue);
+				break;
+			case "userDelegation":
+				user_delegation.setText(returnValue);
 
-		} else if (callbackMessage.equals("userAdministrator")) {
-			user_administrator.setText(returnValue);
+				break;
+			case "userAdministrator":
+				user_administrator.setText(returnValue);
+				break;
 		}
 	}
 
@@ -343,6 +349,8 @@ public class UserEditor implements DialogCallbackInterface {
 		try {
 			AnchorPane selectGroupPane = fxmlLoader.load();
 			selectGroupStage.setScene(new Scene(selectGroupPane));
+			selectGroupStage.getScene().getStylesheets()
+					.addAll(ROOT_SCENE_CSS);
 
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -364,6 +372,8 @@ public class UserEditor implements DialogCallbackInterface {
 		try {
 			AnchorPane selectUserPane = fxmlLoader.load();
 			selectUserStage.setScene(new Scene(selectUserPane));
+			selectUserStage.getScene().getStylesheets()
+					.addAll(ROOT_SCENE_CSS);
 
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);

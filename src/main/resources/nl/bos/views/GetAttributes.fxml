@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<VBox fx:id="vboxGetAttributes" prefHeight="600.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nl.bos.controllers.GetAttributes">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="vboxGetAttributes" prefHeight="620.0" prefWidth="650.0"
+      xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.GetAttributes">
     <TextArea fx:id="txaAttributes" editable="false" prefHeight="500.0">
         <VBox.margin>
             <Insets left="5.0" right="5.0" top="5.0" />
@@ -31,9 +26,9 @@
     </HBox>
     <HBox spacing="10.0">
         <VBox spacing="5.0">
-            <Label text="Get Attributes for Object ID" />
+            <Label styleClass="rootLabel" text="Get Attributes for Object ID"/>
             <HBox spacing="5.0">
-                <Label text="Object ID" />
+                <Label styleClass="rootLabel" text="Object ID"/>
                 <TextField fx:id="txtObjectId" />
                 <Button id="btnDump" mnemonicParsing="false" onAction="#handleDump" text="Dump" />
             </HBox>

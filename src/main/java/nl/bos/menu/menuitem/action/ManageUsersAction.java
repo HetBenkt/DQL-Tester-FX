@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static nl.bos.Constants.ROOT_SCENE_CSS;
+
 public class ManageUsersAction {
 	private static final Logger LOGGER = Logger.getLogger(ManageUsersAction.class.getName());
 
@@ -23,6 +25,8 @@ public class ManageUsersAction {
 		try {
 			AnchorPane userEditor = fxmlLoader.load();
 			userEditorStage.setScene(new Scene(userEditor));
+            userEditorStage.getScene().getStylesheets()
+                    .addAll(ROOT_SCENE_CSS);
 
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);

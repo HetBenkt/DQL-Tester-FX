@@ -13,7 +13,7 @@
             <HBox.margin>
                 <Insets left="5.0" right="5.0" top="5.0"/>
             </HBox.margin>
-            <Label text="Job Type"/>
+            <Label text="Job Type" styleClass="rootLabel"/>
             <TextField fx:id="txtNrOfJobsListed" disable="true" editable="false">
                 <VBox.margin>
                     <Insets/>
@@ -34,33 +34,33 @@
             <HBox.margin>
                 <Insets top="5.0"/>
             </HBox.margin>
-            <Label text="Object ID"/>
-            <Label text="Last Completion Date"/>
-            <Label text="Next Invocation Date"/>
-            <Label text="Runs Completed"/>
-            <Label text="Last Return Code"/>
-            <Label text="Name"/>
-            <Label text="Job Type"/>
-            <Label text="Description"/>
-            <Label text="Job State"/>
-            <Label text="Trace Level">
+            <Label styleClass="rootLabel" text="Object ID"/>
+            <Label styleClass="rootLabel" text="Last Completion Date"/>
+            <Label styleClass="rootLabel" text="Next Invocation Date"/>
+            <Label styleClass="rootLabel" text="Runs Completed"/>
+            <Label styleClass="rootLabel" text="Last Return Code"/>
+            <Label styleClass="rootLabel" text="Name"/>
+            <Label styleClass="rootLabel" text="Job Type"/>
+            <Label styleClass="rootLabel" text="Description"/>
+            <Label styleClass="rootLabel" text="Job State"/>
+            <Label styleClass="rootLabel" text="Trace Level">
                 <VBox.margin>
                     <Insets/>
                 </VBox.margin>
             </Label>
-            <Label text="Designated Server"/>
+            <Label styleClass="rootLabel" text="Designated Server"/>
             <CheckBox fx:id="cbWatchJob" mnemonicParsing="false" onAction="#handleWatchJob" text="Watch Job"/>
-            <Label text="Start Date"/>
-            <Label text="Repeat"/>
-            <Label text="Frequency"/>
-            <Label text="End Date"/>
-            <Label text="Continuous Interval">
+            <Label styleClass="rootLabel" text="Start Date"/>
+            <Label styleClass="rootLabel" text="Repeat"/>
+            <Label styleClass="rootLabel" text="Frequency"/>
+            <Label styleClass="rootLabel" text="End Date"/>
+            <Label styleClass="rootLabel" text="Continuous Interval">
                 <VBox.margin>
                     <Insets top="30.0"/>
                 </VBox.margin>
             </Label>
-            <Label text="Method Name"/>
-            <Label text="Arguments"/>
+            <Label styleClass="rootLabel" text="Method Name"/>
+            <Label styleClass="rootLabel" text="Arguments"/>
             <HBox spacing="5.0">
                 <VBox.margin>
                     <Insets/>
@@ -158,7 +158,7 @@
                     </HBox.margin>
                 </RadioButton>
                 <TextField fx:id="txtMaxIterations"/>
-                <Label text="times">
+                <Label styleClass="rootLabel" text="times">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
@@ -219,6 +219,6 @@
         <ImageView id="ivInfo" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
             <Image url="@../icons/info.png"/>
         </ImageView>
-        <Label fx:id="lblStatus"/>
+        <Label styleClass="rootLabel" fx:id="lblStatus"/>
     </HBox>
 </VBox>

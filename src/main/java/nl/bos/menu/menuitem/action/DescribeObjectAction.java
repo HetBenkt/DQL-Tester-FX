@@ -13,6 +13,8 @@ import nl.bos.utils.TableResultUtils;
 import java.text.MessageFormat;
 import java.util.logging.Logger;
 
+import static nl.bos.Constants.ROOT_SCENE_CSS;
+
 public class DescribeObjectAction implements EventHandler<WindowEvent> {
     private static final Logger LOGGER = Logger.getLogger(DescribeObjectAction.class.getName());
     private final Stage describeObjectStage = new Stage();
@@ -36,6 +38,9 @@ public class DescribeObjectAction implements EventHandler<WindowEvent> {
         describeObjectStage.setTitle("Describe object");
         HBox describeObject = (HBox) resources.loadFXML("/nl/bos/views/DescribeObject.fxml");
         describeObjectStage.setScene(new Scene(describeObject));
+        describeObjectStage.getScene().getStylesheets()
+                .addAll(ROOT_SCENE_CSS);
+
         describeObjectStage.setOnCloseRequest(this);
 
         DescribeObject describeObjectController = resources.getFxmlLoader().getController();

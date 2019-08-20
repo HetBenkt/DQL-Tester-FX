@@ -18,7 +18,6 @@ public class MyApplication extends Application {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     private String dqlKeywordsCss;
-    private String rootSceneCss;
     private Repository repository;
     private Resources resources;
     private BorderPane rootPane;
@@ -37,7 +36,6 @@ public class MyApplication extends Application {
 
             image = new Image(resources.getResourceStream("nl/bos/icons/logo_16.gif"));
             dqlKeywordsCss = resources.getResourceExternalForm("/nl/bos/themes/dql-keywords.css");
-            rootSceneCss = resources.getResourceExternalForm("/nl/bos/themes/rootScene.css");
         });
     }
 
@@ -45,7 +43,7 @@ public class MyApplication extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setScene(new Scene(rootPane));
         primaryStage.getScene().getStylesheets()
-                .addAll(dqlKeywordsCss, rootSceneCss);
+                .addAll(dqlKeywordsCss, ROOT_SCENE_CSS);
         primaryStage.getIcons().add(image);
 
         primaryStage.setTitle(APP_TITLE);

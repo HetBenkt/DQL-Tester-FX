@@ -13,6 +13,8 @@ import nl.bos.menu.menuitem.action.*;
 import nl.bos.utils.Controllers;
 import nl.bos.utils.Resources;
 
+import static nl.bos.Constants.ROOT_SCENE_CSS;
+
 public class Menu {
     @FXML
     private MenuBar menubar;
@@ -94,8 +96,10 @@ public class Menu {
         getAttributesStage.setTitle(String.format("Attributes List - %s (%s)", "ID", repository.getRepositoryName()));
         Resources resources = new Resources();
         VBox getAttributesPane = (VBox) resources.loadFXML("/nl/bos/views/GetAttributes.fxml");
-        Scene scene = new Scene(getAttributesPane);
-        getAttributesStage.setScene(scene);
+        getAttributesStage.setScene(new Scene(getAttributesPane));
+        getAttributesStage.getScene().getStylesheets()
+                .addAll(ROOT_SCENE_CSS);
+
         getAttributesStage.showAndWait();
     }
 

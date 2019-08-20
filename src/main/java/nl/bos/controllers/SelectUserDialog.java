@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static nl.bos.Constants.ROOT_SCENE_CSS;
+
 public class SelectUserDialog implements DialogCallbackInterface {
 	private static final Logger LOGGER = Logger.getLogger(UserEditor.class.getName());
 
@@ -67,7 +69,7 @@ public class SelectUserDialog implements DialogCallbackInterface {
 		String filterText = userFilter.getText();
 		String filterGroup = groupFilter.getText();
 
-		List<String> userNames = null;
+		List<String> userNames;
 
 		if (filterGroup.equals("< All Groups >")) {
 			userNames = repository.getFilteredUserList(filterText);
@@ -94,7 +96,7 @@ public class SelectUserDialog implements DialogCallbackInterface {
 		stage.close();
 	}
 
-	public void setCallbackTarget(DialogCallbackInterface callbackTarget, String callbackMessage) {
+	void setCallbackTarget(DialogCallbackInterface callbackTarget, String callbackMessage) {
 		this.callbackTarget = callbackTarget;
 		this.callbackMessage = callbackMessage;
 	}
@@ -108,6 +110,8 @@ public class SelectUserDialog implements DialogCallbackInterface {
 		try {
 			AnchorPane selectGroupPane = fxmlLoader.load();
 			selectGroupStage.setScene(new Scene(selectGroupPane));
+			selectGroupStage.getScene().getStylesheets()
+					.addAll(ROOT_SCENE_CSS);
 
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);

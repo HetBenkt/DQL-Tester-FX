@@ -39,13 +39,13 @@
                     <Insets top="5.0"/>
                 </VBox.margin>
             </CheckBox>
-            <Label text="Filter by supervisor">
+            <Label text="Filter by supervisor" styleClass="rootLabel">
                 <VBox.margin>
                     <Insets top="20.0"/>
                 </VBox.margin>
             </Label>
             <TextField fx:id="txtSupervisor" onKeyPressed="#handleSupervisor" promptText="supervisor_name"/>
-            <Label text="Filter by Object's Name or ID">
+            <Label text="Filter by Object's Name or ID" styleClass="rootLabel">
                 <VBox.margin>
                     <Insets top="5.0"/>
                 </VBox.margin>

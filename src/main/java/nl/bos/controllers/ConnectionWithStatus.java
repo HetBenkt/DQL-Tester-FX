@@ -4,7 +4,6 @@ import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.client.IDfSession;
 import com.documentum.fc.client.IDfUser;
 import com.documentum.fc.common.DfException;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -16,12 +15,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import nl.bos.Repository;
-import nl.bos.beans.HistoryItem;
 import nl.bos.utils.AppAlert;
 import nl.bos.utils.Calculations;
 import nl.bos.utils.Controllers;
 import nl.bos.utils.Resources;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.time.Instant;
@@ -30,6 +27,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static nl.bos.Constants.ROOT_SCENE_CSS;
 
 public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private static final Logger LOGGER = Logger.getLogger(ConnectionWithStatus.class.getName());
@@ -131,6 +130,9 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         VBox loginPane = (VBox) resources.loadFXML("/nl/bos/views/Login.fxml");
         fxmlLoader = resources.getFxmlLoader();
         loginStage.setScene(new Scene(loginPane));
+        loginStage.getScene().getStylesheets()
+                .addAll(ROOT_SCENE_CSS);
+
         loginStage.setOnCloseRequest(this);
     }
 

@@ -36,14 +36,14 @@
             <Insets bottom="5.0" left="5.0" right="5.0"/>
         </VBox.margin>
     </VBox>
-    <HBox spacing="5.0">
+    <HBox prefWidth="100.0" spacing="5.0">
         <Button fx:id="btnClearScript" mnemonicParsing="false" onAction="#clearScript" text="Clear Script"/>
         <Button fx:id="btnExecute" defaultButton="true" disable="true" layoutX="10.0" layoutY="10.0"
                 mnemonicParsing="false" onAction="#executeScript" text="Execute"/>
         <Button fx:id="btnExit" cancelButton="true" layoutX="72.0" layoutY="10.0" mnemonicParsing="false"
                 onAction="#exit" text="Exit">
             <HBox.margin>
-                <Insets left="410.0"/>
+                <Insets left="400.0"/>
             </HBox.margin>
         </Button>
         <VBox.margin>
