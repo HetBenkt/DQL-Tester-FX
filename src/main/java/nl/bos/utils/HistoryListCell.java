@@ -1,18 +1,15 @@
 package nl.bos.utils;
 
-import java.util.logging.Logger;
-
 import javafx.beans.binding.Bindings;
 import javafx.css.Style;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.paint.Color;
 import nl.bos.beans.HistoryItem;
 import nl.bos.controllers.QueryWithResult;
+
+import java.util.logging.Logger;
 
 /**
  * TODO refactor QueryWithResult to extact this class
@@ -37,6 +34,8 @@ public class HistoryListCell extends ListCell<HistoryItem> {
 		label.setMaxWidth(Double.POSITIVE_INFINITY);
 
 		star = new Hyperlink("☆");
+		star.setTextFill(Color.web("#9B870C"));
+		star.setStyle("-fx-underline: false");
 		star.setVisited(true); // So it is black, and not blue.
 		star.setOnAction(event -> {
 			// Switch the item favorite flag
@@ -44,7 +43,9 @@ public class HistoryListCell extends ListCell<HistoryItem> {
 			queryWithResultController.handleFavoriteHistoryItem(getItem(), !getItem().isFavorite());
 		});
 
-		Hyperlink cross = new Hyperlink("X");
+		Hyperlink cross = new Hyperlink("✗");
+		cross.setTextFill(Color.RED);
+		cross.setStyle("-fx-underline: false");
 		cross.setVisited(true); // So it is black, and not blue.
 		cross.setOnAction(event -> {
 			// Delete the item from history

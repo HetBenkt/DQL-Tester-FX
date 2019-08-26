@@ -6,9 +6,9 @@
 <HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="470.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121"
       fx:controller="nl.bos.controllers.DescribeObject">
     <VBox alignment="TOP_CENTER" prefWidth="300.0" spacing="5.0">
-        <Label styleClass="rootLabel" text="Select a type or table name"/>
+        <Label text="Select a type or table name"/>
         <HBox alignment="BOTTOM_LEFT">
-            <Label styleClass="rootLabel" text="Name:"/>
+            <Label text="Name:"/>
          <Region prefWidth="200.0" HBox.hgrow="ALWAYS" />
             <TextField fx:id="txtNrOfItems" editable="false" prefWidth="50.0"/>
         </HBox>

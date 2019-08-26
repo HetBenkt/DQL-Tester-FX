@@ -7,6 +7,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import nl.bos.controllers.QueryWithResult;
+import nl.bos.utils.Controllers;
 import nl.bos.utils.Resources;
 
 import java.util.List;
@@ -41,6 +43,8 @@ public class MyApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        setUserAgentStylesheet(STYLESHEET_CASPIAN);
+
         primaryStage.setScene(new Scene(rootPane));
         primaryStage.getScene().getStylesheets()
                 .addAll(dqlKeywordsCss, ROOT_SCENE_CSS);
@@ -53,6 +57,9 @@ public class MyApplication extends Application {
         primaryStage.setMinWidth(primaryStage.getWidth());
         primaryStage.setMinHeight(primaryStage.getHeight());
         primaryStage.toFront();
+
+        QueryWithResult queryWithResult = (QueryWithResult) Controllers.get(QueryWithResult.class.getSimpleName());
+        queryWithResult.getStatement().requestFocus();
     }
 
     private void shutdown() {

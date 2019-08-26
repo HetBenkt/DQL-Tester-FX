@@ -10,18 +10,18 @@
         <Tab text="General">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="749.0" prefWidth="507.0" style="-fx-border-color: grey;">
                 <CheckBox fx:id="globally_managed" layoutX="122.0" layoutY="14.0" mnemonicParsing="false" AnchorPane.leftAnchor="125.0" />
-                <Label layoutX="14.0" layoutY="14.0" styleClass="rootLabel" text="Globally managed:"/>
+                <Label layoutX="14.0" layoutY="14.0" text="Globally managed:"/>
                 <CheckBox fx:id="docbase_owner" layoutX="257.0" layoutY="14.0" mnemonicParsing="false" text="Docbase Owner" AnchorPane.rightAnchor="85.0" />
-                <Label layoutX="14.0" layoutY="42.0" styleClass="rootLabel" text="Object ID:"/>
+                <Label layoutX="14.0" layoutY="42.0" text="Object ID:"/>
                 <TextField fx:id="r_object_id" editable="false" layoutX="122.0" layoutY="38.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
                 <TextField fx:id="r_modify_date" editable="false" layoutX="122.0" layoutY="70.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <Label layoutX="14.0" layoutY="74.0" styleClass="rootLabel" text="Modify Date:"/>
+                <Label layoutX="14.0" layoutY="74.0" text="Modify Date:"/>
                 <RadioButton fx:id="userStateActive" layoutX="122.0" layoutY="103.0" mnemonicParsing="false" text="Active" AnchorPane.leftAnchor="125.0">
                <toggleGroup>
                   <ToggleGroup fx:id="userState" />
                </toggleGroup></RadioButton>
                 <RadioButton fx:id="userStateInactive" layoutX="188.0" layoutY="103.0" mnemonicParsing="false" text="Inactive" toggleGroup="$userState" />
-                <Label layoutX="14.0" layoutY="103.0" styleClass="rootLabel" text="User State:"/>
+                <Label layoutX="14.0" layoutY="103.0" text="User State:"/>
                 <RadioButton fx:id="userStateLocked" layoutX="257.0" layoutY="103.0" mnemonicParsing="false" text="Locked" toggleGroup="$userState" />
                 <RadioButton fx:id="userStateLockedInactive" layoutX="324.0" layoutY="103.0" mnemonicParsing="false" text="Locked &amp; Inactive" toggleGroup="$userState" />
                 <TextField fx:id="user_name" editable="false" layoutX="122.0" layoutY="132.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
@@ -47,31 +47,31 @@
                 <ComboBox fx:id="user_xprivilege" layoutX="122.0" layoutY="680.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
                 <CheckBox fx:id="failed_auth_attempt" layoutX="122.0" layoutY="712.0" mnemonicParsing="false" AnchorPane.leftAnchor="125.0" />
                 <Label fx:id="failed_auth_attempt_count" layoutX="149.0" layoutY="712.0" prefWidth="35.0"
-                       style="-fx-border-color: grey;" styleClass="rootLabel" text="0">
+                       style="-fx-border-color: grey;" text="0">
                     <padding>
                         <Insets bottom="1.0" left="2.0" right="2.0" top="1.0" />
                     </padding>
                 </Label>
                 <CheckBox fx:id="has_events" layoutX="285.0" layoutY="714.0" mnemonicParsing="false" text="Has Events" AnchorPane.rightAnchor="85.0" />
-                <Label layoutX="14.0" layoutY="136.0" styleClass="rootLabel" text="Name:"/>
-                <Label layoutX="14.0" layoutY="170.0" styleClass="rootLabel" text="OS Name:"/>
-                <Label layoutX="14.0" layoutY="204.0" styleClass="rootLabel" text="OS Domain:"/>
-                <Label layoutX="14.0" layoutY="236.0" styleClass="rootLabel" text="User Source:"/>
-                <Label layoutX="14.0" layoutY="269.0" styleClass="rootLabel" text="Email Address:"/>
-                <Label layoutX="14.0" layoutY="301.0" styleClass="rootLabel" text="DB Name:"/>
-                <Label layoutX="14.0" layoutY="333.0" styleClass="rootLabel" text="Privileges:"/>
-                <Label layoutX="14.0" layoutY="366.0" styleClass="rootLabel" text="Default Group:"/>
-                <Label layoutX="14.0" layoutY="400.0" styleClass="rootLabel" text="Default Folder:"/>
-                <Label layoutX="14.0" layoutY="432.0" styleClass="rootLabel" text="Default ACL:"/>
-                <Label layoutX="14.0" layoutY="466.0" styleClass="rootLabel" text="Home Docbase:"/>
-                <Label layoutX="14.0" layoutY="498.0" styleClass="rootLabel" text="Client Capability:"/>
-                <Label layoutX="14.0" layoutY="530.0" styleClass="rootLabel" text="Alias Set:"/>
-                <Label layoutX="14.0" layoutY="563.0" styleClass="rootLabel" text="Description:"/>
-                <Label layoutX="14.0" layoutY="591.0" styleClass="rootLabel" text="Workflow Disabled:"/>
-                <Label layoutX="14.0" layoutY="619.0" styleClass="rootLabel" text="User Delegation:"/>
-                <Label layoutX="14.0" layoutY="651.0" styleClass="rootLabel" text="Distinguished Name:"/>
-                <Label layoutX="14.0" layoutY="684.0" styleClass="rootLabel" text="Extended Privileges:"/>
-                <Label layoutX="14.0" layoutY="714.0" styleClass="rootLabel" text="Failed Auth Attempt:"/>
+                <Label layoutX="14.0" layoutY="136.0" text="Name:"/>
+                <Label layoutX="14.0" layoutY="170.0" text="OS Name:"/>
+                <Label layoutX="14.0" layoutY="204.0" text="OS Domain:"/>
+                <Label layoutX="14.0" layoutY="236.0" text="User Source:"/>
+                <Label layoutX="14.0" layoutY="269.0" text="Email Address:"/>
+                <Label layoutX="14.0" layoutY="301.0" text="DB Name:"/>
+                <Label layoutX="14.0" layoutY="333.0" text="Privileges:"/>
+                <Label layoutX="14.0" layoutY="366.0" text="Default Group:"/>
+                <Label layoutX="14.0" layoutY="400.0" text="Default Folder:"/>
+                <Label layoutX="14.0" layoutY="432.0" text="Default ACL:"/>
+                <Label layoutX="14.0" layoutY="466.0" text="Home Docbase:"/>
+                <Label layoutX="14.0" layoutY="498.0" text="Client Capability:"/>
+                <Label layoutX="14.0" layoutY="530.0" text="Alias Set:"/>
+                <Label layoutX="14.0" layoutY="563.0" text="Description:"/>
+                <Label layoutX="14.0" layoutY="591.0" text="Workflow Disabled:"/>
+                <Label layoutX="14.0" layoutY="619.0" text="User Delegation:"/>
+                <Label layoutX="14.0" layoutY="651.0" text="Distinguished Name:"/>
+                <Label layoutX="14.0" layoutY="684.0" text="Extended Privileges:"/>
+                <Label layoutX="14.0" layoutY="714.0" text="Failed Auth Attempt:"/>
                 <ImageView fitHeight="32.0" fitWidth="32.0" layoutX="388.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
                     <Image url="@../icons/type/t_dm_user_16.gif" />
                 </ImageView>
@@ -95,7 +95,7 @@
         <Tab text="Advanced">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-border-color: grey;">
                 <ComboBox fx:id="owner_permit" layoutX="124.0" layoutY="14.0" prefHeight="25.0" prefWidth="85.0" AnchorPane.leftAnchor="125.0" />
-                <Label layoutX="14.0" layoutY="18.0" styleClass="rootLabel" text="Def. Permit O/G/W:"/>
+                <Label layoutX="14.0" layoutY="18.0" text="Def. Permit O/G/W:"/>
                 <ComboBox fx:id="group_permit" layoutX="181.0" layoutY="14.0" prefHeight="25.0" prefWidth="85.0" AnchorPane.leftAnchor="215.0" />
                 <ComboBox fx:id="world_permit" layoutX="238.0" layoutY="14.0" prefHeight="25.0" prefWidth="85.0" AnchorPane.leftAnchor="305.0" />
                 <TextField fx:id="user_administrator" layoutX="124.0" layoutY="46.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
@@ -111,19 +111,19 @@
                 <ListView fx:id="restricted_folder_ids" layoutX="124.0" layoutY="409.0" prefHeight="326.0" prefWidth="265.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="125.0" />
                 <Button layoutX="373.0" layoutY="46.0" mnemonicParsing="false" onAction="#browseUserAdministrator" prefWidth="65.0" text="Browse" AnchorPane.rightAnchor="10.0" />
                 <Button layoutX="369.0" layoutY="408.0" mnemonicParsing="false" prefWidth="65.0" text="Browse" AnchorPane.rightAnchor="10.0" />
-                <Label layoutX="14.0" layoutY="50.0" styleClass="rootLabel" text="User Administrator:"/>
-                <Label layoutX="14.0" layoutY="83.0" styleClass="rootLabel" text="Global Unique ID:"/>
-                <Label layoutX="14.0" layoutY="118.0" styleClass="rootLabel" text="User Login Name:"/>
-                <Label layoutX="14.0" layoutY="152.0" styleClass="rootLabel" text="User Login Domain:"/>
-                <Label layoutX="14.0" layoutY="184.0" styleClass="rootLabel" text="User Initials:"/>
-                <Label layoutX="14.0" layoutY="216.0" styleClass="rootLabel" text="User Password:"/>
+                <Label layoutX="14.0" layoutY="50.0" text="User Administrator:"/>
+                <Label layoutX="14.0" layoutY="83.0" text="Global Unique ID:"/>
+                <Label layoutX="14.0" layoutY="118.0" text="User Login Name:"/>
+                <Label layoutX="14.0" layoutY="152.0" text="User Login Domain:"/>
+                <Label layoutX="14.0" layoutY="184.0" text="User Initials:"/>
+                <Label layoutX="14.0" layoutY="216.0" text="User Password:"/>
                 <PasswordField fx:id="user_password" layoutX="123.0" layoutY="212.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <Label layoutX="14.0" layoutY="248.0" styleClass="rootLabel" text="User Web Page:"/>
-                <Label layoutX="14.0" layoutY="280.0" styleClass="rootLabel" text="First Failed Auth UTC Time:"/>
-                <Label layoutX="14.0" layoutY="313.0" styleClass="rootLabel" text="Last Login UTC Time:"/>
-                <Label layoutX="14.0" layoutY="346.0" styleClass="rootLabel" text="Deactivated UTC Time:"/>
-                <Label layoutX="14.0" layoutY="379.0" styleClass="rootLabel" text="Deactivated IP Addr:"/>
-                <Label layoutX="14.0" layoutY="412.0" styleClass="rootLabel" text="Restricted Folder Ids:"/>
+                <Label layoutX="14.0" layoutY="248.0" text="User Web Page:"/>
+                <Label layoutX="14.0" layoutY="280.0" text="First Failed Auth UTC Time:"/>
+                <Label layoutX="14.0" layoutY="313.0" text="Last Login UTC Time:"/>
+                <Label layoutX="14.0" layoutY="346.0" text="Deactivated UTC Time:"/>
+                <Label layoutX="14.0" layoutY="379.0" text="Deactivated IP Addr:"/>
+                <Label layoutX="14.0" layoutY="412.0" text="Restricted Folder Ids:"/>
             </AnchorPane>
         </Tab>
     </TabPane>
@@ -136,12 +136,12 @@
     <Button fx:id="btnExit" layoutX="629.0" layoutY="854.0" mnemonicParsing="false" onAction="#closeWindow" prefWidth="80.0" text="Exit" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0" />
     <AnchorPane layoutX="226.0" layoutY="18.0" prefHeight="778.0" prefWidth="245.0" AnchorPane.leftAnchor="14.0"
                 AnchorPane.topAnchor="14.0">
-        <Label styleClass="rootLabel" text="User:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="8.0"/>
+        <Label text="User:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="8.0"/>
         <TextField fx:id="userFilter" onKeyReleased="#updateUserFilter" prefWidth="180.0" AnchorPane.leftAnchor="50.0"
                    AnchorPane.topAnchor="5.0"/>
         <ListView fx:id="userList" prefHeight="745.0" prefWidth="180.0" AnchorPane.bottomAnchor="5.0"
                   AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="38.0"/>
-        <Label fx:id="userListCount" styleClass="rootLabel" prefWidth="35.0" style="-fx-border-color: grey;" text="0"
+        <Label fx:id="userListCount" prefWidth="35.0" style="-fx-border-color: grey;" text="0"
                AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0">
             <padding>
                 <Insets bottom="1.0" left="2.0" right="2.0" top="1.0"/>

@@ -181,8 +181,13 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         lblUsernameDC.setText(session.getLoginUserName());
         ttDCUsername.setText(String.format("Documentum Username %s\nDefault Group: %s\nSession ID: %s\nAddress: %s", session.getLoginUserName(), user.getUserGroupName(), user.getObjectSession().getSessionId(), user.getUserAddress()));
 
-        lblDomainOS.setText(user.getUserOSDomain());
-        ttDomain.setText(String.format("Operation System Domain: %s", user.getUserOSDomain()));
+        if (!user.getUserOSDomain().equals("")) {
+            lblDomainOS.setText(user.getUserOSDomain());
+            ttDomain.setText(String.format("Operation System Domain: %s", user.getUserOSDomain()));
+        } else {
+            lblDomainOS.setText("n/a");
+            ttDomain.setText(String.format("Operation System Domain: %s", "n/a"));
+        }
 
         lblPrivileges.setText(String.format("%s (%d)", getUserPrivilegesLabel(user.getUserPrivileges()), user.getUserPrivileges()));
         ttPrivileges.setText(String.format("Documentum User Privileges: %s (%d)\nClient Capability: %s (%d)", getUserPrivilegesLabel(user.getUserPrivileges()), user.getUserPrivileges(), getClientCapabilityLabel(user.getClientCapability()), user.getClientCapability()));

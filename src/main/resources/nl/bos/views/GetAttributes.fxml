@@ -26,9 +26,9 @@
     </HBox>
     <HBox spacing="10.0">
         <VBox spacing="5.0">
-            <Label styleClass="rootLabel" text="Get Attributes for Object ID"/>
+            <Label text="Get Attributes for Object ID"/>
             <HBox spacing="5.0">
-                <Label styleClass="rootLabel" text="Object ID"/>
+                <Label text="Object ID"/>
                 <TextField fx:id="txtObjectId" />
                 <Button id="btnDump" mnemonicParsing="false" onAction="#handleDump" text="Dump" />
             </HBox>

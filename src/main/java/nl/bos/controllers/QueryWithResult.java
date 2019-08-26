@@ -1,25 +1,8 @@
 package nl.bos.controllers;
 
-import static nl.bos.Constants.QUERIES;
-
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.fxmisc.richtext.CodeArea;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.reactfx.Subscription;
-
 import com.documentum.fc.client.IDfCollection;
 import com.documentum.fc.common.DfException;
 import com.documentum.fc.common.IDfAttr;
-
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleStringProperty;
@@ -45,11 +28,22 @@ import nl.bos.AttributeTableColumn;
 import nl.bos.Repository;
 import nl.bos.beans.HistoryItem;
 import nl.bos.contextmenu.ContextMenuOnResultTable;
-import nl.bos.utils.Calculations;
-import nl.bos.utils.Controllers;
-import nl.bos.utils.DQLSyntax;
-import nl.bos.utils.HistoryListCell;
-import nl.bos.utils.Resources;
+import nl.bos.utils.*;
+import org.fxmisc.richtext.CodeArea;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.reactfx.Subscription;
+
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static nl.bos.Constants.QUERIES;
 
 public class QueryWithResult {
 	private static final Logger LOGGER = Logger.getLogger(QueryWithResult.class.getName());
@@ -82,7 +76,7 @@ public class QueryWithResult {
 		return historyStatements;
 	}
 
-	CodeArea getStatement() {
+	public CodeArea getStatement() {
 		return statement;
 	}
 
@@ -126,7 +120,7 @@ public class QueryWithResult {
 		loadHistory();
 	}
 
-	public void onStatementsSelection(HistoryItem newValue, ComboBox<HistoryItem> combo) {
+	private void onStatementsSelection(HistoryItem newValue, ComboBox<HistoryItem> combo) {
 		if (newValue != null) {
 			combo.hide();
 			statement.replaceText(0, statement.getLength(), newValue.getQuery());
@@ -180,7 +174,7 @@ public class QueryWithResult {
 
 		// filter the event that will select the current value 
 		// and close the combo on key SPACE
-		ComboBoxListViewSkin<HistoryItem> comboBoxListViewSkin = new ComboBoxListViewSkin<HistoryItem>(combo);
+		ComboBoxListViewSkin<HistoryItem> comboBoxListViewSkin = new ComboBoxListViewSkin<>(combo);
 		comboBoxListViewSkin.getPopupContent().addEventFilter(KeyEvent.ANY, (event) -> {
 			if (event.getCode() == KeyCode.SPACE) {
 				event.consume();
@@ -249,7 +243,7 @@ public class QueryWithResult {
 	}
 
 	private void setFavoriteItems(ObservableList<HistoryItem> statements) {
-		FilteredList<HistoryItem> favItems = new FilteredList<>(statements, t -> t.isFavorite());
+		FilteredList<HistoryItem> favItems = new FilteredList<>(statements, HistoryItem::isFavorite);
 
 		addFilterToComboBox(favItems, favoriteStatements);
 	}
@@ -467,7 +461,7 @@ public class QueryWithResult {
 		}
 	}
 
-	public void appendNewQueryToHistory(String statement, JSONObject jsonObject) {
+	void appendNewQueryToHistory(String statement, JSONObject jsonObject) {
 		if (statementNotExists(historyItems, statement)) {
 			HistoryItem historyItem = new HistoryItem(statement);
 			historyItems.add(0, historyItem);

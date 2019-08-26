@@ -16,8 +16,8 @@
             <BorderPane.margin>
                 <Insets left="5.0" right="5.0" top="5.0"/>
             </BorderPane.margin>
-            <Button fx:id="btnReadQuery" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                    onAction="#handleReadQuery" text="ReadQuery"/>
+            <Button fx:id="btnReadQuery" defaultButton="true" disable="true" maxWidth="1.7976931348623157E308"
+                    mnemonicParsing="false" onAction="#handleReadQuery" text="ReadQuery"/>
             <Button fx:id="btnFlushCache" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
                     text="Flush Cache"/>
             <Button id="btnClearQuery" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
@@ -34,7 +34,7 @@
             <BorderPane.margin>
                 <Insets top="5.0"/>
             </BorderPane.margin>
-            <Label styleClass="rootLabel" text="Command"/>
+            <Label text="Command"/>
             <HBox alignment="TOP_CENTER" disable="true" spacing="5.0">
                 <VBox.margin>
                     <Insets bottom="20.0"/>
@@ -53,16 +53,16 @@
                 <RadioButton mnemonicParsing="false" text="CacheQuery" toggleGroup="$tgCommand"/>
                 <RadioButton mnemonicParsing="false" text="ODBC" toggleGroup="$tgCommand"/>
             </HBox>
-            <Label styleClass="rootLabel" text="Timings"/>
+            <Label text="Timings"/>
             <HBox alignment="TOP_CENTER" spacing="5.0">
                 <padding>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                 </padding>
-                <Label styleClass="rootLabel" text="Query"/>
+                <Label text="Query"/>
                 <TextField id="txtQuery" fx:id="timeQuery" alignment="CENTER" editable="false"/>
-                <Label styleClass="rootLabel" text="List"/>
+                <Label text="List"/>
                 <TextField id="txtList" fx:id="timeList" alignment="CENTER" editable="false"/>
-                <Label styleClass="rootLabel" text="Sort"/>
+                <Label text="Sort"/>
                 <TextField id="txtSort" fx:id="timeSort" alignment="CENTER" editable="false"/>
             </HBox>
         </VBox>
@@ -91,72 +91,105 @@
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
             </padding>
-            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                <Image url="@../icons/type/t_dm_docbase_config_16.gif"/>
-            </ImageView>
-            <Label fx:id="lblStatus" style="-fx-background-color: #a8a8a8" text="Offline">
+            <HBox style="-fx-border-color: #D3D3D3;">
                 <padding>
-                    <Insets left="5.0" right="5.0"/>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                 </padding>
-                <tooltip>
-                    <Tooltip fx:id="ttStatus"/>
-                </tooltip>
-            </Label>
-            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                <Image url="@../icons/type/t_dm_user_16.gif"/>
-            </ImageView>
-            <Label fx:id="lblUsernameOS" style="-fx-background-color: #d3d3d3" text="OS Username">
+                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                    <Image url="@../icons/type/t_dm_docbase_config_16.gif"/>
+                </ImageView>
+                <Label fx:id="lblStatus" text="Offline">
+                    <padding>
+                        <Insets left="5.0" right="5.0"/>
+                    </padding>
+                    <tooltip>
+                        <Tooltip fx:id="ttStatus"/>
+                    </tooltip>
+                </Label>
+            </HBox>
+            <HBox style="-fx-border-color: #D3D3D3;">
                 <padding>
-                    <Insets left="5.0" right="5.0"/>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                 </padding>
-                <tooltip>
-                    <Tooltip fx:id="ttOSUsername"/>
-                </tooltip>
-            </Label>
-            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                <Image url="@../icons/type/t_dm_user_16.gif"/>
-            </ImageView>
-            <Label fx:id="lblUsernameDC" style="-fx-background-color: #a8a8a8" text="DC Username">
+                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                    <Image url="@../icons/type/t_dm_user_16.gif"/>
+                </ImageView>
+                <Label fx:id="lblUsernameOS" text="OS Username">
+                    <padding>
+                        <Insets left="5.0" right="5.0"/>
+                    </padding>
+                    <tooltip>
+                        <Tooltip fx:id="ttOSUsername"/>
+                    </tooltip>
+                </Label>
+            </HBox>
+            <HBox style="-fx-border-color: #D3D3D3;">
                 <padding>
-                    <Insets left="5.0" right="5.0"/>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                 </padding>
-                <tooltip>
-                    <Tooltip fx:id="ttDCUsername"/>
-                </tooltip>
-            </Label>
-            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                <Image url="@../icons/federations.gif"/>
-            </ImageView>
-            <Label fx:id="lblDomainOS" style="-fx-background-color: #d3d3d3" text="OS Domain">
+                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                    <Image url="@../icons/type/t_dm_user_16.gif"/>
+                </ImageView>
+                <Label fx:id="lblUsernameDC" text="DC Username">
+                    <padding>
+                        <Insets left="5.0" right="5.0"/>
+                    </padding>
+                    <tooltip>
+                        <Tooltip fx:id="ttDCUsername"/>
+                    </tooltip>
+                </Label>
+            </HBox>
+            <HBox style="-fx-border-color: #D3D3D3;">
                 <padding>
-                    <Insets left="5.0" right="5.0"/>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                 </padding>
-                <tooltip>
-                    <Tooltip fx:id="ttDomain"/>
-                </tooltip>
-            </Label>
-            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                <Image url="@../icons/sortByLock.gif"/>
-            </ImageView>
-            <Label fx:id="lblPrivileges" style="-fx-background-color: #a8a8a8" text="Privileges">
+                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                    <Image url="@../icons/federations.gif"/>
+                </ImageView>
+                <Label fx:id="lblDomainOS" text="OS Domain">
+                    <padding>
+                        <Insets left="5.0" right="5.0"/>
+                    </padding>
+                    <tooltip>
+                        <Tooltip fx:id="ttDomain"/>
+                    </tooltip>
+                </Label>
+            </HBox>
+            <HBox style="-fx-border-color: #D3D3D3;">
                 <padding>
-                    <Insets left="5.0" right="5.0"/>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                 </padding>
-                <tooltip>
-                    <Tooltip fx:id="ttPrivileges"/>
-                </tooltip>
-            </Label>
-            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                <Image url="@../icons/type/t_dm_server_config_16.gif"/>
-            </ImageView>
-            <Label fx:id="lblServerVersion" style="-fx-background-color: #d3d3d3" text="Server Version">
+                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                    <Image url="@../icons/sortByLock.gif"/>
+                </ImageView>
+                <Label fx:id="lblPrivileges" text="Privileges">
+                    <padding>
+                        <Insets left="5.0" right="5.0"/>
+                    </padding>
+                    <tooltip>
+                        <Tooltip fx:id="ttPrivileges"/>
+                    </tooltip>
+                </Label>
+            </HBox>
+            <HBox style="-fx-border-color: #D3D3D3;">
                 <padding>
-                    <Insets left="5.0" right="5.0"/>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                 </padding>
-                <tooltip>
-                    <Tooltip fx:id="ttServerVersion"/>
-                </tooltip>
-            </Label>
+                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                    <Image url="@../icons/type/t_dm_server_config_16.gif"/>
+                </ImageView>
+                <Label fx:id="lblServerVersion" text="Server Version">
+                    <padding>
+                        <Insets left="5.0" right="5.0"/>
+                    </padding>
+                    <tooltip>
+                        <Tooltip fx:id="ttServerVersion"/>
+                    </tooltip>
+                </Label>
+            </HBox>
+            <opaqueInsets>
+                <Insets/>
+            </opaqueInsets>
         </HBox>
     </bottom>
 </BorderPane>

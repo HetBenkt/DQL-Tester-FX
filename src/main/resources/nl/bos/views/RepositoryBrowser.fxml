@@ -18,12 +18,12 @@
             <padding>
                 <Insets top="5.0"/>
             </padding>
-            <Label styleClass="rootLabel" text="Object ID"/>
-            <Label styleClass="rootLabel" text="Object Type"/>
-            <Label styleClass="rootLabel" text="Content Type"/>
-            <Label styleClass="rootLabel" text="Content Size"/>
-            <Label styleClass="rootLabel" text="Creation Date"/>
-            <Label styleClass="rootLabel" text="Modify Date"/>
+            <Label text="Object ID"/>
+            <Label text="Object Type"/>
+            <Label text="Content Type"/>
+            <Label text="Content Size"/>
+            <Label text="Creation Date"/>
+            <Label text="Modify Date"/>
         </VBox>
         <VBox spacing="3.0">
             <TextField fx:id="txtObjectId" editable="false"/>
@@ -37,12 +37,12 @@
             <padding>
                 <Insets top="5.0"/>
             </padding>
-            <Label styleClass="rootLabel" text="Lock Owner"/>
-            <Label styleClass="rootLabel" text="Lock Machine"/>
-            <Label styleClass="rootLabel" text="Lock Date"/>
-            <Label styleClass="rootLabel" text="ACL Name"/>
-            <Label styleClass="rootLabel" text="Permission"/>
-            <Label styleClass="rootLabel" text="Version"/>
+            <Label text="Lock Owner"/>
+            <Label text="Lock Machine"/>
+            <Label text="Lock Date"/>
+            <Label text="ACL Name"/>
+            <Label text="Permission"/>
+            <Label text="Version"/>
         </VBox>
         <VBox spacing="3.0">
             <TextField fx:id="txtLockOwner" editable="false"/>
@@ -66,7 +66,7 @@
                     text="Exit"/>
         </VBox>
     </HBox>
-    <Label fx:id="lblNrOfItems" styleClass="rootLabel">
+    <Label fx:id="lblNrOfItems">
         <padding>
             <Insets left="10.0" top="20.0"/>
         </padding>

@@ -12,27 +12,27 @@
 			<padding>
 				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 			</padding>
-			<Label styleClass="rootLabel" text="Result"/>
+			<Label text="Result"/>
 			<TableView fx:id="result" VBox.vgrow="ALWAYS" />
 		</VBox>
 		<VBox>
 			<padding>
 				<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 			</padding>
-			<Label styleClass="rootLabel" text="DQL/SQL Statement"/>
+			<Label text="DQL/SQL Statement"/>
 			<VirtualizedScrollPane VBox.vgrow="ALWAYS">
 				<content>
 					<CodeArea fx:id="statement" VBox.vgrow="ALWAYS" />
 				</content>
 			</VirtualizedScrollPane>
 
-			<Label styleClass="rootLabel" text="DQL/SQL History"/>
+			<Label text="DQL/SQL History"/>
 			<HBox>
-				<ComboBox fx:id="historyStatements" />
+				<ComboBox fx:id="historyStatements" prefWidth="840.0"/>
 			</HBox>
-			<Label styleClass="rootLabel" text="DQL/SQL Favorites"/>
+			<Label text="DQL/SQL Favorites"/>
 			<HBox>
-				<ComboBox fx:id="favoriteStatements" />
+				<ComboBox fx:id="favoriteStatements" prefWidth="840.0"/>
 			</HBox>
 		</VBox>
 	</SplitPane>
