@@ -17,9 +17,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.skin.ComboBoxListViewSkin;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
@@ -103,6 +101,18 @@ public class QueryWithResult {
 	@FXML
 	private void initialize() {
 		Controllers.put(this.getClass().getSimpleName(), this);
+
+        statement.setOnKeyPressed(event -> {
+            final KeyCombination keyCombination = new KeyCodeCombination(
+                    KeyCode.F9, KeyCombination.SHIFT_DOWN);
+            if (keyCombination.match(event)) {
+                executeQuery(statement.getSelectedText());
+                appendNewQueryToHistory(statement.getSelectedText(), jsonObject);
+            } else if (event.getCode() == KeyCode.F9) {
+                executeQuery(statement.getText());
+                appendNewQueryToHistory(statement.getText(), jsonObject);
+            }
+        });
 
 		contextMenuOnResultTable = new ContextMenuOnResultTable(result);
 		result.getSelectionModel().setCellSelectionEnabled(true);
