@@ -94,4 +94,4 @@ Make sure the 'Coverage' and 'Emmo' plugins are enabled
 ### Wiki
 * [Wiki](https://github.com/HetBenkt/DQL-Tester-FX/wiki) 
 ### Communication channels
-* This will be available in the future when communication will be an issue
+* An e-mail can be sent to [DQLTesterFX@gmail.com](mailto:DQLTesterFX@gmail.com)
