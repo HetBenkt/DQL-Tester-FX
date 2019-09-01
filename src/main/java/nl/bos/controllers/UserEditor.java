@@ -1,8 +1,7 @@
 package nl.bos.controllers;
 
-import com.documentum.fc.client.IDfACL;
-import com.documentum.fc.client.IDfUser;
-import com.documentum.fc.common.DfException;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -10,19 +9,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
-import nl.bos.Repository;
-import nl.bos.utils.AppAlert;
+import nl.bos.beans.UserObject;
+import nl.bos.services.UserService;
 import nl.bos.utils.DialogCallbackInterface;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,60 +26,7 @@ import static nl.bos.Constants.ROOT_SCENE_CSS;
 
 public class UserEditor implements DialogCallbackInterface {
 	private static final Logger LOGGER = Logger.getLogger(UserEditor.class.getName());
-	private final Repository repository = Repository.getInstance();
-
 	private final HashMap<Integer, Toggle> userStateToggles = new HashMap<>();
-
-	private static final List<String> userSources = new ArrayList<>();
-	private static final Map<Integer, String> userPrivileges = new HashMap<>();
-	private static final Map<Integer, String> userXPrivileges = new HashMap<>();
-	private static final Map<Integer, String> clientCapabilities = new HashMap<>();
-	private static final Map<Integer, String> basicPermissions = new HashMap<>();
-
-	static {
-		userSources.add("None");
-		userSources.add("UNIX only");
-		userSources.add("Domain only");
-		userSources.add("UNIX first");
-		userSources.add("Domain first");
-		userSources.add("LDAP");
-		userSources.add("Inline Password");
-		userSources.add("dm_krb");
-
-		userPrivileges.put(IDfUser.DF_PRIVILEGE_NONE, "None");
-		userPrivileges.put(IDfUser.DF_PRIVILEGE_CREATE_TYPE, "Create Type");
-		userPrivileges.put(IDfUser.DF_PRIVILEGE_CREATE_CABINET, "Create Cabinet");
-		userPrivileges.put(IDfUser.DF_PRIVILEGE_CREATE_TYPE | IDfUser.DF_PRIVILEGE_CREATE_CABINET, "Create Cabinet and Type");
-		userPrivileges.put(IDfUser.DF_PRIVILEGE_CREATE_GROUP, "Create Group");
-		userPrivileges.put(IDfUser.DF_PRIVILEGE_CREATE_GROUP | IDfUser.DF_PRIVILEGE_CREATE_TYPE, "Create Group and Type");
-		userPrivileges.put(IDfUser.DF_PRIVILEGE_CREATE_GROUP | IDfUser.DF_PRIVILEGE_CREATE_CABINET, "Create Group and Cabinet");
-		userPrivileges.put(IDfUser.DF_PRIVILEGE_CREATE_GROUP | IDfUser.DF_PRIVILEGE_CREATE_CABINET | IDfUser.DF_PRIVILEGE_CREATE_TYPE, "Create Group, Cabinet and Type");
-		userPrivileges.put(IDfUser.DF_PRIVILEGE_SYSADMIN, "System Administrator");
-		userPrivileges.put(IDfUser.DF_PRIVILEGE_SUPERUSER, "Super User");
-
-		userXPrivileges.put(0, "None");
-		userXPrivileges.put(IDfUser.DF_XPRIVILEGE_VIEW_AUDIT, "View Audit");
-		userXPrivileges.put(IDfUser.DF_XPRIVILEGE_CONFIG_AUDIT, "Config Audit");
-		userXPrivileges.put(IDfUser.DF_XPRIVILEGE_CONFIG_AUDIT | IDfUser.DF_XPRIVILEGE_VIEW_AUDIT, "Config and View Audit");
-		userXPrivileges.put(IDfUser.DF_XPRIVILEGE_PURGE_AUDIT, "Purge Audit");
-		userXPrivileges.put(IDfUser.DF_XPRIVILEGE_CONFIG_AUDIT | IDfUser.DF_XPRIVILEGE_PURGE_AUDIT, "Config and Purge Audit");
-		userXPrivileges.put(IDfUser.DF_XPRIVILEGE_VIEW_AUDIT | IDfUser.DF_XPRIVILEGE_PURGE_AUDIT, "View and Purge Audit");
-		userXPrivileges.put(IDfUser.DF_XPRIVILEGE_CONFIG_AUDIT | IDfUser.DF_XPRIVILEGE_VIEW_AUDIT | IDfUser.DF_XPRIVILEGE_PURGE_AUDIT, "Config, View and Purge Audit");
-
-		clientCapabilities.put(IDfUser.DF_CAPABILITY_NONE, "Consumer");
-		clientCapabilities.put(IDfUser.DF_CAPABILITY_CONSUMER, "Consumer");
-		clientCapabilities.put(IDfUser.DF_CAPABILITY_CONTRIBUTOR, "Contributor");
-		clientCapabilities.put(IDfUser.DF_CAPABILITY_COORDINATOR, "Coordinator");
-		clientCapabilities.put(IDfUser.DF_CAPABILITY_SYSTEM_ADMIN, "System Administrator");
-
-		basicPermissions.put(IDfACL.DF_PERMIT_NONE, IDfACL.DF_PERMIT_NONE_STR);
-		basicPermissions.put(IDfACL.DF_PERMIT_BROWSE, IDfACL.DF_PERMIT_BROWSE_STR);
-		basicPermissions.put(IDfACL.DF_PERMIT_READ, IDfACL.DF_PERMIT_READ_STR);
-		basicPermissions.put(IDfACL.DF_PERMIT_RELATE, IDfACL.DF_PERMIT_RELATE_STR);
-		basicPermissions.put(IDfACL.DF_PERMIT_VERSION, IDfACL.DF_PERMIT_VERSION_STR);
-		basicPermissions.put(IDfACL.DF_PERMIT_WRITE, IDfACL.DF_PERMIT_WRITE_STR);
-		basicPermissions.put(IDfACL.DF_PERMIT_DELETE, IDfACL.DF_PERMIT_DELETE_STR);
-	}
 
 	@FXML
 	private ListView<String> userList;
@@ -183,114 +126,106 @@ public class UserEditor implements DialogCallbackInterface {
 	private ListView<String> restricted_folder_ids;
 	@FXML
 	private PasswordField user_password;
+	private UserService userService;
+	@FXML
+	private Button btnUpdate;
+	@FXML
+	private Button btnExport;
 
 	@FXML
 	private void initialize() {
-		userStateToggles.put(IDfUser.DF_USER_ACTIVE, userStateActive);
-		userStateToggles.put(IDfUser.DF_USER_INACTIVE, userStateInactive);
-		userStateToggles.put(IDfUser.DF_USER_LOCKED, userStateLocked);
-		userStateToggles.put(IDfUser.DF_USER_LOCKED_INACTIVE, userStateLockedInactive);
+		userService = new UserService();
 
-		user_source.setItems(FXCollections.observableList(userSources));
-		user_privilege.setItems(FXCollections.observableList(new ArrayList<>(userPrivileges.values())));
-		user_xprivilege.setItems(FXCollections.observableList(new ArrayList<>(userXPrivileges.values())));
-		client_capability.setItems(FXCollections.observableList(new ArrayList<>(clientCapabilities.values())));
+		userStateToggles.put(UserService.USER_ACTIVE, userStateActive);
+		userStateToggles.put(UserService.USER_INACTIVE, userStateInactive);
+		userStateToggles.put(UserService.USER_LOCKED, userStateLocked);
+		userStateToggles.put(UserService.USER_LOCKED_INACTIVE, userStateLockedInactive);
 
-		List<String> homeDocbases = new ArrayList<>();
-		homeDocbases.add(repository.getRepositoryName());
-		home_docbase.setItems(FXCollections.observableList(homeDocbases));
+		user_source.setItems(FXCollections.observableList(UserService.userSources));
+		user_privilege.setItems(FXCollections.observableList(new ArrayList<>(UserService.userPrivileges.values())));
+		user_xprivilege.setItems(FXCollections.observableList(new ArrayList<>(UserService.userXPrivileges.values())));
+		client_capability.setItems(FXCollections.observableList(new ArrayList<>(UserService.clientCapabilities.values())));
+		home_docbase.setItems(FXCollections.observableList(userService.getHomeDocbaseList()));
 
-		final ObservableList<String> observableBasicPermissions = FXCollections.observableList(new ArrayList<>(basicPermissions.values()));
+		final ObservableList<String> observableBasicPermissions = FXCollections.observableList(new ArrayList<>(UserService.basicPermissions.values()));
 		owner_permit.setItems(observableBasicPermissions);
 		group_permit.setItems(observableBasicPermissions);
 		world_permit.setItems(observableBasicPermissions);
 
-		List<String> aliasSets = repository.getAliasSets();
+		List<String> aliasSets = userService.getAliasSets();
 		alias_set.setItems(FXCollections.observableList(aliasSets));
 
 		refreshUserList();
 		userList.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> handleUserSelection(newValue));
+
+		addChangeListeners();
 	}
 
 	private void handleUserSelection(String selectedUser) {
 		LOGGER.info(String.format("Selected user %s", selectedUser));
-
-		try {
-			IDfUser userObject = repository.getUserByName(selectedUser);
-
-			if (userObject == null) {
-				throw new DfException();
-			}
-
-			updateUIFields(userObject);
-
-		} catch (DfException e) {
-			AppAlert.error("User not found", String.format("Could not retrieve user %s!", selectedUser));
-			LOGGER.log(Level.SEVERE, e.getMessage(), e);
-		}
+		UserObject userObject = userService.getUserByName(selectedUser);
+		assert userObject != null;
+		updateUIFields(userObject);
 	}
 
 	private void refreshUserList() {
-		List<String> filteredUsers = repository.getFilteredUserList(userFilter.getText());
+		List<String> filteredUsers = userService.getFilteredUserlist(userFilter.getText());// repository.getFilteredUserList(userFilter.getText());
 		ObservableList<String> observableUserList = FXCollections.observableList(filteredUsers);
 		userList.setItems(observableUserList);
 		userListCount.setText("" + filteredUsers.size());
 	}
 
-	public void updateUserFilter(KeyEvent keyEvent) {
+	public void updateUserFilter() {
 		refreshUserList();
 	}
 
-	private void updateUIFields(IDfUser userObject) throws DfException {
-		globally_managed.setSelected(userObject.isGloballyManaged());
-		docbase_owner.setSelected(userObject.getUserName().equals(repository.getDocbaseOwner()));
-		r_object_id.setText(userObject.getObjectId().getId());
-		r_modify_date.setText(userObject.getModifyDate().asString(""));
-		userState.selectToggle(userStateToggles.get(userObject.getUserState()));
-		user_name.setText(userObject.getUserName());
-		user_os_name.setText(userObject.getUserOSName());
-		user_os_domain.setText(userObject.getUserOSDomain());
-		user_source.getSelectionModel().select(userObject.getUserSourceAsString());
-		user_address.setText(userObject.getUserAddress());
-		user_db_name.setText(userObject.getUserDBName());
-		user_privilege.getSelectionModel().select(userPrivileges.get(userObject.getUserPrivileges()));
-		default_group.setText(userObject.getUserGroupName());
-		default_folder.setText(userObject.getDefaultFolder());
-		default_acl.setText(userObject.getACLName());
-		home_docbase.getSelectionModel().select(userObject.getHomeDocbase());
-		client_capability.getSelectionModel().select(clientCapabilities.get(userObject.getClientCapability()));
-		alias_set.getSelectionModel().select(userObject.getAliasSet());
+	private void updateUIFields(UserObject userObject) {
+		globally_managed.setSelected(userObject.isGlobally_managed());
+		docbase_owner.setSelected(userObject.isDocbase_owner());
+		r_object_id.setText(userObject.getR_object_id());
+		r_modify_date.setText(userObject.getR_modify_date());
+		userState.selectToggle(userStateToggles.get(userObject.getUser_state()));
+		user_name.setText(userObject.getUser_name());
+		user_os_name.setText(userObject.getUser_os_name());
+		user_os_domain.setText(userObject.getUser_os_domain());
+		user_source.getSelectionModel().select(userObject.getUser_source());
+		user_address.setText(userObject.getUser_address());
+		user_db_name.setText(userObject.getUser_db_name());
+		user_privilege.getSelectionModel().select(UserService.userPrivileges.get(userObject.getUser_privileges()));
+		default_group.setText(userObject.getUser_group_name());
+		default_folder.setText(userObject.getDefault_folder());
+		default_acl.setText(userObject.getAcl_domain() + "//" + userObject.getAcl_name());
+		home_docbase.getSelectionModel().select(userObject.getHome_docbase());
+		client_capability.getSelectionModel().select(UserService.clientCapabilities.get(userObject.getClient_capability()));
+		alias_set.getSelectionModel().select(userService.getAliasSet(userObject.getAlias_set_id()));
 		description.setText(userObject.getDescription());
-		workflow_disabled.setSelected(userObject.isWorkflowDisabled());
-		user_delegation.setText(userObject.getUserDelegation());
-		distinguished_name.setText(userObject.getUserDistinguishedLDAPName());
-		user_xprivilege.getSelectionModel().select(userXPrivileges.get(userObject.getUserXPrivileges()));
-		failed_auth_attempt.setSelected(userObject.getFailedAuthenticationAttempts() > -1);
-		failed_auth_attempt_count.setText("" + userObject.getFailedAuthenticationAttempts());
-		has_events.setSelected(userObject.hasEvents());
+		workflow_disabled.setSelected(userObject.isWorkflow_disabled());
+		user_delegation.setText(userObject.getUser_delegation());
+		distinguished_name.setText(userObject.getUser_ldap_dn());
+		user_xprivilege.getSelectionModel().select(UserService.userXPrivileges.get(userObject.getUser_xprivileges()));
+		failed_auth_attempt.setSelected(userObject.getFailed_auth_attempt() > -1);
+		failed_auth_attempt_count.setText("" + userObject.getFailed_auth_attempt());
+		has_events.setSelected(userObject.isHas_events());
 
-		owner_permit.getSelectionModel().select(basicPermissions.get(userObject.getOwnerDefPermit()));
-		group_permit.getSelectionModel().select(basicPermissions.get(userObject.getGroupDefPermit()));
-		world_permit.getSelectionModel().select(basicPermissions.get(userObject.getWorldDefPermit()));
-		user_administrator.setText(userObject.getString("user_admin"));
-		user_global_unique_id.setText(userObject.getString("user_global_unique_id"));
-		user_login_name.setText(userObject.getUserLoginName());
-		user_login_domain.setText(userObject.getString("user_login_domain"));
-		user_initials.setText(userObject.getString("user_initials"));
-		user_password.setText(userObject.getUserPassword());
-		user_web_page.setText(userObject.getString("user_web_page"));
-		first_failed_auth_utc_time.setText(userObject.getTime("first_failed_auth_utc_time").asString(""));
-		last_login_utc_time.setText(userObject.getTime("last_login_utc_time").asString(""));
-		deactivated_utc_time.setText(userObject.getTime("deactivated_utc_time").asString(""));
-		deactivated_ip_address.setText(userObject.getString("deactivated_ip_addr"));
+		owner_permit.getSelectionModel().select(UserService.basicPermissions.get(userObject.getOwner_permit()));
+		group_permit.getSelectionModel().select(UserService.basicPermissions.get(userObject.getGroup_permit()));
+		world_permit.getSelectionModel().select(UserService.basicPermissions.get(userObject.getWorld_permit()));
+		user_administrator.setText(userObject.getUser_admin());
+		user_global_unique_id.setText(userObject.getUser_global_unique_id());
+		user_login_name.setText(userObject.getUser_login_name());
+		user_login_domain.setText(userObject.getUser_login_domain());
+		user_initials.setText(userObject.getUser_initials());
+		user_password.setText(userObject.getUser_password());
+		user_web_page.setText(userObject.getUser_web_page());
+		first_failed_auth_utc_time.setText(userObject.getFirst_failed_auth_utc_time());
+		last_login_utc_time.setText(userObject.getLast_login_utc_time());
+		deactivated_utc_time.setText(userObject.getDeactivated_utc_time());
+		deactivated_ip_address.setText(userObject.getDeactivated_ip_addr());
 
-		List<String> restrictedFolders = new ArrayList<>();
-		for (int i = 0; i < userObject.getValueCount("restricted_folder_ids"); i++) {
-			restrictedFolders.add(userObject.getRepeatingString("restricted_folder_ids", i));
-		}
-
-		ObservableList<String> restrictedFolderIdList = FXCollections.observableList(restrictedFolders);
+		ObservableList<String> restrictedFolderIdList = FXCollections.observableList(userObject.getRestricted_folder_ids());
 		restricted_folder_ids.setItems(restrictedFolderIdList);
+
+		btnUpdate.setDisable(true);
 	}
 
 	public void closeWindow(ActionEvent actionEvent) {
@@ -299,15 +234,15 @@ public class UserEditor implements DialogCallbackInterface {
 		stage.close();
 	}
 
-	public void emptyDefaultGroupField(MouseEvent mouseEvent) {
+	public void emptyDefaultGroupField() {
 		default_group.clear();
 	}
 
-	public void emptyDefaultFolderField(MouseEvent mouseEvent) {
+	public void emptyDefaultFolderField() {
 		default_folder.clear();
 	}
 
-	public void emptyDefaultACLField(MouseEvent mouseEvent) {
+	public void emptyDefaultACLField() {
 		default_acl.clear();
 	}
 
@@ -328,15 +263,15 @@ public class UserEditor implements DialogCallbackInterface {
 		}
 	}
 
-	public void browseDefaultGroup(ActionEvent actionEvent) {
+	public void browseDefaultGroup() {
 		openSelectGroupDialog("defaultGroup", false);
 	}
 
-	public void browseUserDelegation(ActionEvent actionEvent) {
+	public void browseUserDelegation() {
 		openSelectUserDialog("Select Delegation User", "userDelegation");
 	}
 
-	public void browseUserAdministrator(ActionEvent actionEvent) {
+	public void browseUserAdministrator() {
 		openSelectUserDialog("Select User Administrator", "userAdministrator");
 	}
 
@@ -345,21 +280,17 @@ public class UserEditor implements DialogCallbackInterface {
 		selectGroupStage.setTitle("Select a Group");
 		selectGroupStage.setResizable(false);
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/dialogs/SelectGroupDialog.fxml"));
-
 		try {
 			AnchorPane selectGroupPane = fxmlLoader.load();
 			selectGroupStage.setScene(new Scene(selectGroupPane));
 			selectGroupStage.getScene().getStylesheets()
 					.addAll(ROOT_SCENE_CSS);
-
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
-
 		SelectGroupDialog controller = fxmlLoader.getController();
 		controller.setAllowAllGroupsOption(allowAllGroupsOption);
 		controller.setCallbackTarget(this, callbackMessage);
-
 		selectGroupStage.showAndWait();
 	}
 
@@ -368,20 +299,113 @@ public class UserEditor implements DialogCallbackInterface {
 		selectUserStage.setTitle(dialogTitle);
 		selectUserStage.setResizable(false);
 		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/nl/bos/views/dialogs/SelectUserDialog.fxml"));
-
 		try {
 			AnchorPane selectUserPane = fxmlLoader.load();
 			selectUserStage.setScene(new Scene(selectUserPane));
 			selectUserStage.getScene().getStylesheets()
 					.addAll(ROOT_SCENE_CSS);
-
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
-
 		SelectUserDialog controller = fxmlLoader.getController();
 		controller.setCallbackTarget(this, callbackMessage);
-
 		selectUserStage.showAndWait();
+	}
+
+	public void exportUser() {
+		userService.exportUser(user_name.getText());
+	}
+
+	public void updateUser() {
+		String[] aclParts = default_acl.getText().split("//");
+		String aclDomain = aclParts[0];
+		String aclName = aclParts[1];
+
+		// TODO user state
+		UserObject updatedUserObject = userService.getUserByName(user_name.getText());
+		updatedUserObject.setGlobally_managed(globally_managed.isSelected());
+		updatedUserObject.setUser_os_name(user_os_name.getText());
+		updatedUserObject.setUser_os_domain(user_os_domain.getText());
+		updatedUserObject.setUser_source(user_source.getSelectionModel().getSelectedItem());
+		updatedUserObject.setUser_address(user_address.getText());
+		updatedUserObject.setUser_db_name(user_db_name.getText());
+		updatedUserObject.setUser_privileges(userService.getUserPrivilege(user_privilege.getSelectionModel().getSelectedItem()));
+		updatedUserObject.setUser_group_name(default_group.getText());
+		updatedUserObject.setDefault_folder(default_folder.getText());
+		updatedUserObject.setAcl_domain(aclDomain);
+		updatedUserObject.setAcl_name(aclName);
+		updatedUserObject.setHome_docbase(home_docbase.getSelectionModel().getSelectedItem());
+		updatedUserObject.setClient_capability(userService.getClientCapability(client_capability.getSelectionModel().getSelectedItem()));
+		updatedUserObject.setAlias_set_id(alias_set.getSelectionModel().getSelectedItem());
+		updatedUserObject.setDescription(description.getText());
+		updatedUserObject.setWorkflow_disabled(workflow_disabled.isSelected());
+		updatedUserObject.setUser_delegation(user_delegation.getText());
+		updatedUserObject.setUser_ldap_dn(distinguished_name.getText());
+		updatedUserObject.setUser_xprivileges(userService.getUserXPrivilege(user_xprivilege.getSelectionModel().getSelectedItem()));
+		updatedUserObject.setFailed_auth_attempt(getFailedAuthAttempt());
+
+		updatedUserObject.setOwner_permit(userService.getBasicPermission(owner_permit.getSelectionModel().getSelectedItem()));
+		updatedUserObject.setGroup_permit(userService.getBasicPermission(group_permit.getSelectionModel().getSelectedItem()));
+		updatedUserObject.setWorld_permit(userService.getBasicPermission(world_permit.getSelectionModel().getSelectedItem()));
+		updatedUserObject.setUser_admin(user_administrator.getText());
+		updatedUserObject.setUser_global_unique_id(user_global_unique_id.getText());
+		updatedUserObject.setUser_login_name(user_login_name.getText());
+		updatedUserObject.setUser_login_domain(user_login_domain.getText());
+		updatedUserObject.setUser_initials(user_initials.getText());
+		// TODO password
+		updatedUserObject.setUser_web_page(user_web_page.getText());
+		updatedUserObject.setDeactivated_ip_addr(deactivated_ip_address.getText());
+		updatedUserObject.setRestricted_folder_ids(restricted_folder_ids.getItems());
+
+		userService.updateUser(updatedUserObject);
+	}
+
+	private int getFailedAuthAttempt() {
+		int displayedAttemptCount = Integer.parseInt(failed_auth_attempt_count.getText());
+		if (failed_auth_attempt.isSelected() && displayedAttemptCount == -1) {
+			return 0;
+		} else if (!failed_auth_attempt.isSelected()) {
+			return -1;
+		}
+		return displayedAttemptCount;
+	}
+
+	private void addChangeListeners() {
+		ChangeListener changeListener = (observableValue, oldValue, newValue) -> btnUpdate.setDisable(false);
+
+		globally_managed.selectedProperty().addListener(changeListener);
+		userState.selectedToggleProperty().addListener(changeListener);
+		user_name.textProperty().addListener(changeListener);
+		user_os_name.textProperty().addListener(changeListener);
+		user_os_domain.textProperty().addListener(changeListener);
+		user_source.valueProperty().addListener(changeListener);
+		user_address.textProperty().addListener(changeListener);
+		user_db_name.textProperty().addListener(changeListener);
+		user_privilege.valueProperty().addListener(changeListener);
+		default_group.textProperty().addListener(changeListener);
+		default_folder.textProperty().addListener(changeListener);
+		default_acl.textProperty().addListener(changeListener);
+		home_docbase.valueProperty().addListener(changeListener);
+		client_capability.valueProperty().addListener(changeListener);
+		alias_set.valueProperty().addListener(changeListener);
+		description.textProperty().addListener(changeListener);
+		workflow_disabled.selectedProperty().addListener(changeListener);
+		user_delegation.textProperty().addListener(changeListener);
+		distinguished_name.textProperty().addListener(changeListener);
+		user_xprivilege.valueProperty().addListener(changeListener);
+		failed_auth_attempt.selectedProperty().addListener(changeListener);
+
+		owner_permit.valueProperty().addListener(changeListener);
+		group_permit.valueProperty().addListener(changeListener);
+		world_permit.valueProperty().addListener(changeListener);
+		user_administrator.textProperty().addListener(changeListener);
+		user_global_unique_id.textProperty().addListener(changeListener);
+		user_login_name.textProperty().addListener(changeListener);
+		user_login_domain.textProperty().addListener(changeListener);
+		user_initials.textProperty().addListener(changeListener);
+		user_password.textProperty().addListener(changeListener);
+		user_web_page.textProperty().addListener(changeListener);
+		deactivated_ip_address.textProperty().addListener(changeListener);
+		restricted_folder_ids.itemsProperty().addListener(changeListener);
 	}
 }
