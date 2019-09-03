@@ -1,7 +1,6 @@
 package nl.bos.controllers;
 
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -166,10 +165,11 @@ public class UserEditor implements DialogCallbackInterface {
 		UserObject userObject = userService.getUserByName(selectedUser);
 		assert userObject != null;
 		updateUIFields(userObject);
+		btnExport.setDisable(false);
 	}
 
 	private void refreshUserList() {
-		List<String> filteredUsers = userService.getFilteredUserlist(userFilter.getText());// repository.getFilteredUserList(userFilter.getText());
+		List<String> filteredUsers = userService.getFilteredUserlist(userFilter.getText());
 		ObservableList<String> observableUserList = FXCollections.observableList(filteredUsers);
 		userList.setItems(observableUserList);
 		userListCount.setText("" + filteredUsers.size());
@@ -321,9 +321,9 @@ public class UserEditor implements DialogCallbackInterface {
 		String aclDomain = aclParts[0];
 		String aclName = aclParts[1];
 
-		// TODO user state
 		UserObject updatedUserObject = userService.getUserByName(user_name.getText());
 		updatedUserObject.setGlobally_managed(globally_managed.isSelected());
+		updatedUserObject.setUser_state(getUserState());
 		updatedUserObject.setUser_os_name(user_os_name.getText());
 		updatedUserObject.setUser_os_domain(user_os_domain.getText());
 		updatedUserObject.setUser_source(user_source.getSelectionModel().getSelectedItem());
@@ -360,6 +360,22 @@ public class UserEditor implements DialogCallbackInterface {
 		userService.updateUser(updatedUserObject);
 	}
 
+	private int getUserState() {
+		if (userStateActive.isSelected()) {
+			return UserService.USER_ACTIVE;
+		}
+		if (userStateInactive.isSelected()) {
+			return UserService.USER_INACTIVE;
+		}
+		if (userStateLocked.isSelected()) {
+			return UserService.USER_LOCKED;
+		}
+		if (userStateLockedInactive.isSelected()) {
+			return UserService.USER_LOCKED_INACTIVE;
+		}
+		return 0;
+	}
+
 	private int getFailedAuthAttempt() {
 		int displayedAttemptCount = Integer.parseInt(failed_auth_attempt_count.getText());
 		if (failed_auth_attempt.isSelected() && displayedAttemptCount == -1) {
@@ -371,41 +387,41 @@ public class UserEditor implements DialogCallbackInterface {
 	}
 
 	private void addChangeListeners() {
-		ChangeListener changeListener = (observableValue, oldValue, newValue) -> btnUpdate.setDisable(false);
+		ChangeListener btnUpdateListener = (observableValue, oldValue, newValue) -> btnUpdate.setDisable(false);
 
-		globally_managed.selectedProperty().addListener(changeListener);
-		userState.selectedToggleProperty().addListener(changeListener);
-		user_name.textProperty().addListener(changeListener);
-		user_os_name.textProperty().addListener(changeListener);
-		user_os_domain.textProperty().addListener(changeListener);
-		user_source.valueProperty().addListener(changeListener);
-		user_address.textProperty().addListener(changeListener);
-		user_db_name.textProperty().addListener(changeListener);
-		user_privilege.valueProperty().addListener(changeListener);
-		default_group.textProperty().addListener(changeListener);
-		default_folder.textProperty().addListener(changeListener);
-		default_acl.textProperty().addListener(changeListener);
-		home_docbase.valueProperty().addListener(changeListener);
-		client_capability.valueProperty().addListener(changeListener);
-		alias_set.valueProperty().addListener(changeListener);
-		description.textProperty().addListener(changeListener);
-		workflow_disabled.selectedProperty().addListener(changeListener);
-		user_delegation.textProperty().addListener(changeListener);
-		distinguished_name.textProperty().addListener(changeListener);
-		user_xprivilege.valueProperty().addListener(changeListener);
-		failed_auth_attempt.selectedProperty().addListener(changeListener);
+		globally_managed.selectedProperty().addListener(btnUpdateListener);
+		userState.selectedToggleProperty().addListener(btnUpdateListener);
+		user_name.textProperty().addListener(btnUpdateListener);
+		user_os_name.textProperty().addListener(btnUpdateListener);
+		user_os_domain.textProperty().addListener(btnUpdateListener);
+		user_source.valueProperty().addListener(btnUpdateListener);
+		user_address.textProperty().addListener(btnUpdateListener);
+		user_db_name.textProperty().addListener(btnUpdateListener);
+		user_privilege.valueProperty().addListener(btnUpdateListener);
+		default_group.textProperty().addListener(btnUpdateListener);
+		default_folder.textProperty().addListener(btnUpdateListener);
+		default_acl.textProperty().addListener(btnUpdateListener);
+		home_docbase.valueProperty().addListener(btnUpdateListener);
+		client_capability.valueProperty().addListener(btnUpdateListener);
+		alias_set.valueProperty().addListener(btnUpdateListener);
+		description.textProperty().addListener(btnUpdateListener);
+		workflow_disabled.selectedProperty().addListener(btnUpdateListener);
+		user_delegation.textProperty().addListener(btnUpdateListener);
+		distinguished_name.textProperty().addListener(btnUpdateListener);
+		user_xprivilege.valueProperty().addListener(btnUpdateListener);
+		failed_auth_attempt.selectedProperty().addListener(btnUpdateListener);
 
-		owner_permit.valueProperty().addListener(changeListener);
-		group_permit.valueProperty().addListener(changeListener);
-		world_permit.valueProperty().addListener(changeListener);
-		user_administrator.textProperty().addListener(changeListener);
-		user_global_unique_id.textProperty().addListener(changeListener);
-		user_login_name.textProperty().addListener(changeListener);
-		user_login_domain.textProperty().addListener(changeListener);
-		user_initials.textProperty().addListener(changeListener);
-		user_password.textProperty().addListener(changeListener);
-		user_web_page.textProperty().addListener(changeListener);
-		deactivated_ip_address.textProperty().addListener(changeListener);
-		restricted_folder_ids.itemsProperty().addListener(changeListener);
+		owner_permit.valueProperty().addListener(btnUpdateListener);
+		group_permit.valueProperty().addListener(btnUpdateListener);
+		world_permit.valueProperty().addListener(btnUpdateListener);
+		user_administrator.textProperty().addListener(btnUpdateListener);
+		user_global_unique_id.textProperty().addListener(btnUpdateListener);
+		user_login_name.textProperty().addListener(btnUpdateListener);
+		user_login_domain.textProperty().addListener(btnUpdateListener);
+		user_initials.textProperty().addListener(btnUpdateListener);
+		user_password.textProperty().addListener(btnUpdateListener);
+		user_web_page.textProperty().addListener(btnUpdateListener);
+		deactivated_ip_address.textProperty().addListener(btnUpdateListener);
+		restricted_folder_ids.itemsProperty().addListener(btnUpdateListener);
 	}
 }

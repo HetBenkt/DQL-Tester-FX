@@ -85,13 +85,13 @@ public class UserService {
 
 	private List<String> updatedAttributes = new ArrayList<>();
 
-	public String getAliasSet(String alias_set_id) {
-		if (!repository.isObjectId(alias_set_id)) {
+	public String getAliasSet(String aliasSetId) {
+		if (!repository.isObjectId(aliasSetId)) {
 			return NO_ALIAS_SET;
 		}
 
 		try {
-			return ((IDfAliasSet) repository.getObjectById(alias_set_id)).getObjectName();
+			return ((IDfAliasSet) repository.getObjectById(aliasSetId)).getObjectName();
 		} catch (DfException e) {
 			e.printStackTrace();
 		}
@@ -139,7 +139,7 @@ public class UserService {
 			};
 
 			StringBuilder exportDataBuilder = new StringBuilder();
-			exportDataBuilder.append(String.format("# *------------ dm_user - %s ------------*\n", userObject.getUserName()));
+			exportDataBuilder.append(String.format("# *------------ dm_user - %s ------------*%n", userObject.getUserName()));
 			exportDataBuilder.append("create,c,dm_user").append("\n");
 
 			for (String attributeName : attributesToExport) {
@@ -211,12 +211,12 @@ public class UserService {
 			userObject.setDeactivated_utc_time(dfcUserObject.getTime(ATTR_DEACTIVATED_UTC_TIME).asString(""));
 			userObject.setDeactivated_ip_addr(dfcUserObject.getString(ATTR_DEACTIVATED_IP_ADDR));
 
-			java.util.List<String> restricted_folder_ids = new ArrayList<>();
+			java.util.List<String> restrictedFolderIds = new ArrayList<>();
 			for (int i = 0; i < dfcUserObject.getValueCount(""); i++) {
-				restricted_folder_ids.add(dfcUserObject.getRepeatingString("", i));
+				restrictedFolderIds.add(dfcUserObject.getRepeatingString("", i));
 			}
 
-			userObject.setRestricted_folder_ids(restricted_folder_ids);
+			userObject.setRestricted_folder_ids(restrictedFolderIds);
 
 			return userObject;
 
@@ -288,7 +288,7 @@ public class UserService {
 			updateIntIfChanged(user, "group_def_permit", userObject.getGroup_permit());
 			updateIntIfChanged(user, "world_def_permit", userObject.getWorld_permit());
 			updateStringIfChanged(user, ATTR_USER_ADMIN, userObject.getUser_admin());
-			updateStringIfChanged(user, "user_global_unique_id", userObject.getUser_global_unique_id());
+			updateStringIfChanged(user, ATTR_USER_GLOBAL_UNIQUE_ID, userObject.getUser_global_unique_id());
 			updateStringIfChanged(user, "user_login_name", userObject.getUser_login_name());
 			updateStringIfChanged(user, ATTR_USER_LOGIN_DOMAIN, userObject.getUser_login_domain());
 			updateStringIfChanged(user, ATTR_USER_INITIALS, userObject.getUser_initials());
