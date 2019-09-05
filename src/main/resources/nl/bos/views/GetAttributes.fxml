@@ -30,7 +30,7 @@
             <HBox spacing="5.0">
                 <Label text="Object ID"/>
                 <TextField fx:id="txtObjectId" />
-                <Button id="btnDump" mnemonicParsing="false" onAction="#handleDump" text="Dump" />
+                <Button id="btnDump" defaultButton="true" mnemonicParsing="false" onAction="#handleDump" text="Dump"/>
             </HBox>
         </VBox>
         <VBox spacing="5.0">

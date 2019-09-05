@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <HBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="470.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.121"
       fx:controller="nl.bos.controllers.DescribeObject">
-    <VBox alignment="TOP_CENTER" prefWidth="300.0" spacing="5.0">
+    <VBox prefWidth="250.0" spacing="5.0">
         <Label text="Select a type or table name"/>
-        <HBox alignment="BOTTOM_LEFT">
-            <Label text="Name:"/>
-         <Region prefWidth="200.0" HBox.hgrow="ALWAYS" />
+        <HBox alignment="CENTER_LEFT">
+            <Label text="Name:">
+                <HBox.margin>
+                    <Insets right="5.0"/>
+                </HBox.margin>
+            </Label>
+            <ComboBox fx:id="cbTypesTables" maxWidth="1.7976931348623157E308" onAction="#handleTypesTables"
+                      prefWidth="150.0">
+                <HBox.margin>
+                    <Insets right="10.0"/>
+                </HBox.margin>
+            </ComboBox>
             <TextField fx:id="txtNrOfItems" editable="false" prefWidth="50.0"/>
+            <VBox.margin>
+                <Insets top="15.0"/>
+            </VBox.margin>
         </HBox>
-        <ComboBox fx:id="cbTypesTables" maxWidth="1.7976931348623157E308" onAction="#handleTypesTables" prefWidth="150.0" />
-        <HBox alignment="CENTER" spacing="5.0">
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
             <RadioButton id="rbTypeTable" mnemonicParsing="false" onAction="#handleTypeTable" selected="true" text="Type &amp; Table">
                 <toggleGroup>
                     <!--suppress JavaFxUnresolvedFxIdReference -->
@@ -22,20 +33,20 @@
             </RadioButton>
             <RadioButton id="rbType" mnemonicParsing="false" onAction="#handleType" text="Type" toggleGroup="$tgTypeTable" />
             <RadioButton id="rbTable" mnemonicParsing="false" onAction="#handleTable" text="Table" toggleGroup="$tgTypeTable" />
+            <VBox.margin>
+                <Insets top="15.0"/>
+            </VBox.margin>
         </HBox>
       <Region prefHeight="10.0" />
         <HBox alignment="CENTER" spacing="5.0">
-         <Region />
             <Button fx:id="btnOk" defaultButton="true" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleOK" text="Ok" HBox.hgrow="ALWAYS" />
-         <Region />
             <Button fx:id="btnCancel" cancelButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCancel" text="Cancel" HBox.hgrow="ALWAYS" />
-         <Region />
         </HBox>
       <HBox.margin>
          <Insets left="5.0" top="5.0" />
       </HBox.margin>
     </VBox>
-    <TreeView fx:id="tvTypesTables" prefWidth="285.0">
+    <TreeView fx:id="tvTypesTables" prefWidth="335.0">
         <HBox.margin>
             <Insets bottom="5.0" left="5.0" top="5.0" />
         </HBox.margin>

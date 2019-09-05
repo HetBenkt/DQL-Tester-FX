@@ -13,7 +13,7 @@
                 <MenuItem mnemonicParsing="false" onAction="#getAttributes" text="Get Attributes"/>
                 <SeparatorMenuItem mnemonicParsing="false"/>
                 <MenuItem mnemonicParsing="false" onAction="#executeAPIScript" text="Execute API Script"/>
-                <MenuItem mnemonicParsing="false" onAction="#executeDQLScript" text="Execute DQL Script"/>
+                <!--<MenuItem mnemonicParsing="false" onAction="#executeDQLScript" text="Execute DQL Script"/>-->
                 <SeparatorMenuItem mnemonicParsing="false"/>
                 <MenuItem mnemonicParsing="false" onAction="#browseRepository" text="Browse Repository"/>
                 <SeparatorMenuItem mnemonicParsing="false"/>

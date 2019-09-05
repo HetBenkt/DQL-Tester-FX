@@ -6,10 +6,10 @@
 <?import javafx.scene.layout.*?>
 <?import nl.bos.DateTimePicker?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121"
+      minWidth="-Infinity" prefHeight="750.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121"
       fx:controller="nl.bos.controllers.JobEditor">
     <HBox>
-        <VBox spacing="5.0">
+        <VBox spacing="25.0">
             <HBox.margin>
                 <Insets left="5.0" right="5.0" top="5.0"/>
             </HBox.margin>
@@ -72,7 +72,7 @@
                 </VBox>
             </HBox>
         </VBox>
-        <VBox fx:id="vbFields" disable="true" prefWidth="400.0" spacing="5.0">
+        <VBox fx:id="vbFields" disable="true" prefWidth="400.0" spacing="6.0">
             <HBox.margin>
                 <Insets top="5.0"/>
             </HBox.margin>
@@ -83,7 +83,7 @@
             <HBox spacing="5.0">
                 <TextField fx:id="txtLastReturnCode" editable="false"/>
                 <HBox disable="true">
-                    <CheckBox fx:id="chkIsContinued" style="-fx-opacity: 1" mnemonicParsing="false" text="Is Continued">
+                    <CheckBox fx:id="chkIsContinued" mnemonicParsing="false" style="-fx-opacity: 1" text="Is Continued">
                         <HBox.margin>
                             <Insets top="3.0"/>
                         </HBox.margin>
@@ -125,13 +125,25 @@
                     </HBox.margin>
                 </CheckBox>
             </HBox>
-            <ComboBox fx:id="cbDesignatedServer" onAction="#handleComboBox"/>
+            <HBox>
+                <VBox.margin>
+                    <Insets top="6.0"/>
+                </VBox.margin>
+                <ComboBox fx:id="cbDesignatedServer" onAction="#handleComboBox">
+                    <HBox.margin>
+                        <Insets right="5.0"/>
+                    </HBox.margin>
+                </ComboBox>
+                <Button fx:id="btnEditServer" maxWidth="50.0" minWidth="50.0" mnemonicParsing="false"
+                        prefWidth="50.0" text="Edit"/>
+            </HBox>
             <CheckBox fx:id="chkRunAfterUpdate" mnemonicParsing="false" onAction="#handleCheckBox"
                       text="Run After Update">
                 <VBox.margin>
                     <Insets top="4.0"/>
                 </VBox.margin>
             </CheckBox>
+            <!--<Label text="dpStartDate" />-->
             <DateTimePicker fx:id="dpStartDate" onAction="#handleDatePicker">
                 <VBox.margin>
                     <Insets top="5.0"/>
@@ -149,6 +161,7 @@
                         <ToggleGroup fx:id="jobEndDate"/>
                     </toggleGroup>
                 </RadioButton>
+                <!--<Label text="dpEndDate" />-->
                 <DateTimePicker fx:id="dpEndDate" onAction="#handleDatePicker"/>
             </HBox>
             <HBox spacing="5.0">
@@ -166,15 +179,32 @@
             </HBox>
             <HBox spacing="5.0">
                 <TextField fx:id="txtContinuousInterval"/>
-                <CheckBox fx:id="chkPassStandardArguments" mnemonicParsing="false" text="Pass standard arguments"
-                          onAction="#handleCheckBox">
+                <CheckBox fx:id="chkPassStandardArguments" mnemonicParsing="false" onAction="#handleCheckBox"
+                          text="Pass standard arguments">
                     <HBox.margin>
                         <Insets top="3.0"/>
                     </HBox.margin>
                 </CheckBox>
+                <VBox.margin>
+                    <Insets top="5.0"/>
+                </VBox.margin>
             </HBox>
-            <TextField fx:id="txtMethod" editable="false"/>
-            <ListView fx:id="lvArguments" prefHeight="100.0"/>
+            <HBox>
+                <TextField fx:id="txtMethod" editable="false">
+                    <HBox.margin>
+                        <Insets right="5.0"/>
+                    </HBox.margin>
+                </TextField>
+                <Button fx:id="btnBrowseMethod" mnemonicParsing="false" text="Browse"/>
+            </HBox>
+            <HBox>
+                <ListView fx:id="lvArguments" prefHeight="100.0">
+                    <HBox.margin>
+                        <Insets right="5.0"/>
+                    </HBox.margin>
+                </ListView>
+                <Button fx:id="btnEditArguments" mnemonicParsing="false" text="Edit list"/>
+            </HBox>
         </VBox>
         <VBox fx:id="vbFieldButtons" disable="true" spacing="5.0">
             <HBox.margin>
@@ -187,17 +217,6 @@
                        preserveRatio="true" visible="false">
                 <Image url="@../icons/shield.png"/>
             </ImageView>
-            <Button fx:id="btnEditServer" mnemonicParsing="false" text="Edit">
-                <VBox.margin>
-                    <Insets top="161.0"/>
-                </VBox.margin>
-            </Button>
-            <Button fx:id="btnBrowseMethod" mnemonicParsing="false" text="Browse">
-                <VBox.margin>
-                    <Insets top="212.0"/>
-                </VBox.margin>
-            </Button>
-            <Button fx:id="btnEditArguments" mnemonicParsing="false" text="Edit list"/>
         </VBox>
     </HBox>
     <HBox fx:id="hbButtons" spacing="15.0">
@@ -210,15 +229,22 @@
         <Button fx:id="btnExportJob" disable="true" mnemonicParsing="false" text="Export Job"/>
         <Button fx:id="btnNewJob" mnemonicParsing="false" text="New Job"/>
         <Button fx:id="btnUpdate" disable="true" mnemonicParsing="false" onAction="#handleUpdate" text="Update"/>
-        <Button fx:id="btnExit" mnemonicParsing="false" onAction="#handleExit" text="Exit"/>
+        <Button fx:id="btnExit" defaultButton="true" mnemonicParsing="false" onAction="#handleExit" text="Exit"/>
     </HBox>
     <HBox spacing="5.0">
         <VBox.margin>
-            <Insets top="5.0"/>
+            <Insets bottom="5.0" top="5.0"/>
         </VBox.margin>
         <ImageView id="ivInfo" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
             <Image url="@../icons/info.png"/>
+            <HBox.margin>
+                <Insets left="5.0"/>
+            </HBox.margin>
         </ImageView>
-        <Label fx:id="lblStatus"/>
+        <Label fx:id="lblStatus">
+            <HBox.margin>
+                <Insets left="5.0"/>
+            </HBox.margin>
+        </Label>
     </HBox>
 </VBox>

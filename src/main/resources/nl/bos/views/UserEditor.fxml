@@ -129,11 +129,18 @@
     </TabPane>
     <Button mnemonicParsing="false" prefWidth="80.0" text="Refresh" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" />
     <Button disable="true" layoutX="77.0" layoutY="854.0" mnemonicParsing="false" prefWidth="80.0" text="Copy User" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="100.0" />
-    <Button disable="true" layoutX="161.0" layoutY="854.0" mnemonicParsing="false" prefWidth="80.0" text="Delete User" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="186.0" />
-    <Button fx:id="btnExport" onAction="#exportUser" disable="true" layoutX="372.0" layoutY="854.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Export User" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="272.0" />
-    <Button layoutX="507.0" layoutY="854.0" mnemonicParsing="false" prefWidth="80.0" text="New User" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="358.0" />
-    <Button fx:id="btnUpdate" disable="true" layoutX="574.0" layoutY="854.0" mnemonicParsing="false" onAction="#updateUser" prefWidth="80.0" text="Update" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="444.0" />
-    <Button layoutX="629.0" layoutY="854.0" mnemonicParsing="false" onAction="#closeWindow" prefWidth="80.0" text="Exit" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+    <Button disable="true" layoutX="161.0" layoutY="854.0" mnemonicParsing="false" prefWidth="100.0" text="Delete User"
+            AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="186.0"/>
+    <Button fx:id="btnExport" disable="true" layoutX="293.0" layoutY="806.0" mnemonicParsing="false"
+            onAction="#exportUser" prefWidth="100.0" text="Export User" AnchorPane.bottomAnchor="14.0"
+            AnchorPane.leftAnchor="293.0"/>
+    <Button layoutX="402.0" layoutY="806.0" mnemonicParsing="false" prefWidth="80.0" text="New User"
+            AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="402.0"/>
+    <Button fx:id="btnUpdate" disable="true" layoutX="491.0" layoutY="806.0" mnemonicParsing="false"
+            onAction="#updateUser" prefWidth="80.0" text="Update" AnchorPane.bottomAnchor="14.0"
+            AnchorPane.leftAnchor="491.0"/>
+    <Button defaultButton="true" layoutX="629.0" layoutY="854.0" mnemonicParsing="false" onAction="#closeWindow"
+            prefWidth="80.0" text="Exit" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0"/>
     <AnchorPane layoutX="226.0" layoutY="18.0" prefHeight="778.0" prefWidth="245.0" AnchorPane.leftAnchor="14.0"
                 AnchorPane.topAnchor="14.0">
         <Label text="User:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="8.0"/>

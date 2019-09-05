@@ -4,10 +4,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="vbox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-      minWidth="-Infinity" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121"
+      minWidth="-Infinity" prefHeight="750.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.121"
       fx:controller="nl.bos.controllers.RepositoryBrowser">
-    <TreeView fx:id="treeView"/>
-    <HBox spacing="10.0">
+    <TreeView fx:id="treeView" prefHeight="530.0"/>
+    <HBox fillHeight="false" spacing="10.0">
         <padding>
             <Insets left="10.0"/>
         </padding>
@@ -62,8 +62,8 @@
                     <Insets top="20.0"/>
                 </VBox.margin>
             </Button>
-            <Button fx:id="btnExit" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleExit"
-                    text="Exit"/>
+            <Button fx:id="btnExit" defaultButton="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                    onAction="#handleExit" text="Exit"/>
         </VBox>
     </HBox>
     <Label fx:id="lblNrOfItems">
