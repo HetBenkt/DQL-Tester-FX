@@ -12,6 +12,8 @@ import nl.bos.utils.Controllers;
 import nl.bos.utils.Resources;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 import static nl.bos.Constants.*;
@@ -28,6 +30,12 @@ public class MyApplication extends Application {
     @Override
     public void init() {
         repository = Repository.getInstance();
+
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
+        InitRepositoryList initRepositoryList = new InitRepositoryList();
+        executorService.execute(initRepositoryList);
+        executorService.shutdown();
+
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
         tryDevModeConnection();
         resources = new Resources();
