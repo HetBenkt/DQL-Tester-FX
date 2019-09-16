@@ -23,6 +23,7 @@ public class ContextMenuOnResultTable {
 	private final MenuItem exportToCsv;
 	private final MenuItem showProperties;
 	private final MenuItem getAttributes;
+	private final MenuItem generateAPIScript;
 	private final MenuItem copyCellToClipBoard;
 	private final MenuItem copyRowToClipBoard;
 	private final MenuItem describeObject;
@@ -66,6 +67,10 @@ public class ContextMenuOnResultTable {
 		getAttributes.setDisable(true);
 		new MenuItemGetAttributesAction(getAttributes, result);
 
+		generateAPIScript = new MenuItem("Generate API script");
+		generateAPIScript.setDisable(true);
+		new MenuItemGenerateAPIScriptAction(generateAPIScript, result);
+
 		destroyObject = new MenuItem("Destroy Object");
 		destroyObject.setDisable(true);
 		new MenuItemDestroyObjectAction(destroyObject, result);
@@ -99,7 +104,7 @@ public class ContextMenuOnResultTable {
 		new MenuItemCancelCheckoutAction(cancelcheckout, result);
 
 		contextMenu.getItems().addAll(openContent, new SeparatorMenuItem(), showProperties, new SeparatorMenuItem(), copyCellToClipBoard, copyRowToClipBoard,
-				exportToCsv, new SeparatorMenuItem(), describeObject, new SeparatorMenuItem(), getAttributes, destroyObject, new SeparatorMenuItem(), versions, renditions, new SeparatorMenuItem(),
+				exportToCsv, new SeparatorMenuItem(), describeObject, new SeparatorMenuItem(), getAttributes, generateAPIScript, destroyObject, new SeparatorMenuItem(), versions, renditions, new SeparatorMenuItem(),
 				checkout, checkin, cancelcheckout, new SeparatorMenuItem(), exportContent);
 	}
 
@@ -158,6 +163,7 @@ public class ContextMenuOnResultTable {
 		describeObject.setDisable(selectionIsNotAnDescribeObjectType(selectedCell));
 
 		getAttributes.setDisable(selectionIsNotAnObjectId(selectedCell));
+		generateAPIScript.setDisable(selectionIsNotAnObjectId(selectedCell));
 		destroyObject.setDisable(selectionIsNotAnObjectId(selectedCell));
 		openContent.setDisable(selectionIsNotAnDocumentType(selectedCell));
 		exportContent.setDisable(selectionIsNotAnDocumentType(selectedCell));

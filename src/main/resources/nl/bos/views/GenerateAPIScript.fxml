@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="vboxGetAttributes" prefHeight="620.0" prefWidth="650.0"
+      xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.GetAttributes">
+    <TextArea fx:id="txaAttributes" editable="false" prefHeight="500.0">
+        <VBox.margin>
+            <Insets left="5.0" right="5.0" top="5.0"/>
+        </VBox.margin>
+        <font>
+            <Font name="Monospaced Regular" size="12.0"/>
+        </font>
+    </TextArea>
+    <HBox spacing="10.0">
+        <Button id="btnFind" mnemonicParsing="false" onAction="#handleFind" text="Find"/>
+        <Button id="btnFindPrevious" mnemonicParsing="false" onAction="#handleFindPrevious" text="&lt;"/>
+        <Button id="btnFindNext" mnemonicParsing="false" onAction="#handleFindNext" text="&gt;"/>
+        <CheckBox fx:id="chkCaseSensitive" mnemonicParsing="false" onAction="#handleCaseSensitive"
+                  text="Case Sensitive"/>
+        <TextField fx:id="txtSearch" prefColumnCount="30"/>
+        <VBox.margin>
+            <Insets left="5.0" right="5.0" top="10.0"/>
+        </VBox.margin>
+    </HBox>
+    <HBox spacing="10.0">
+        <VBox spacing="5.0">
+            <Label text="Get Attributes for Object ID"/>
+            <HBox spacing="5.0">
+                <Label text="Object ID"/>
+                <TextField fx:id="txtObjectId"/>
+                <Button id="btnDump" defaultButton="true" mnemonicParsing="false" onAction="#handleDump" text="Dump"/>
+            </HBox>
+        </VBox>
+        <VBox spacing="5.0">
+            <CheckBox id="chkUseAPIkill" mnemonicParsing="false" selected="true"
+                      text="Use API Method 'kill' to remove object from cache"/>
+            <CheckBox id="chkFilterList" mnemonicParsing="false" text="Filter Attributes List"/>
+        </VBox>
+        <VBox alignment="BOTTOM_RIGHT">
+            <Button fx:id="btnExit" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#handleExit" text="Exit">
+                <VBox.margin>
+                    <Insets/>
+                </VBox.margin>
+            </Button>
+        </VBox>
+        <VBox.margin>
+            <Insets left="5.0" right="5.0" top="10.0"/>
+        </VBox.margin>
+    </HBox>
+</VBox>
