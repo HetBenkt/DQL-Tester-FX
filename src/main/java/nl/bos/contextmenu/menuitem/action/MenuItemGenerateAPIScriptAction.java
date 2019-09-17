@@ -27,6 +27,6 @@ public class MenuItemGenerateAPIScriptAction implements EventHandler<ActionEvent
         String id = (String) focusedCell.getTableColumn().getCellObservableValue(focusedCell.getRow()).getValue();
         LOGGER.info(id);
 
-        new GenerateAPIScriptAction(id);
+        new GenerateAPIScriptAction(result);
     }
 }

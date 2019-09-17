@@ -82,7 +82,7 @@ public class Menu {
 
     @FXML
     private void executeAPIScript() {
-        new ExecuteAPIScriptAction();
+        new ExecuteAPIScriptAction("");
     }
 
     @FXML

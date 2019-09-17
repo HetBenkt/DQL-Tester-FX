@@ -157,4 +157,8 @@ public class ExecuteAPIScript {
         Stage stage = (Stage) btnExecute.getScene().getWindow();
         stage.close();
     }
+
+    public void injectData(String script) {
+        apiScriptView.setText(script);
+    }
 }
