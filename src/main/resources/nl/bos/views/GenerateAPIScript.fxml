@@ -4,8 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="vboxGenerateAPIScript" prefHeight="600.0" prefWidth="500.0"
-      spacing="5.0"
-      xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.GenerateAPIScript">
+      spacing="5.0" xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.GenerateAPIScript">
     <padding>
         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
     </padding>
@@ -19,9 +18,9 @@
     </Pane>
     <Pane>
         <HBox alignment="CENTER_LEFT" prefWidth="200.0" spacing="5.0">
-            <Button fx:id="btnGenerate" defaultButton="true" mnemonicParsing="false"
-                    onAction="#callExecuteAPI" text="Generate"/>
-            <CheckBox mnemonicParsing="false" text="Per result item"/>
+            <Button fx:id="btnGenerate" defaultButton="true" mnemonicParsing="false" onAction="#callExecuteAPI"
+                    text="Generate"/>
+            <CheckBox fx:id="cbResultPerItem" mnemonicParsing="false" text="Per result item"/>
         </HBox>
         <HBox alignment="TOP_RIGHT" layoutX="260.0" prefWidth="230.0">
             <Button fx:id="btnClose" alignment="CENTER_RIGHT" cancelButton="true" contentDisplay="RIGHT"

@@ -2,10 +2,7 @@ package nl.bos.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import nl.bos.AttributeTableColumn;
 import nl.bos.menu.menuitem.action.ExecuteAPIScriptAction;
@@ -19,6 +16,9 @@ public class GenerateAPIScript {
     private TextArea txaTemplate;
     @FXML
     private TextArea txaColumns;
+    @FXML
+    private CheckBox cbResultPerItem;
+
     private TableView result;
 
     @FXML
@@ -28,10 +28,24 @@ public class GenerateAPIScript {
     }
 
     private String generateScript(String template) {
+        if (cbResultPerItem.isSelected()) {
+            StringBuilder templateBuilder = new StringBuilder();
+            for (int rowIndex = 0; rowIndex < result.getItems().size(); rowIndex++) {
+                templateBuilder.append(loopOverColums(rowIndex, template));
+                templateBuilder.append(System.lineSeparator());
+            }
+            template = templateBuilder.toString();
+        } else {
+            template = loopOverColums(result.getSelectionModel().getSelectedIndex(), template);
+        }
+        return template;
+    }
+
+    private String loopOverColums(int rowIndex, String template) {
         List<TableColumn> columns = result.getColumns();
         int columnIndex = 0;
         for (TableColumn column : columns) {
-            String cellData = String.valueOf(((AttributeTableColumn) result.getColumns().get(columnIndex)).getCellData(result.getItems().get(result.getSelectionModel().getSelectedIndex())));
+            String cellData = String.valueOf(((AttributeTableColumn) result.getColumns().get(columnIndex)).getCellData(result.getItems().get(rowIndex)));
             template = template.replace(String.format("{%s}", column.getText()), cellData);
             columnIndex++;
         }
