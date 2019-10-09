@@ -1,95 +1,254 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="845.0" prefWidth="753.0"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="700.0" prefWidth="753.0"
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.UserEditor">
-    <TabPane layoutX="212.0" layoutY="14.0" prefHeight="778.0" prefWidth="476.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="53.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+    <TabPane layoutX="212.0" layoutY="14.0" prefHeight="700.0" prefWidth="476.0" tabClosingPolicy="UNAVAILABLE"
+             AnchorPane.bottomAnchor="53.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
         <Tab text="General">
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="749.0" prefWidth="507.0" style="-fx-border-color: grey;">
-                <CheckBox fx:id="globally_managed" layoutX="122.0" layoutY="14.0" mnemonicParsing="false" AnchorPane.leftAnchor="125.0" />
-                <Label layoutX="14.0" layoutY="14.0" text="Globally managed:"/>
-                <CheckBox fx:id="docbase_owner" layoutX="257.0" layoutY="14.0" mnemonicParsing="false" text="Docbase Owner" AnchorPane.rightAnchor="85.0" />
-                <Label layoutX="14.0" layoutY="42.0" text="Object ID:"/>
-                <TextField fx:id="r_object_id" editable="false" layoutX="122.0" layoutY="38.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <TextField fx:id="r_modify_date" editable="false" layoutX="122.0" layoutY="70.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <Label layoutX="14.0" layoutY="74.0" text="Modify Date:"/>
-                <RadioButton fx:id="userStateActive" layoutX="122.0" layoutY="103.0" mnemonicParsing="false" text="Active" AnchorPane.leftAnchor="125.0">
-               <toggleGroup>
-                  <ToggleGroup fx:id="userState" />
-               </toggleGroup></RadioButton>
-                <RadioButton fx:id="userStateInactive" layoutX="188.0" layoutY="103.0" mnemonicParsing="false" text="Inactive" toggleGroup="$userState" />
-                <Label layoutX="14.0" layoutY="103.0" text="User State:"/>
-                <RadioButton fx:id="userStateLocked" layoutX="257.0" layoutY="103.0" mnemonicParsing="false" text="Locked" toggleGroup="$userState" />
-                <RadioButton fx:id="userStateLockedInactive" layoutX="324.0" layoutY="103.0" mnemonicParsing="false" text="Locked &amp; Inactive" toggleGroup="$userState" />
-                <TextField fx:id="user_name" editable="false" layoutX="122.0" layoutY="132.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <TextField fx:id="user_os_name" layoutX="122.0" layoutY="166.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <TextField fx:id="user_os_domain" layoutX="122.0" layoutY="200.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <ComboBox fx:id="user_source" layoutX="122.0" layoutY="232.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <TextField fx:id="user_address" layoutX="122.0" layoutY="265.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <TextField fx:id="user_db_name" layoutX="122.0" layoutY="297.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <ComboBox fx:id="user_privilege" layoutX="122.0" layoutY="329.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <TextField fx:id="default_group" layoutX="122.0" layoutY="363.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" AnchorPane.topAnchor="363.0" />
-                <TextField fx:id="default_folder" layoutX="122.0" layoutY="396.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" AnchorPane.topAnchor="396.0" />
-                <TextField fx:id="default_acl" layoutX="122.0" layoutY="428.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <ComboBox fx:id="home_docbase" layoutX="122.0" layoutY="462.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <ComboBox fx:id="client_capability" layoutX="122.0" layoutY="494.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <ComboBox fx:id="alias_set" layoutX="122.0" layoutY="526.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <Button layoutX="370.0" layoutY="363.0" mnemonicParsing="false" onAction="#browseDefaultGroup" prefHeight="25.0" prefWidth="65.0" text="Browse" AnchorPane.rightAnchor="10.0" />
-                <Button layoutX="370.0" layoutY="396.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="65.0" text="Browse" AnchorPane.rightAnchor="10.0" />
-                <Button layoutX="370.0" layoutY="428.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="65.0" text="Browse" AnchorPane.rightAnchor="10.0" />
-                <TextField fx:id="description" layoutX="122.0" layoutY="559.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <CheckBox fx:id="workflow_disabled" layoutX="122.0" layoutY="591.0" mnemonicParsing="false" AnchorPane.leftAnchor="125.0" />
-                <TextField fx:id="user_delegation" layoutX="122.0" layoutY="615.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <TextField fx:id="distinguished_name" layoutX="122.0" layoutY="647.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <ComboBox fx:id="user_xprivilege" layoutX="122.0" layoutY="680.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <CheckBox fx:id="failed_auth_attempt" layoutX="122.0" layoutY="712.0" mnemonicParsing="false" AnchorPane.leftAnchor="125.0" />
-                <Label fx:id="failed_auth_attempt_count" layoutX="149.0" layoutY="712.0" prefWidth="35.0"
-                       style="-fx-border-color: grey;" text="0">
-                    <padding>
-                        <Insets bottom="1.0" left="2.0" right="2.0" top="1.0" />
-                    </padding>
-                </Label>
-                <CheckBox fx:id="has_events" layoutX="285.0" layoutY="714.0" mnemonicParsing="false" text="Has Events" AnchorPane.rightAnchor="85.0" />
-                <Label layoutX="14.0" layoutY="136.0" text="Name:"/>
-                <Label layoutX="14.0" layoutY="170.0" text="OS Name:"/>
-                <Label layoutX="14.0" layoutY="204.0" text="OS Domain:"/>
-                <Label layoutX="14.0" layoutY="236.0" text="User Source:"/>
-                <Label layoutX="14.0" layoutY="269.0" text="Email Address:"/>
-                <Label layoutX="14.0" layoutY="301.0" text="DB Name:"/>
-                <Label layoutX="14.0" layoutY="333.0" text="Privileges:"/>
-                <Label layoutX="14.0" layoutY="366.0" text="Default Group:"/>
-                <Label layoutX="14.0" layoutY="400.0" text="Default Folder:"/>
-                <Label layoutX="14.0" layoutY="432.0" text="Default ACL:"/>
-                <Label layoutX="14.0" layoutY="466.0" text="Home Docbase:"/>
-                <Label layoutX="14.0" layoutY="498.0" text="Client Capability:"/>
-                <Label layoutX="14.0" layoutY="530.0" text="Alias Set:"/>
-                <Label layoutX="14.0" layoutY="563.0" text="Description:"/>
-                <Label layoutX="14.0" layoutY="591.0" text="Workflow Disabled:"/>
-                <Label layoutX="14.0" layoutY="619.0" text="User Delegation:"/>
-                <Label layoutX="14.0" layoutY="651.0" text="Distinguished Name:"/>
-                <Label layoutX="14.0" layoutY="684.0" text="Extended Privileges:"/>
-                <Label layoutX="14.0" layoutY="714.0" text="Failed Auth Attempt:"/>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="700.0" prefWidth="507.0"
+                        style="-fx-border-color: grey;">
+                <GridPane layoutX="6.0" prefHeight="651.0" prefWidth="467.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="208.0" minWidth="10.0" prefWidth="120.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="348.0" minWidth="10.0" prefWidth="347.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <children>
+                        <Label text="Globally managed:"/>
+                        <HBox GridPane.columnIndex="1">
+                            <children>
+                                <CheckBox fx:id="globally_managed" mnemonicParsing="false">
+                                    <HBox.margin>
+                                        <Insets right="110.0"/>
+                                    </HBox.margin>
+                                </CheckBox>
+                                <CheckBox fx:id="docbase_owner" mnemonicParsing="false" text="Docbase Owner">
+                                    <HBox.margin>
+                                        <Insets/>
+                                    </HBox.margin>
+                                </CheckBox>
+                            </children>
+                            <padding>
+                                <Insets top="5.0"/>
+                            </padding>
+                        </HBox>
+                        <Label text="Object ID:" GridPane.rowIndex="1"/>
+                        <HBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <children>
+                                <TextField fx:id="r_object_id" editable="false" prefHeight="25.0"/>
+                            </children>
+                        </HBox>
+                        <Label text="Modify Date:" GridPane.rowIndex="2"/>
+                        <HBox GridPane.columnIndex="1" GridPane.rowIndex="2">
+                            <children>
+                                <TextField fx:id="r_modify_date" editable="false" prefHeight="25.0"/>
+                            </children>
+                        </HBox>
+                        <Label text="User State:" GridPane.rowIndex="3"/>
+                        <HBox GridPane.columnIndex="1" GridPane.rowIndex="3">
+                            <children>
+                                <RadioButton fx:id="userStateActive" mnemonicParsing="false" text="Active">
+                                    <toggleGroup>
+                                        <ToggleGroup fx:id="userState"/>
+                                    </toggleGroup>
+                                    <HBox.margin>
+                                        <Insets right="5.0"/>
+                                    </HBox.margin>
+                                </RadioButton>
+                                <RadioButton fx:id="userStateInactive" mnemonicParsing="false" text="Inactive"
+                                             toggleGroup="$userState">
+                                    <HBox.margin>
+                                        <Insets right="5.0"/>
+                                    </HBox.margin>
+                                </RadioButton>
+                                <RadioButton fx:id="userStateLocked" mnemonicParsing="false" text="Locked"
+                                             toggleGroup="$userState">
+                                    <HBox.margin>
+                                        <Insets right="5.0"/>
+                                    </HBox.margin>
+                                </RadioButton>
+                                <RadioButton fx:id="userStateLockedInactive" mnemonicParsing="false"
+                                             text="Locked &amp; Inactive" toggleGroup="$userState"/>
+                            </children>
+                            <padding>
+                                <Insets top="5.0"/>
+                            </padding>
+                        </HBox>
+                        <Label text="Name:" GridPane.rowIndex="4"/>
+                        <TextField fx:id="user_name" editable="false" prefHeight="25.0" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="4"/>
+                        <Label text="OS Name:" GridPane.rowIndex="5"/>
+                        <TextField fx:id="user_os_name" prefHeight="25.0" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="5"/>
+                        <Label text="OS Domain:" GridPane.rowIndex="6"/>
+                        <TextField fx:id="user_os_domain" prefHeight="25.0" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="6"/>
+                        <Label text="User Source:" GridPane.rowIndex="7"/>
+                        <ComboBox fx:id="user_source" prefHeight="25.0" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+                        <Label text="Email Address:" GridPane.rowIndex="8"/>
+                        <TextField fx:id="user_address" prefHeight="25.0" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="8"/>
+                        <Label text="DB Name:" GridPane.rowIndex="9"/>
+                        <TextField fx:id="user_db_name" prefHeight="25.0" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="9"/>
+                        <Label text="Privileges:" GridPane.rowIndex="10"/>
+                        <ComboBox fx:id="user_privilege" prefHeight="25.0" GridPane.columnIndex="1"
+                                  GridPane.rowIndex="10"/>
+                        <HBox GridPane.rowIndex="11">
+                            <children>
+                                <Label text="Default Group:"/>
+                            </children>
+                        </HBox>
+                        <HBox GridPane.columnIndex="1" GridPane.rowIndex="11">
+                            <children>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" onMouseClicked="#emptyDefaultGroupField"
+                                           pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@../icons/delete.gif"/>
+                                    <HBox.margin>
+                                        <Insets right="5.0" top="5.0"/>
+                                    </HBox.margin>
+                                </ImageView>
+                                <TextField fx:id="default_group" prefHeight="25.0">
+                                    <HBox.margin>
+                                        <Insets right="5.0"/>
+                                    </HBox.margin>
+                                </TextField>
+                                <Button mnemonicParsing="false" onAction="#browseDefaultGroup" prefHeight="25.0"
+                                        prefWidth="100.0" text="Browse"/>
+                            </children>
+                        </HBox>
+                        <HBox GridPane.rowIndex="12">
+                            <children>
+                                <Label text="Default Folder:"/>
+                            </children>
+                        </HBox>
+                        <HBox GridPane.columnIndex="1" GridPane.rowIndex="12">
+                            <children>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" onMouseClicked="#emptyDefaultFolderField"
+                                           pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@../icons/delete.gif"/>
+                                    <HBox.margin>
+                                        <Insets right="5.0" top="5.0"/>
+                                    </HBox.margin>
+                                </ImageView>
+                                <TextField fx:id="default_folder" prefHeight="25.0">
+                                    <HBox.margin>
+                                        <Insets right="5.0"/>
+                                    </HBox.margin>
+                                </TextField>
+                                <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Browse"/>
+                            </children>
+                        </HBox>
+                        <HBox GridPane.rowIndex="13">
+                            <children>
+                                <Label text="Default ACL:"/>
+                            </children>
+                        </HBox>
+                        <HBox GridPane.columnIndex="1" GridPane.rowIndex="13">
+                            <children>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" onMouseClicked="#emptyDefaultACLField"
+                                           pickOnBounds="true" preserveRatio="true">
+                                    <Image url="@../icons/delete.gif"/>
+                                    <HBox.margin>
+                                        <Insets right="5.0" top="5.0"/>
+                                    </HBox.margin>
+                                </ImageView>
+                                <TextField fx:id="default_acl" prefHeight="25.0">
+                                    <HBox.margin>
+                                        <Insets right="5.0"/>
+                                    </HBox.margin>
+                                </TextField>
+                                <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="100.0" text="Browse"/>
+                            </children>
+                        </HBox>
+                        <Label text="Home Docbase:" GridPane.rowIndex="14"/>
+                        <ComboBox fx:id="home_docbase" prefHeight="25.0" GridPane.columnIndex="1"
+                                  GridPane.rowIndex="14"/>
+                        <Label text="Client Capability:" GridPane.rowIndex="15"/>
+                        <ComboBox fx:id="client_capability" prefHeight="25.0" GridPane.columnIndex="1"
+                                  GridPane.rowIndex="15"/>
+                        <Label text="Alias Set:" GridPane.rowIndex="16"/>
+                        <ComboBox fx:id="alias_set" prefHeight="25.0" GridPane.columnIndex="1" GridPane.rowIndex="16"/>
+                        <Label text="Description:" GridPane.rowIndex="17"/>
+                        <TextField fx:id="description" prefHeight="25.0" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="17"/>
+                        <Label text="Workflow Disabled:" GridPane.rowIndex="18"/>
+                        <CheckBox fx:id="workflow_disabled" mnemonicParsing="false" GridPane.columnIndex="1"
+                                  GridPane.rowIndex="18"/>
+                        <Label text="User Delegation:" GridPane.rowIndex="19"/>
+                        <HBox GridPane.columnIndex="1" GridPane.rowIndex="19">
+                            <children>
+                                <TextField fx:id="user_delegation" prefHeight="25.0">
+                                    <HBox.margin>
+                                        <Insets right="5.0"/>
+                                    </HBox.margin>
+                                </TextField>
+                                <Button mnemonicParsing="false" onAction="#browseUserDelegation" prefWidth="100.0"
+                                        text="Browse"/>
+                            </children>
+                        </HBox>
+                        <Label text="Distinguished Name:" GridPane.rowIndex="20"/>
+                        <TextField fx:id="distinguished_name" prefHeight="25.0" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="20"/>
+                        <Label text="Extended Privileges:" GridPane.rowIndex="21"/>
+                        <ComboBox fx:id="user_xprivilege" prefHeight="25.0" GridPane.columnIndex="1"
+                                  GridPane.rowIndex="21"/>
+                        <Label text="Failed Auth Attempt:" GridPane.rowIndex="22"/>
+                        <HBox prefWidth="267.0" GridPane.columnIndex="1" GridPane.rowIndex="22">
+                            <children>
+                                <CheckBox fx:id="failed_auth_attempt" mnemonicParsing="false">
+                                    <HBox.margin>
+                                        <Insets right="10.0"/>
+                                    </HBox.margin>
+                                </CheckBox>
+                                <Label fx:id="failed_auth_attempt_count" prefWidth="35.0"
+                                       style="-fx-border-color: grey;" text="0">
+                                    <padding>
+                                        <Insets bottom="1.0" left="2.0" right="2.0" top="1.0"/>
+                                    </padding>
+                                    <HBox.margin>
+                                        <Insets right="130.0"/>
+                                    </HBox.margin>
+                                </Label>
+                                <CheckBox fx:id="has_events" mnemonicParsing="false" text="Has Events"/>
+                            </children>
+                            <padding>
+                                <Insets top="5.0"/>
+                            </padding>
+                        </HBox>
+                    </children>
+                </GridPane>
                 <ImageView fitHeight="32.0" fitWidth="32.0" layoutX="388.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
                     <Image url="@../icons/type/t_dm_user_16.gif" />
                 </ImageView>
-                <ImageView fitHeight="16.0" fitWidth="16.0" layoutX="103.0" layoutY="366.0"
-                           onMouseClicked="#emptyDefaultGroupField" pickOnBounds="true" preserveRatio="true"
-                           AnchorPane.leftAnchor="105.0" AnchorPane.topAnchor="367.0">
-                    <Image url="@../icons/delete.gif"/>
-                </ImageView>
-                <ImageView fitHeight="16.0" fitWidth="16.0" onMouseClicked="#emptyDefaultFolderField"
-                           pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="105.0"
-                           AnchorPane.topAnchor="400.0">
-                    <Image url="@../icons/delete.gif"/>
-                </ImageView>
-                <ImageView fitHeight="16.0" fitWidth="16.0" onMouseClicked="#emptyDefaultACLField" pickOnBounds="true"
-                           preserveRatio="true" AnchorPane.leftAnchor="105.0" AnchorPane.topAnchor="432.0">
-                    <Image url="@../icons/delete.gif"/>
-                </ImageView>
-            <Button layoutX="400.0" layoutY="615.0" mnemonicParsing="false" onAction="#browseUserDelegation" prefWidth="65.0" text="Browse" AnchorPane.rightAnchor="10.0" />
             </AnchorPane>
         </Tab>
         <Tab text="Advanced">
@@ -108,7 +267,8 @@
                 <TextField fx:id="last_login_utc_time" editable="false" layoutX="176.0" layoutY="309.0" prefHeight="25.0" prefWidth="215.0" AnchorPane.leftAnchor="175.0" />
                 <TextField fx:id="deactivated_utc_time" editable="false" layoutX="176.0" layoutY="342.0" prefHeight="25.0" prefWidth="215.0" AnchorPane.leftAnchor="175.0" />
                 <TextField fx:id="deactivated_ip_address" layoutX="124.0" layoutY="375.0" prefHeight="25.0" prefWidth="265.0" AnchorPane.leftAnchor="125.0" />
-                <ListView fx:id="restricted_folder_ids" layoutX="124.0" layoutY="409.0" prefHeight="326.0" prefWidth="265.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="125.0" />
+                <ListView fx:id="restricted_folder_ids" layoutX="128.0" layoutY="408.0" prefHeight="237.0"
+                          prefWidth="265.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="127.0"/>
                 <Button layoutX="373.0" layoutY="46.0" mnemonicParsing="false" onAction="#browseUserAdministrator" prefWidth="65.0" text="Browse" AnchorPane.rightAnchor="10.0" />
                 <Button layoutX="369.0" layoutY="408.0" mnemonicParsing="false" prefWidth="65.0" text="Browse" AnchorPane.rightAnchor="10.0" />
                 <Label layoutX="14.0" layoutY="50.0" text="User Administrator:"/>
@@ -141,15 +301,15 @@
             AnchorPane.leftAnchor="491.0"/>
     <Button defaultButton="true" layoutX="629.0" layoutY="854.0" mnemonicParsing="false" onAction="#closeWindow"
             prefWidth="80.0" text="Exit" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0"/>
-    <AnchorPane layoutX="226.0" layoutY="18.0" prefHeight="778.0" prefWidth="245.0" AnchorPane.leftAnchor="14.0"
-                AnchorPane.topAnchor="14.0">
-        <Label text="User:" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="8.0"/>
+    <AnchorPane layoutX="14.0" layoutY="14.0" prefHeight="750.0" prefWidth="245.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.topAnchor="0.0">
+        <Label text="User:" AnchorPane.leftAnchor="8.0" AnchorPane.topAnchor="8.0"/>
         <TextField fx:id="userFilter" onKeyReleased="#updateUserFilter" prefWidth="180.0" AnchorPane.leftAnchor="50.0"
                    AnchorPane.topAnchor="5.0"/>
-        <ListView fx:id="userList" prefHeight="745.0" prefWidth="180.0" AnchorPane.bottomAnchor="5.0"
+        <ListView fx:id="userList" prefHeight="609.0" prefWidth="180.0" AnchorPane.bottomAnchor="53.0"
                   AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="38.0"/>
-        <Label fx:id="userListCount" prefWidth="35.0" style="-fx-border-color: grey;" text="0"
-               AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0">
+        <Label fx:id="userListCount" layoutX="10.0" layoutY="626.0" prefWidth="35.0" style="-fx-border-color: grey;"
+               text="0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="10.0">
             <padding>
                 <Insets bottom="1.0" left="2.0" right="2.0" top="1.0"/>
             </padding>
