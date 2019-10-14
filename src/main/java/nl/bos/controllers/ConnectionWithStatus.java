@@ -205,7 +205,10 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         btnConnect.setManaged(!session.isConnected());
 
         Menu menuLoaderController = (Menu) Controllers.get(Menu.class.getSimpleName());
-        menuLoaderController.getMenubar().setDisable(!session.isConnected());
+        menuLoaderController.getMenuAdmin().setDisable(!session.isConnected());
+        menuLoaderController.getMenuInfo().setDisable(!session.isConnected());
+        menuLoaderController.getMenuSpecial().setDisable(!session.isConnected());
+        menuLoaderController.getMenuTools().setDisable(!session.isConnected());
     }
 
     private String getClientCapabilityLabel(int clientCapability) {
@@ -249,7 +252,10 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
         btnConnect.setManaged(true);
 
         Menu menuLoaderController = (Menu) Controllers.get(Menu.class.getSimpleName());
-        menuLoaderController.getMenubar().setDisable(true);
+        menuLoaderController.getMenuAdmin().setDisable(true);
+        menuLoaderController.getMenuInfo().setDisable(true);
+        menuLoaderController.getMenuSpecial().setDisable(true);
+        menuLoaderController.getMenuTools().setDisable(true);
     }
 
     @FXML

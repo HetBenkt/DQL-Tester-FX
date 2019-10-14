@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" minHeight="200.0" minWidth="400.0"
+            xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.About">
+    <center>
+        <HBox BorderPane.alignment="CENTER">
+            <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                <HBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </HBox.margin>
+                <Image url="@../icons/logo_16.gif"/>
+            </ImageView>
+            <VBox spacing="10.0">
+                <HBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                </HBox.margin>
+                <Label text="DQL Tester FX">
+                    <font>
+                        <Font name="System Bold" size="30.0"/>
+                    </font>
+                </Label>
+                <HBox>
+                    <TextField fx:id="txtVersion" text="Version"/>
+                    <Hyperlink fx:id="hlWhatsNew" text="What's new"/>
+                </HBox>
+                <TextArea prefHeight="65.0" prefWidth="350.0"
+                          text="DQL Tester FX is created and maintained by a team of Documentum developers that work together to add a best of all maintenance tool for the community"
+                          wrapText="true"/>
+                <Hyperlink fx:id="hlFeedback" text="Send feedback?"/>
+                <Hyperlink fx:id="hlContribute" text="Want to help?"/>
+            </VBox>
+        </HBox>
+    </center>
+    <bottom>
+        <HBox BorderPane.alignment="CENTER">
+            <children>
+                <Hyperlink fx:id="hlLicense" text="License information"/>
+            </children>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </HBox>
+    </bottom>
+</BorderPane>

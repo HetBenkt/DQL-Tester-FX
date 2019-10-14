@@ -256,11 +256,11 @@ public class Resources {
         return fxmlLoader;
     }
 
-    public String getProjectVersion() {
+    public String getProjectProperty(String property) {
         try {
             final Properties properties = new Properties();
             properties.load(getClass().getClassLoader().getResourceAsStream("project.properties"));
-            return properties.getProperty("version");
+            return properties.getProperty(property);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }

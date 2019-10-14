@@ -3,8 +3,8 @@ package nl.bos.controllers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import nl.bos.Repository;
@@ -17,7 +17,14 @@ import static nl.bos.Constants.ROOT_SCENE_CSS;
 
 public class Menu {
     @FXML
-    private MenuBar menubar;
+    private javafx.scene.control.Menu menuTools;
+    @FXML
+    private javafx.scene.control.Menu menuAdmin;
+    @FXML
+    private javafx.scene.control.Menu menuInfo;
+    @FXML
+    private javafx.scene.control.Menu menuSpecial;
+
     private final Repository repository = Repository.getInstance();
 
     private final DescribeObjectAction describeObjectAction;
@@ -33,16 +40,15 @@ public class Menu {
     @FXML
     private void initialize() {
         if (repository.isConnected()) {
-            menubar.setDisable(false);
+            menuTools.setDisable(true);
+            menuAdmin.setDisable(true);
+            menuInfo.setDisable(true);
+            menuSpecial.setDisable(true);
         }
     }
 
     MenuItem getMiExportResults() {
         return miExportResults;
-    }
-
-    MenuBar getMenubar() {
-        return menubar;
     }
 
     @FXML
@@ -119,4 +125,29 @@ public class Menu {
         new ManageWorkflowsAction();
     }
 
+    public void about(ActionEvent actionEvent) {
+        Stage aboutStage = new Stage();
+        aboutStage.setTitle("About DQL Tester FX");
+        Resources resources = new Resources();
+        BorderPane aboutPane = (BorderPane) resources.loadFXML("/nl/bos/views/About.fxml");
+        aboutStage.setScene(new Scene(aboutPane));
+        aboutStage.getScene().getStylesheets().addAll(ROOT_SCENE_CSS);
+        aboutStage.showAndWait();
+    }
+
+    public javafx.scene.control.Menu getMenuTools() {
+        return menuTools;
+    }
+
+    public javafx.scene.control.Menu getMenuAdmin() {
+        return menuAdmin;
+    }
+
+    public javafx.scene.control.Menu getMenuInfo() {
+        return menuInfo;
+    }
+
+    public javafx.scene.control.Menu getMenuSpecial() {
+        return menuSpecial;
+    }
 }

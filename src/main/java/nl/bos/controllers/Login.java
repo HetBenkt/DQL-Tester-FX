@@ -71,7 +71,7 @@ public class Login {
             chbSecureMode.setValue(chbSecureMode.getItems().get(0));
 
             setFieldsConnect(repository.isConnected());
-            lblVersion.setText(new Resources().getProjectVersion());
+            lblVersion.setText(new Resources().getProjectProperty("version"));
 
             ttUsername.setText("Enter a user name");
             ttPassword.setText("Enter the user password");
