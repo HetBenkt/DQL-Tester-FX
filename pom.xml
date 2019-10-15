@@ -6,7 +6,7 @@
 
     <groupId>nl.bos</groupId>
     <artifactId>DQLTesterFX</artifactId>
-    <version>v0.3-alpha</version>
+    <version>v0.4-alpha</version>
     <repositories>
         <repository>
             <id>sonatype-snapshots</id>

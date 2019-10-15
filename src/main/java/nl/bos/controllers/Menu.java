@@ -13,9 +13,18 @@ import nl.bos.menu.menuitem.action.*;
 import nl.bos.utils.Controllers;
 import nl.bos.utils.Resources;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import static nl.bos.Constants.ROOT_SCENE_CSS;
 
 public class Menu {
+    private static final Logger LOGGER = Logger.getLogger(Menu.class.getName());
+
     @FXML
     private javafx.scene.control.Menu menuTools;
     @FXML
@@ -24,8 +33,13 @@ public class Menu {
     private javafx.scene.control.Menu menuInfo;
     @FXML
     private javafx.scene.control.Menu menuSpecial;
+    @FXML
+    private javafx.scene.control.MenuItem menuItemHelp;
+    @FXML
+    private javafx.scene.control.MenuItem menuShortcutKeys;
 
     private final Repository repository = Repository.getInstance();
+    private Resources resources = new Resources();
 
     private final DescribeObjectAction describeObjectAction;
     @FXML
@@ -100,7 +114,6 @@ public class Menu {
     private void getAttributes() {
         Stage getAttributesStage = new Stage();
         getAttributesStage.setTitle(String.format("Attributes List - %s (%s)", "ID", repository.getRepositoryName()));
-        Resources resources = new Resources();
         VBox getAttributesPane = (VBox) resources.loadFXML("/nl/bos/views/GetAttributes.fxml");
         getAttributesStage.setScene(new Scene(getAttributesPane));
         getAttributesStage.getScene().getStylesheets()
@@ -128,7 +141,6 @@ public class Menu {
     public void about(ActionEvent actionEvent) {
         Stage aboutStage = new Stage();
         aboutStage.setTitle("About DQL Tester FX");
-        Resources resources = new Resources();
         BorderPane aboutPane = (BorderPane) resources.loadFXML("/nl/bos/views/About.fxml");
         aboutStage.setScene(new Scene(aboutPane));
         aboutStage.getScene().getStylesheets().addAll(ROOT_SCENE_CSS);
@@ -149,5 +161,21 @@ public class Menu {
 
     public javafx.scene.control.Menu getMenuSpecial() {
         return menuSpecial;
+    }
+
+    public void help() {
+        showLink("url.help");
+    }
+
+    public void shortcutKeys() {
+        showLink("url.shortcut_keys");
+    }
+
+    private void showLink(String url) {
+        try {
+            Desktop.getDesktop().browse(new URI(resources.getProjectProperty(url)));
+        } catch (IOException | URISyntaxException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        }
     }
 }

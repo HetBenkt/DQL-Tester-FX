@@ -34,8 +34,9 @@
                 <MenuItem mnemonicParsing="false" onAction="#disableSQLTrace" text="Disable SQL Trace"/>
             </Menu>
             <Menu fx:id="menuHelp" mnemonicParsing="false" text="Help">
-                <!--<MenuItem mnemonicParsing="false" onAction="#help" text="DQL Tester FX Help"/>-->
-                <!--<MenuItem mnemonicParsing="false" onAction="#shortcutKeys" text="Shortcut Keys"/>-->
+                <MenuItem fx:id="menuItemHelp" mnemonicParsing="false" onAction="#help" text="DQL Tester FX Help"/>
+                <MenuItem fx:id="menuShortcutKeys" mnemonicParsing="false" onAction="#shortcutKeys"
+                          text="Shortcut Keys"/>
                 <MenuItem mnemonicParsing="false" onAction="#about" text="About DQL Tester FX"/>
             </Menu>
         </MenuBar>
