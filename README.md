@@ -28,13 +28,14 @@ The 'FX' postfix in the title makes it clear we use the new JavaFX technology to
 ### How to run the application:
 1. Download the latest [release](https://github.com/HetBenkt/DQL-Tester-FX/releases) to the local drive from
 2. In the download directory create a sub directory named: `lib`
-3. Copy the following DFC jar files in this `lib` directory
+3. Copy the following DFC (minimal) jar files in this `lib` directory
     * aspectjrt.jar
     * certj.jar
     * commons-lang-2.4.jar
     * cryptoj.jar
     * dfc.jar
     * log4j.jar
+    * jaxb-api.jar
     * bpm_infra.jar (BPM / Process Engine)
 4. Copy the following jar files in this `lib` directory from the download locations
     * [json-20180813.jar](http://central.maven.org/maven2/org/json/json/20180813/json-20180813.jar)
