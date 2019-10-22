@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="700.0" prefWidth="753.0"
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="750.0" prefWidth="753.0"
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="nl.bos.controllers.UserEditor">
     <TabPane layoutX="212.0" layoutY="14.0" prefHeight="700.0" prefWidth="476.0" tabClosingPolicy="UNAVAILABLE"
              AnchorPane.bottomAnchor="53.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
@@ -301,15 +301,15 @@
             AnchorPane.leftAnchor="491.0"/>
     <Button defaultButton="true" layoutX="629.0" layoutY="854.0" mnemonicParsing="false" onAction="#closeWindow"
             prefWidth="80.0" text="Exit" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0"/>
-    <AnchorPane layoutX="14.0" layoutY="14.0" prefHeight="750.0" prefWidth="245.0" AnchorPane.leftAnchor="0.0"
+    <AnchorPane layoutX="44.0" layoutY="14.0" prefHeight="700.0" prefWidth="201.0" AnchorPane.leftAnchor="0.0"
                 AnchorPane.topAnchor="0.0">
         <Label text="User:" AnchorPane.leftAnchor="8.0" AnchorPane.topAnchor="8.0"/>
         <TextField fx:id="userFilter" onKeyReleased="#updateUserFilter" prefWidth="180.0" AnchorPane.leftAnchor="50.0"
                    AnchorPane.topAnchor="5.0"/>
-        <ListView fx:id="userList" prefHeight="609.0" prefWidth="180.0" AnchorPane.bottomAnchor="53.0"
+        <ListView fx:id="userList" prefHeight="660.0" prefWidth="180.0" AnchorPane.bottomAnchor="2.0"
                   AnchorPane.leftAnchor="50.0" AnchorPane.topAnchor="38.0"/>
-        <Label fx:id="userListCount" layoutX="10.0" layoutY="626.0" prefWidth="35.0" style="-fx-border-color: grey;"
-               text="0" AnchorPane.bottomAnchor="53.0" AnchorPane.leftAnchor="10.0">
+        <Label fx:id="userListCount" layoutX="8.0" layoutY="665.0" prefWidth="35.0" style="-fx-border-color: grey;"
+               text="0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="8.0">
             <padding>
                 <Insets bottom="1.0" left="2.0" right="2.0" top="1.0"/>
             </padding>
