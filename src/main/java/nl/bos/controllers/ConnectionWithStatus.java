@@ -172,7 +172,7 @@ public class ConnectionWithStatus implements EventHandler<WindowEvent> {
     private void updateNodes(IDfSession session) throws DfException {
         IDfUser user = session.getUser(session.getLoginUserName());
 
-        lblStatus.setText(session.getDocbaseName());
+        lblStatus.setText(session.getDocbaseName()+"."+session.getServerConfig().getString("object_name"));
         ttStatus.setText(String.format("Connected repository: %s\nRepository hostname: %s\nRepository ID: %s\nConnection Broker hostname: %s\nConnection Broker port: %s", session.getDocbaseName(), repository.obtainServerMap(session.getDocbaseName()).getString("i_host_name"), session.getDocbaseId(), repository.obtainRepositoryMap().getRepeatingString("i_host_name", 0), repository.obtainRepositoryMap().getRepeatingString("i_port_number", 0)));
 
         lblUsernameOS.setText(user.getUserOSName());

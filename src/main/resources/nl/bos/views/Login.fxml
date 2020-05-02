@@ -17,7 +17,7 @@
             <Insets />
         </VBox.margin>
         <Label text="Repository" />
-        <ChoiceBox fx:id="chbRepository" maxWidth="1.7976931348623157E308" />
+        <ComboBox fx:id="chbRepository" maxWidth="1.7976931348623157E308" />
         <Label text="User Name" />
         <TextField fx:id="txtUsername" maxWidth="1.7976931348623157E308" onKeyReleased="#handleConnectButton">
          <tooltip>
