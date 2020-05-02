@@ -37,7 +37,7 @@ public class Login {
     @FXML
     private Label lblServer;
     @FXML
-    private ChoiceBox<String> chbRepository;
+    private ComboBox<String> chbRepository;
     @FXML
     private Button btnLogin;
     @FXML
@@ -91,9 +91,24 @@ public class Login {
                     chbRepository.getItems().clear();
                     for (int i = 0; i < repositoryMap.getDocbaseCount(); i++) {
                         LOGGER.info(MessageFormat.format("Repository {0}: {1}", i + 1, repositoryMap.getDocbaseName(i)));
-                        chbRepository.getItems().add(repositoryMap.getDocbaseName(i));
+                        
+                        IDfTypedObject ob=repositoryMap.getServerMapByName(repositoryMap.getDocbaseName(i)); 
+                        LOGGER.info(MessageFormat.format("Total number of servers: {0}", ob.getValueCount("r_server_name")));
+                        
+                        if (ob.getValueCount("r_server_name")>1) {
+	                        for (int j=0; j<ob.getValueCount("r_server_name"); j++) {
+	                        	chbRepository.getItems().add(repositoryMap.getDocbaseName(i)+"."+ob.getRepeatingString("r_server_name", j));
+	                        }
+                        }else {
+                        	chbRepository.getItems().add(repositoryMap.getDocbaseName(i));
+                        	for (int j=1;j<3;j++) {
+                        		chbRepository.getItems().add("repo0"+j);
+                        	}
+	                    }
                     }
-
+                    if (chbRepository.getItems().size()>5) {
+                    	chbRepository.setVisibleRowCount(5);
+                    }
                     chbRepository.setValue(chbRepository.getItems().get(0));
                 }
             }

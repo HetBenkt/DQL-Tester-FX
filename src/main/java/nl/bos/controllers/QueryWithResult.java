@@ -104,7 +104,8 @@ public class QueryWithResult {
 
         statement.setOnKeyPressed(event -> {
             final KeyCombination keyCombination = new KeyCodeCombination(KeyCode.F9, KeyCombination.SHIFT_DOWN);
-
+            final KeyCombination keyCombinationAlt = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.CONTROL_DOWN);
+            
             if (Repository.getInstance().isConnected()) {
                 if (keyCombination.match(event)) {
                     executeQuery(statement.getSelectedText());
@@ -112,6 +113,9 @@ public class QueryWithResult {
                 } else if (event.getCode() == KeyCode.F9) {
                     executeQuery(statement.getText());
                     appendNewQueryToHistory(statement.getText(), jsonObject);
+                } else if (keyCombinationAlt.match(event)) {
+	                executeQuery(statement.getText());
+	                appendNewQueryToHistory(statement.getSelectedText(), jsonObject);
                 }
             }
 
